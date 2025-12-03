@@ -1,0 +1,22 @@
+{
+  "name": "spectre-payment",
+  "version": "1.0.0",
+  "description": "Spectre Tech Limited - M-Pesa Payment System",
+  "type": "module",
+  "engines": {
+    "node": "18.x"
+  },
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'No build step required'",
+    "start": "vercel dev"
+  },
+  "author": "Spectre Tech Limited",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.8.4"
+  },
+  "devDependencies": {
+    "vercel": "^37.0.0"
+  }
+}

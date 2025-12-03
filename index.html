@@ -879,7 +879,7 @@
                         <span>Waiting for confirmation...</span>
                     </div>
                     <div class="text-gray-500 text-xs">
-                        <span id="countdown">30</span> seconds remaining
+                        <span id="countdown">60</span> seconds remaining
                     </div>
                 </div>
 
@@ -1042,7 +1042,7 @@
         });
 
         // Pay button click
-        payBtn.addEventListener('click', () => {
+        payBtn.addEventListener('click', async () => {
             const phone = phoneInput.value;
             const amount = amountInput.value;
             const reason = reasonInput.value.trim();
@@ -1075,56 +1075,167 @@
             step2.classList.remove('hidden');
             displayPhone.textContent = formatPhone(phone);
 
-            // Countdown timer
-            let timeLeft = 30;
+            // Start countdown timer
+            let timeLeft = 60;
             const timer = setInterval(() => {
                 timeLeft--;
                 countdown.textContent = timeLeft;
                 
                 if (timeLeft <= 0) {
                     clearInterval(timer);
+                    handlePaymentFailure('Payment request timed out. Please try again.');
                 }
             }, 1000);
 
-            // Simulate processing (5-8 seconds)
-            const processingTime = 5000 + Math.random() * 3000;
-            setTimeout(() => {
+            try {
+                // Get the API base URL (same origin for Vercel deployment)
+                const apiBaseUrl = window.location.origin;
+                
+                // Format phone for API (remove spaces, ensure format)
+                const cleanPhone = phone.replace(/\s/g, '');
+                const formattedPhone = cleanPhone.startsWith('0') ? cleanPhone : '0' + cleanPhone;
+
+                // Send STK Push request
+                console.log('📱 Sending STK Push request...');
+                const stkResponse = await fetch(`${apiBaseUrl}/api/stkpush`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        phoneNumber: formattedPhone,
+                        amount: parseInt(amount),
+                        accountReference: 'Spectre Tech',
+                        transactionDesc: reason.substring(0, 30) // Max 30 chars
+                    })
+                });
+
+                const stkData = await stkResponse.json();
+                console.log('STK Response:', stkData);
+
+                if (!stkData.success) {
+                    clearInterval(timer);
+                    handlePaymentFailure(stkData.error || 'Failed to send payment request');
+                    return;
+                }
+
+                const checkoutRequestID = stkData.checkoutRequestID;
+                console.log('✅ STK Push sent! CheckoutRequestID:', checkoutRequestID);
+
+                // Poll for payment status
+                let pollCount = 0;
+                const maxPolls = 12; // 12 polls x 5 seconds = 60 seconds
+                
+                const pollInterval = setInterval(async () => {
+                    pollCount++;
+                    console.log(`🔄 Polling payment status... (${pollCount}/${maxPolls})`);
+
+                    try {
+                        const queryResponse = await fetch(`${apiBaseUrl}/api/query`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ checkoutRequestID })
+                        });
+
+                        const queryData = await queryResponse.json();
+                        console.log('Query Response:', queryData);
+
+                        if (queryData.status === 'success') {
+                            clearInterval(timer);
+                            clearInterval(pollInterval);
+                            await handlePaymentSuccess(phone, amount, reason);
+                        } else if (queryData.status === 'cancelled') {
+                            clearInterval(timer);
+                            clearInterval(pollInterval);
+                            handlePaymentFailure('Payment was cancelled by user.');
+                        } else if (queryData.status === 'failed') {
+                            clearInterval(timer);
+                            clearInterval(pollInterval);
+                            handlePaymentFailure(queryData.message || 'Payment failed.');
+                        } else if (queryData.status === 'timeout') {
+                            clearInterval(timer);
+                            clearInterval(pollInterval);
+                            handlePaymentFailure('Payment request timed out. Please try again.');
+                        }
+                        // If still pending, continue polling
+
+                    } catch (queryError) {
+                        console.error('Query error:', queryError);
+                    }
+
+                    // Stop polling after max attempts
+                    if (pollCount >= maxPolls) {
+                        clearInterval(timer);
+                        clearInterval(pollInterval);
+                        handlePaymentFailure('Payment verification timed out. If you completed the payment, please contact support.');
+                    }
+                }, 5000); // Poll every 5 seconds
+
+            } catch (error) {
                 clearInterval(timer);
-                
-                // Hide step 2 and show step 1 again
-                step2.classList.add('hidden');
-                step1.classList.remove('hidden');
-                
-                // Get current time
-                const now = new Date();
-                const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
-                const receiptCode = generateReceiptCode();
-                
-                // Store payment data for printing
-                currentPaymentData = {
-                    amount: formatAmount(amount),
-                    phone: formatPhone(phone),
-                    reason: reason,
-                    date: getCurrentDate(),
-                    time: timeStr,
-                    code: receiptCode
-                };
-                
-                // Populate and show success modal
-                modalAmount.textContent = currentPaymentData.amount;
-                modalPhone.textContent = currentPaymentData.phone;
-                modalReason.textContent = currentPaymentData.reason;
-                modalDate.textContent = currentPaymentData.date;
-                modalTime.textContent = currentPaymentData.time;
-                modalCode.textContent = currentPaymentData.code;
-                successModal.classList.add('show');
-                
-                // Reset form
-                phoneInput.value = '';
-                amountInput.value = '';
-                reasonInput.value = '';
-            }, processingTime);
+                console.error('Payment error:', error);
+                handlePaymentFailure(error.message || 'Failed to process payment. Please try again.');
+            }
         });
+
+        // Handle payment failure
+        function handlePaymentFailure(message) {
+            step2.classList.add('hidden');
+            step1.classList.remove('hidden');
+            
+            // Show error alert
+            alert('❌ Payment Failed\n\n' + message);
+        }
+
+        // Handle payment success
+        async function handlePaymentSuccess(phone, amount, reason) {
+            // Hide step 2 and show step 1 again
+            step2.classList.add('hidden');
+            step1.classList.remove('hidden');
+            
+            // Get current time
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
+            const receiptCode = generateReceiptCode();
+            
+            // Store payment data for printing
+            currentPaymentData = {
+                amount: formatAmount(amount),
+                amountRaw: parseInt(amount),
+                phone: formatPhone(phone),
+                phoneRaw: phone.replace(/\s/g, ''),
+                reason: reason,
+                date: getCurrentDate(),
+                time: timeStr,
+                code: receiptCode
+            };
+
+            // Save payment to Firebase
+            if (window.savePaymentToFirebase) {
+                const result = await window.savePaymentToFirebase(currentPaymentData);
+                if (result.success) {
+                    console.log("✅ Payment saved to Firebase:", result.id);
+                } else {
+                    console.error("❌ Failed to save payment:", result.error);
+                }
+            }
+            
+            // Populate and show success modal
+            modalAmount.textContent = currentPaymentData.amount;
+            modalPhone.textContent = currentPaymentData.phone;
+            modalReason.textContent = currentPaymentData.reason;
+            modalDate.textContent = currentPaymentData.date;
+            modalTime.textContent = currentPaymentData.time;
+            modalCode.textContent = currentPaymentData.code;
+            successModal.classList.add('show');
+            
+            // Reset form
+            phoneInput.value = '';
+            amountInput.value = '';
+            reasonInput.value = '';
+        }
 
         // Modal copy button click
         modalCopyBtn.addEventListener('click', async () => {
@@ -1381,28 +1492,42 @@
     </script>
 
 
-<script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+<!-- Firebase API Script -->
+<script type="module" src="js/firebase-api.js"></script>
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyB2CXyFin6LNLTXe4C_Dj8HrAkwIhbuQPs",
-    authDomain: "spectre-payment.firebaseapp.com",
-    projectId: "spectre-payment",
-    storageBucket: "spectre-payment.firebasestorage.app",
-    messagingSenderId: "384792827904",
-    appId: "1:384792827904:web:4a08eed1fe885f9cab60e5",
-    measurementId: "G-J0BZ9STKZ1"
-  };
+<!-- Helper functions for payment flow -->
+<script>
+    // Wait for FirebaseAPI to be available
+    function waitForFirebaseAPI(callback) {
+        if (window.FirebaseAPI) {
+            callback();
+        } else {
+            setTimeout(() => waitForFirebaseAPI(callback), 100);
+        }
+    }
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
+    // Test Firebase connection (can be called from console)
+    window.testFirebaseConnection = function() {
+        waitForFirebaseAPI(async () => {
+            const result = await window.FirebaseAPI.testConnection();
+            if (result.success) {
+                alert("✅ Firebase connected successfully!\nDocument ID: " + result.id);
+            } else {
+                alert("❌ Firebase connection failed!\nError: " + result.error);
+            }
+        });
+    };
+
+    // Save payment to Firebase
+    window.savePaymentToFirebase = async function(paymentData) {
+        if (!window.FirebaseAPI) {
+            console.error("FirebaseAPI not loaded yet");
+            return { success: false, error: "API not ready" };
+        }
+        return await window.FirebaseAPI.savePayment(paymentData);
+    };
+
+    console.log("🔗 Firebase helper functions loaded");
 </script>
 
 
