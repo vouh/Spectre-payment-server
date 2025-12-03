@@ -597,32 +597,53 @@
         /* Download Toast Notification */
         .download-toast {
             position: fixed;
-            bottom: 20px;
+            bottom: 25px;
             left: 50%;
             transform: translateX(-50%) translateY(100px);
             background: linear-gradient(135deg, #3cb371, #2d9a5e);
             color: white;
-            padding: 12px 24px;
-            border-radius: 10px;
-            font-size: 14px;
+            padding: 14px 28px;
+            border-radius: 50px;
+            font-size: 13px;
             font-weight: 600;
-            box-shadow: 0 4px 20px rgba(60, 179, 113, 0.4);
+            box-shadow: 
+                0 4px 25px rgba(60, 179, 113, 0.5),
+                0 0 40px rgba(60, 179, 113, 0.3),
+                0 0 60px rgba(60, 179, 113, 0.2);
             z-index: 3000;
             opacity: 0;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            white-space: nowrap;
         }
 
         .download-toast.show {
             transform: translateX(-50%) translateY(0);
             opacity: 1;
+            animation: toastGlow 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes toastGlow {
+            from {
+                box-shadow: 
+                    0 4px 25px rgba(60, 179, 113, 0.5),
+                    0 0 40px rgba(60, 179, 113, 0.3),
+                    0 0 60px rgba(60, 179, 113, 0.2);
+            }
+            to {
+                box-shadow: 
+                    0 4px 30px rgba(60, 179, 113, 0.7),
+                    0 0 50px rgba(60, 179, 113, 0.4),
+                    0 0 80px rgba(60, 179, 113, 0.3);
+            }
         }
 
         .download-toast svg {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
         }
 
         /* Success Modal Overlay */
@@ -814,7 +835,7 @@
                         </button>
                     </div>
 
-                    <div class="flex items-center justify-center gap-3 text-gray-400 text-xs mt-2">
+                    <div class="flex items-center justify-center gap-3 text-gray-400 text-xs mt-3">
                         <div class="flex items-center gap-1">
                             <svg class="w-4 h-4 text-[#3cb371]" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>
@@ -1246,7 +1267,7 @@
                 doc.setFontSize(6);
                 doc.setFont('helvetica', 'normal');
                 doc.text('Thank you for your payment!', 40, y, { align: 'center' });
-                doc.text('support@specter.com', 40, y + 4, { align: 'center' });
+                doc.text('spectretechlimited@gmail.com | 0741739262', 40, y + 4, { align: 'center' });
 
                 // M-Pesa badge
                 doc.setFillColor(76, 175, 80);
