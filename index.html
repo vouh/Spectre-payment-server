@@ -279,54 +279,93 @@
         /* Mobile Responsive */
         @media (max-width: 640px) {
             .card-3d {
-                padding: 1.5rem !important;
-                border-radius: 1.5rem !important;
+                padding: 1rem !important;
+                border-radius: 1.25rem !important;
             }
 
             .glow-green {
-                box-shadow: 0 0 15px rgba(60, 179, 113, 0.3), 0 0 20px rgba(45, 74, 94, 0.2);
+                box-shadow: 0 0 10px rgba(60, 179, 113, 0.25), 0 0 15px rgba(45, 74, 94, 0.15);
             }
 
             .floating img {
-                width: 5rem !important;
-                height: 5rem !important;
+                width: 3.5rem !important;
+                height: 3.5rem !important;
             }
 
             #liveTime {
-                font-size: 1.25rem !important;
+                font-size: 1rem !important;
             }
 
             #liveDate {
-                font-size: 0.75rem !important;
+                font-size: 0.65rem !important;
             }
 
             .theme-toggle {
-                width: 50px;
-                height: 26px;
+                width: 44px;
+                height: 22px;
             }
 
             .theme-toggle-ball {
-                width: 20px;
-                height: 20px;
+                width: 16px;
+                height: 16px;
             }
 
             .theme-toggle.light .theme-toggle-ball {
-                transform: translateX(24px);
+                transform: translateX(22px);
             }
 
             .mobile-website-btn {
                 display: flex !important;
+            }
+
+            .compact-input {
+                padding: 0.625rem 0.75rem !important;
+                font-size: 0.9rem !important;
+            }
+
+            .compact-btn {
+                padding: 0.625rem 1rem !important;
+                font-size: 0.9rem !important;
+            }
+
+            .mb-8 {
+                margin-bottom: 1rem !important;
+            }
+
+            .mb-6 {
+                margin-bottom: 0.75rem !important;
+            }
+
+            .space-y-6 > * + * {
+                margin-top: 0.75rem !important;
+            }
+
+            .text-2xl {
+                font-size: 1.1rem !important;
+            }
+
+            .text-xl {
+                font-size: 1rem !important;
+            }
+
+            .text-lg {
+                font-size: 0.9rem !important;
             }
         }
 
         /* Tablet and Desktop */
         @media (min-width: 641px) {
             .card-3d {
-                padding: 2.5rem !important;
+                padding: 1.5rem !important;
             }
 
             .mobile-website-btn {
                 display: none !important;
+            }
+
+            .floating img {
+                width: 4.5rem !important;
+                height: 4.5rem !important;
             }
         }
     </style>
@@ -336,15 +375,15 @@
     <div id="particles" class="fixed inset-0 pointer-events-none z-0"></div>
     
     <!-- Main Container -->
-    <div class="min-h-screen flex items-center justify-center p-4 perspective-1000 relative z-10">
-        <div class="max-w-lg w-full preserve-3d">
+    <div class="min-h-screen flex items-center justify-center p-2 perspective-1000 relative z-10">
+        <div class="max-w-sm w-full preserve-3d">
             
             <!-- Header with Date/Time and Theme Toggle -->
-            <div class="flex items-center justify-between mb-6 px-2">
+            <div class="flex items-center justify-between mb-3 px-1">
                 <!-- Live Date/Time Display -->
                 <div class="text-center">
-                    <div id="liveTime" class="text-2xl font-bold text-white">12:00:00</div>
-                    <div id="liveDate" class="text-sm text-[#3cb371] font-medium">3 Dec 2025 WED</div>
+                    <div id="liveTime" class="text-lg font-bold text-white">12:00:00</div>
+                    <div id="liveDate" class="text-xs text-[#3cb371] font-medium">3 Dec 2025 WED</div>
                 </div>
                 
                 <!-- Theme Toggle -->
@@ -360,21 +399,21 @@
             </div>
             
             <!-- Payment Card -->
-            <div id="paymentCard" class="card-3d bg-gradient-to-br from-[#1a2634] via-[#243442] to-[#1a2634] rounded-3xl p-8 border border-[#3cb371]/30 glow-green">
+            <div id="paymentCard" class="card-3d bg-gradient-to-br from-[#1a2634] via-[#243442] to-[#1a2634] rounded-2xl p-5 border border-[#3cb371]/30 glow-green">
                 
                 <!-- Logo Section -->
-                <div class="text-center mb-8">
+                <div class="text-center mb-4">
                     <div class="floating inline-block">
-                        <img src="logo.jpg" alt="Spectre Logo" class="w-24 h-24 mx-auto rounded-2xl shadow-lg mb-4 border-2 border-[#3cb371]/50">
+                        <img src="logo.jpg" alt="Spectre Logo" class="w-16 h-16 mx-auto rounded-xl shadow-lg mb-2 border-2 border-[#3cb371]/50">
                     </div>
-                    <h1 class="text-2xl font-bold glow-text">SPECTRE</h1>
-                    <p class="text-[#3cb371] text-sm mt-1">Reliable Tech Solutions | Powered by M-Pesa</p>
+                    <h1 class="text-lg font-bold glow-text">SPECTRE</h1>
+                    <p class="text-[#3cb371] text-xs mt-0.5">Reliable Tech Solutions | Powered by M-Pesa</p>
                 </div>
 
                 <!-- M-Pesa Badge -->
-                <div class="flex items-center justify-center gap-2 mb-8">
-                    <div class="bg-[#3cb371] text-white px-4 py-2 rounded-full flex items-center gap-2 shadow-lg">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <div class="flex items-center justify-center gap-2 mb-4">
+                    <div class="bg-[#3cb371] text-white px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-lg text-sm">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                         </svg>
                         <span class="font-semibold">M-PESA</span>
@@ -382,41 +421,41 @@
                 </div>
 
                 <!-- Step 1: Phone Number Input -->
-                <div id="step1" class="space-y-6">
+                <div id="step1" class="space-y-3">
                     <div class="relative">
-                        <label class="block text-[#3cb371] text-sm font-medium mb-2">Phone Number</label>
+                        <label class="block text-[#3cb371] text-xs font-medium mb-1">Phone Number</label>
                         <div class="flex items-center">
-                            <span class="bg-gray-700 text-white px-4 py-4 rounded-l-xl border border-r-0 border-gray-600">+254</span>
+                            <span class="bg-gray-700 text-white px-3 py-2.5 rounded-l-lg border border-r-0 border-gray-600 text-sm">+254</span>
                             <input 
                                 type="tel" 
                                 id="phoneInput" 
                                 placeholder="712 345 678"
                                 maxlength="12"
-                                class="input-3d w-full bg-gray-800 text-white text-lg px-4 py-4 rounded-r-xl border border-gray-600 focus:border-[#3cb371] focus:outline-none focus:ring-2 focus:ring-[#3cb371]/50 transition-all"
+                                class="input-3d w-full bg-gray-800 text-white text-sm px-3 py-2.5 rounded-r-lg border border-gray-600 focus:border-[#3cb371] focus:outline-none focus:ring-2 focus:ring-[#3cb371]/50 transition-all"
                             >
                         </div>
-                        <p id="phoneError" class="text-red-400 text-sm mt-2 hidden">Please enter a valid phone number</p>
+                        <p id="phoneError" class="text-red-400 text-xs mt-1 hidden">Please enter a valid phone number</p>
                     </div>
 
                     <div class="relative">
-                        <label class="block text-[#3cb371] text-sm font-medium mb-2">Amount (KES)</label>
+                        <label class="block text-[#3cb371] text-xs font-medium mb-1">Amount (KES)</label>
                         <input 
                             type="number" 
                             id="amountInput" 
                             placeholder="Enter amount"
                             min="1"
-                            class="input-3d w-full bg-gray-800 text-white text-lg px-4 py-4 rounded-xl border border-gray-600 focus:border-[#3cb371] focus:outline-none focus:ring-2 focus:ring-[#3cb371]/50 transition-all"
+                            class="input-3d w-full bg-gray-800 text-white text-sm px-3 py-2.5 rounded-lg border border-gray-600 focus:border-[#3cb371] focus:outline-none focus:ring-2 focus:ring-[#3cb371]/50 transition-all"
                         >
                     </div>
 
                     <button 
                         id="payBtn"
-                        class="btn-3d w-full mpesa-gradient text-white font-bold py-4 px-8 rounded-xl text-lg transition-all hover:brightness-110"
+                        class="btn-3d w-full mpesa-gradient text-white font-bold py-2.5 px-6 rounded-lg text-sm transition-all hover:brightness-110"
                     >
                         Pay with M-Pesa
                     </button>
 
-                    <div class="flex items-center justify-center gap-4 text-gray-400 text-sm">
+                    <div class="flex items-center justify-center gap-3 text-gray-400 text-xs">
                         <div class="flex items-center gap-1">
                             <svg class="w-4 h-4 text-[#3cb371]" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>
@@ -433,48 +472,48 @@
                 </div>
 
                 <!-- Step 2: Processing STK Push -->
-                <div id="step2" class="hidden space-y-6 text-center">
-                    <div class="relative w-24 h-24 mx-auto">
-                        <div class="absolute inset-0 border-4 border-[#3cb371]/30 rounded-full pulse-ring"></div>
-                        <div class="absolute inset-0 border-4 border-[#3cb371]/30 rounded-full pulse-ring" style="animation-delay: 0.5s"></div>
+                <div id="step2" class="hidden space-y-4 text-center">
+                    <div class="relative w-16 h-16 mx-auto">
+                        <div class="absolute inset-0 border-3 border-[#3cb371]/30 rounded-full pulse-ring"></div>
+                        <div class="absolute inset-0 border-3 border-[#3cb371]/30 rounded-full pulse-ring" style="animation-delay: 0.5s"></div>
                         <div class="absolute inset-0 flex items-center justify-center">
-                            <svg class="w-12 h-12 text-[#3cb371] animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-8 h-8 text-[#3cb371] animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
                             </svg>
                         </div>
                     </div>
-                    <h3 class="text-xl font-bold text-white">STK Push Sent!</h3>
-                    <p class="text-gray-400">Check your phone for the M-Pesa prompt</p>
-                    <p class="text-[#3cb371] font-medium" id="displayPhone">+254 712 345 678</p>
-                    <div class="flex items-center justify-center gap-2 text-yellow-400">
-                        <svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <h3 class="text-base font-bold text-white">STK Push Sent!</h3>
+                    <p class="text-gray-400 text-sm">Check your phone for the M-Pesa prompt</p>
+                    <p class="text-[#3cb371] font-medium text-sm" id="displayPhone">+254 712 345 678</p>
+                    <div class="flex items-center justify-center gap-2 text-yellow-400 text-sm">
+                        <svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                         </svg>
                         <span>Waiting for confirmation...</span>
                     </div>
-                    <div class="text-gray-500 text-sm">
+                    <div class="text-gray-500 text-xs">
                         <span id="countdown">30</span> seconds remaining
                     </div>
                 </div>
 
                 <!-- Step 3: Success with Receipt -->
-                <div id="step3" class="hidden space-y-6 text-center slide-up">
-                    <div class="w-24 h-24 mx-auto bg-[#3cb371] rounded-full flex items-center justify-center">
-                        <svg class="w-14 h-14 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div id="step3" class="hidden space-y-3 text-center slide-up">
+                    <div class="w-14 h-14 mx-auto bg-[#3cb371] rounded-full flex items-center justify-center">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path class="success-check" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" stroke-dasharray="100" stroke-dashoffset="100" d="M5 13l4 4L19 7"/>
                         </svg>
                     </div>
                     
                     <div>
-                        <h3 class="text-2xl font-bold text-white mb-2">Payment Successful!</h3>
-                        <p class="text-gray-400">Transaction completed</p>
+                        <h3 class="text-lg font-bold text-white mb-1">Payment Successful!</h3>
+                        <p class="text-gray-400 text-sm">Transaction completed</p>
                     </div>
 
                     <!-- Receipt Card -->
-                    <div class="bg-gray-800/80 rounded-2xl p-6 border border-[#3cb371]/30 text-left space-y-4">
-                        <div class="flex justify-between items-center pb-4 border-b border-gray-700">
+                    <div class="bg-gray-800/80 rounded-xl p-4 border border-[#3cb371]/30 text-left space-y-2 text-sm">
+                        <div class="flex justify-between items-center pb-2 border-b border-gray-700">
                             <span class="text-gray-400">Amount Paid</span>
-                            <span class="text-white font-bold text-xl" id="displayAmount">KES 1,000</span>
+                            <span class="text-white font-bold text-base" id="displayAmount">KES 1,000</span>
                         </div>
                         
                         <div class="flex justify-between items-center">
@@ -488,22 +527,22 @@
                         </div>
 
                         <!-- Receipt Code -->
-                        <div class="pt-4 border-t border-gray-700">
-                            <p class="text-gray-400 text-sm mb-2">M-Pesa Receipt Number</p>
+                        <div class="pt-2 border-t border-gray-700">
+                            <p class="text-gray-400 text-xs mb-1">M-Pesa Receipt Number</p>
                             <div class="relative">
-                                <div class="bg-gray-900 rounded-xl p-4 flex items-center justify-between">
-                                    <span class="receipt-code text-[#3cb371] text-xl font-bold" id="receiptCode">RKL7H9X2QP</span>
+                                <div class="bg-gray-900 rounded-lg p-2.5 flex items-center justify-between">
+                                    <span class="receipt-code text-[#3cb371] text-base font-bold" id="receiptCode">RKL7H9X2QP</span>
                                     <button 
                                         id="copyBtn"
-                                        class="bg-[#3cb371] hover:bg-[#2d9a5e] text-white px-4 py-2 rounded-lg transition-all flex items-center gap-2"
+                                        class="bg-[#3cb371] hover:bg-[#2d9a5e] text-white px-3 py-1.5 rounded-md transition-all flex items-center gap-1 text-xs"
                                     >
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
                                         </svg>
                                         <span id="copyText">Copy</span>
                                     </button>
                                 </div>
-                                <div id="copyTooltip" class="copy-tooltip absolute -top-10 left-1/2 transform -translate-x-1/2 bg-[#3cb371] text-white px-3 py-1 rounded-lg text-sm">
+                                <div id="copyTooltip" class="copy-tooltip absolute -top-8 left-1/2 transform -translate-x-1/2 bg-[#3cb371] text-white px-2 py-0.5 rounded text-xs">
                                     Copied!
                                 </div>
                             </div>
@@ -512,7 +551,7 @@
 
                     <button 
                         id="newPaymentBtn"
-                        class="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-xl transition-all"
+                        class="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition-all text-sm"
                     >
                         Make Another Payment
                     </button>
