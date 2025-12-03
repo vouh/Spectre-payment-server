@@ -200,7 +200,106 @@
 
         @keyframes floating {
             0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+            50% { transform: translateY(-3px); }
+        }
+
+        /* Money Flow Animation */
+        .money-flow-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            position: relative;
+        }
+
+        .flow-dots {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 0 8px;
+        }
+
+        .flow-dot {
+            width: 6px;
+            height: 6px;
+            background: #3cb371;
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: flowPulse 1.5s ease-in-out infinite;
+        }
+
+        .flow-dot:nth-child(1) { animation-delay: 0s; }
+        .flow-dot:nth-child(2) { animation-delay: 0.2s; }
+        .flow-dot:nth-child(3) { animation-delay: 0.4s; }
+        .flow-dot:nth-child(4) { animation-delay: 0.6s; }
+        .flow-dot:nth-child(5) { animation-delay: 0.8s; }
+
+        @keyframes flowPulse {
+            0%, 100% { 
+                opacity: 0.2;
+                transform: scale(0.8);
+            }
+            50% { 
+                opacity: 1;
+                transform: scale(1.2);
+                box-shadow: 0 0 8px rgba(60, 179, 113, 0.6);
+            }
+        }
+
+        .logo-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .logo-box img {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            border: 2px solid rgba(60, 179, 113, 0.5);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .logo-box span {
+            font-size: 10px;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        .mpesa-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border: 2px solid rgba(60, 179, 113, 0.5);
+        }
+
+        .mpesa-icon svg {
+            width: 28px;
+            height: 28px;
+            color: white;
+        }
+
+        @media (max-width: 640px) {
+            .logo-box img, .mpesa-icon {
+                width: 40px;
+                height: 40px;
+            }
+            .mpesa-icon svg {
+                width: 22px;
+                height: 22px;
+            }
+            .flow-dot {
+                width: 5px;
+                height: 5px;
+            }
+            .logo-box span {
+                font-size: 8px;
+            }
         }
 
         .pulse-ring {
@@ -256,13 +355,30 @@
             transform: translateY(4px);
         }
 
-        .particle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: #3cb371;
-            border-radius: 50%;
+        /* Clean background pattern */
+        .clean-bg {
+            background: linear-gradient(180deg, #0f1a24 0%, #1a2634 50%, #0f1a24 100%);
+            position: relative;
+        }
+
+        .clean-bg::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(60, 179, 113, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(45, 74, 94, 0.1) 0%, transparent 50%);
             pointer-events: none;
+        }
+
+        .light-mode.clean-bg {
+            background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%);
+        }
+
+        .light-mode.clean-bg::before {
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(60, 179, 113, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(45, 74, 94, 0.08) 0%, transparent 50%);
         }
 
         .receipt-code {
@@ -279,51 +395,77 @@
             opacity: 1;
         }
 
-        /* Floating Website Button */
-        .floating-website-btn {
+        /* Website Link - Subtle 3D Button */
+        .website-link {
             position: fixed;
-            bottom: 50%;
-            right: calc(50% - 280px);
-            transform: translateY(50%);
+            bottom: 24px;
+            right: 24px;
             z-index: 1000;
-            animation: bubble-float 3s ease-in-out infinite;
         }
 
-        .floating-website-btn a {
+        .website-link a {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 12px 16px;
-            background: linear-gradient(135deg, #2d4a5e 0%, #3cb371 100%);
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(60, 179, 113, 0.3), 0 0 30px rgba(45, 74, 94, 0.2);
+            gap: 8px;
+            padding: 10px 16px;
+            background: linear-gradient(145deg, #1e3a4f, #162a3a);
+            border-radius: 10px;
+            box-shadow: 
+                4px 4px 12px rgba(0, 0, 0, 0.3),
+                -2px -2px 8px rgba(60, 179, 113, 0.1),
+                inset 1px 1px 2px rgba(255,255,255,0.05);
             transition: all 0.3s ease;
             text-decoration: none;
-            gap: 6px;
+            border: 1px solid rgba(60, 179, 113, 0.2);
         }
 
-        .floating-website-btn a:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 30px rgba(60, 179, 113, 0.5), 0 0 40px rgba(45, 74, 94, 0.3);
+        .website-link a:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                6px 6px 16px rgba(0, 0, 0, 0.4),
+                -2px -2px 10px rgba(60, 179, 113, 0.15);
+            border-color: rgba(60, 179, 113, 0.4);
         }
 
-        .floating-website-btn .btn-text {
-            color: white;
-            font-size: 11px;
-            font-weight: 600;
-            text-align: center;
-            line-height: 1.2;
+        .website-link a:active {
+            transform: translateY(1px);
+            box-shadow: 
+                2px 2px 6px rgba(0, 0, 0, 0.3),
+                inset 1px 1px 3px rgba(0,0,0,0.2);
         }
 
-        @keyframes bubble-float {
-            0%, 100% { transform: translateY(50%); }
-            50% { transform: translateY(calc(50% - 8px)); }
+        .website-link .link-text {
+            color: #94a3b8;
+            font-size: 12px;
+            font-weight: 500;
         }
 
-        /* Hide on smaller screens and show inside card instead */
-        @media (max-width: 1100px) {
-            .floating-website-btn {
+        .website-link svg {
+            width: 16px;
+            height: 16px;
+            color: #3cb371;
+        }
+
+        .light-mode .website-link a {
+            background: linear-gradient(145deg, #ffffff, #f1f5f9);
+            box-shadow: 
+                4px 4px 12px rgba(0, 0, 0, 0.1),
+                -2px -2px 8px rgba(255, 255, 255, 0.8);
+        }
+
+        .light-mode .website-link .link-text {
+            color: #475569;
+        }
+
+        @media (max-width: 640px) {
+            .website-link {
+                bottom: 16px;
+                right: 16px;
+            }
+            .website-link a {
+                padding: 8px 12px;
+            }
+            .website-link .link-text {
                 display: none;
             }
         }
@@ -377,36 +519,7 @@
             }
         }
 
-        /* Mobile floating bubble for website */
-        .mobile-bubble {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
-            display: none;
-        }
-
-        @media (max-width: 640px) {
-            .mobile-bubble {
-                display: block;
-            }
-        }
-
-        .mobile-bubble a {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 45px;
-            height: 45px;
-            background: linear-gradient(135deg, #2d4a5e 0%, #3cb371 100%);
-            border-radius: 50%;
-            box-shadow: 0 4px 15px rgba(60, 179, 113, 0.4);
-            animation: bubble-float 3s ease-in-out infinite;
-        }
-
-        .mobile-bubble a:hover {
-            transform: scale(1.1);
-        }
+        /* Mobile bubble removed - using unified website-link instead */
 
         /* Success Modal Overlay */
         .success-modal {
@@ -474,10 +587,7 @@
         }
     </style>
 </head>
-<body class="min-h-screen dark-gradient overflow-x-hidden">
-    <!-- Floating Particles Background -->
-    <div id="particles" class="fixed inset-0 pointer-events-none z-0"></div>
-    
+<body class="min-h-screen clean-bg overflow-x-hidden">
     <!-- Main Container -->
     <div class="min-h-screen flex items-center justify-center p-3 perspective-1000 relative z-10 mobile-top-align">
         <div class="w-full max-w-xs sm:max-w-sm md:max-w-md preserve-3d">
@@ -505,24 +615,36 @@
             <!-- Payment Card -->
             <div id="paymentCard" class="card-3d bg-gradient-to-br from-[#1a2634] via-[#243442] to-[#1a2634] rounded-2xl p-5 border border-[#3cb371]/30 glow-green">
                 
-                <!-- Logo Section -->
-                <div class="text-center mb-4">
-                    <div class="floating inline-block">
-                        <img src="logo.jpg" alt="Spectre Logo" class="w-16 h-16 mx-auto rounded-xl shadow-lg mb-2 border-2 border-[#3cb371]/50">
+                <!-- Logo Section - M-Pesa to Spectre Flow -->
+                <div class="money-flow-container mb-4">
+                    <!-- M-Pesa Logo -->
+                    <div class="logo-box">
+                        <div class="mpesa-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
+                            </svg>
+                        </div>
+                        <span class="text-[#4CAF50]">M-PESA</span>
                     </div>
-                    <h1 class="text-lg font-bold glow-text">SPECTRE</h1>
-                    <p class="text-[#3cb371] text-xs mt-0.5">Reliable Tech Solutions | Powered by M-Pesa</p>
+
+                    <!-- Flowing Dots -->
+                    <div class="flow-dots">
+                        <div class="flow-dot"></div>
+                        <div class="flow-dot"></div>
+                        <div class="flow-dot"></div>
+                        <div class="flow-dot"></div>
+                        <div class="flow-dot"></div>
+                    </div>
+
+                    <!-- Spectre Logo -->
+                    <div class="logo-box floating">
+                        <img src="logo.jpg" alt="Spectre Logo">
+                        <span class="glow-text">SPECTRE</span>
+                    </div>
                 </div>
 
-                <!-- M-Pesa Badge -->
-                <div class="flex items-center justify-center gap-2 mb-4">
-                    <div class="bg-[#3cb371] text-white px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-lg text-sm">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                        </svg>
-                        <span class="font-semibold">M-PESA</span>
-                    </div>
-                </div>
+                <!-- Tagline -->
+                <p class="text-center text-[#3cb371] text-xs mb-3">Reliable Tech Solutions</p>
 
                 <!-- Step 1: Phone Number Input -->
                 <div id="step1" class="space-y-3">
@@ -653,22 +775,13 @@
         </div>
     </div>
 
-    <!-- Mobile Website Bubble -->
-    <div class="mobile-bubble">
+    <!-- Website Link -->
+    <div class="website-link">
         <a href="https://specter.com" target="_blank" title="Visit Specter Tech">
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
             </svg>
-        </a>
-    </div>
-
-    <!-- Floating Website Button (Desktop) -->
-    <div class="floating-website-btn">
-        <a href="https://specter.com" target="_blank" title="Visit Specter Tech Website">
-            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
-            </svg>
-            <span class="btn-text">Visit Our<br/>Website</span>
+            <span class="link-text">specter.com</span>
         </a>
     </div>
 
@@ -911,13 +1024,11 @@
             isDarkMode = !isDarkMode;
             
             if (isDarkMode) {
-                body.classList.remove('light-mode', 'light-gradient');
-                body.classList.add('dark-gradient');
+                body.classList.remove('light-mode');
                 themeToggle.classList.remove('light');
                 toggleIcon.textContent = '🌙';
             } else {
-                body.classList.remove('dark-gradient');
-                body.classList.add('light-mode', 'light-gradient');
+                body.classList.add('light-mode');
                 themeToggle.classList.add('light');
                 toggleIcon.textContent = '☀️';
             }
