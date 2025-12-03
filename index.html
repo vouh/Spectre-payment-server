@@ -372,13 +372,44 @@
         }
 
         .light-mode.clean-bg {
-            background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%);
+            background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%) !important;
         }
 
         .light-mode.clean-bg::before {
             background: 
                 radial-gradient(ellipse at 20% 20%, rgba(60, 179, 113, 0.1) 0%, transparent 50%),
                 radial-gradient(ellipse at 80% 80%, rgba(45, 74, 94, 0.08) 0%, transparent 50%);
+        }
+
+        /* Smaller compact inputs */
+        .input-compact {
+            padding: 0.4rem 0.6rem !important;
+            font-size: 0.8rem !important;
+        }
+
+        .label-compact {
+            font-size: 0.65rem !important;
+            margin-bottom: 0.2rem !important;
+        }
+
+        .prefix-compact {
+            padding: 0.4rem 0.5rem !important;
+            font-size: 0.75rem !important;
+        }
+
+        /* Print button styles */
+        .print-btn {
+            background: linear-gradient(135deg, #2d4a5e 0%, #1e3a4f 100%);
+            border: 1px solid rgba(60, 179, 113, 0.3);
+        }
+
+        .print-btn:hover {
+            background: linear-gradient(135deg, #3d5a6e 0%, #2e4a5f 100%);
+        }
+
+        .light-mode .print-btn {
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%) !important;
+            color: #1e293b !important;
         }
 
         .receipt-code {
@@ -647,36 +678,48 @@
                 <p class="text-center text-[#3cb371] text-xs mb-3">Reliable Tech Solutions</p>
 
                 <!-- Step 1: Phone Number Input -->
-                <div id="step1" class="space-y-3">
+                <div id="step1" class="space-y-2">
                     <div class="relative">
-                        <label class="block text-[#3cb371] text-xs font-medium mb-1">Phone Number</label>
+                        <label class="label-compact block text-[#3cb371] font-medium">Phone Number</label>
                         <div class="flex items-center">
-                            <span class="bg-gray-700 text-white px-3 py-2.5 rounded-l-lg border border-r-0 border-gray-600 text-sm">+254</span>
+                            <span class="prefix-compact bg-gray-700 text-white rounded-l-lg border border-r-0 border-gray-600">+254</span>
                             <input 
                                 type="tel" 
                                 id="phoneInput" 
                                 placeholder="712 345 678"
                                 maxlength="12"
-                                class="input-3d w-full bg-gray-800 text-white text-sm px-3 py-2.5 rounded-r-lg border border-gray-600 focus:border-[#3cb371] focus:outline-none focus:ring-2 focus:ring-[#3cb371]/50 transition-all"
+                                class="input-compact input-3d w-full bg-gray-800 text-white rounded-r-lg border border-gray-600 focus:border-[#3cb371] focus:outline-none focus:ring-1 focus:ring-[#3cb371]/50 transition-all"
                             >
                         </div>
-                        <p id="phoneError" class="text-red-400 text-xs mt-1 hidden">Please enter a valid phone number</p>
+                        <p id="phoneError" class="text-red-400 text-xs mt-0.5 hidden">Please enter a valid phone number</p>
                     </div>
 
                     <div class="relative">
-                        <label class="block text-[#3cb371] text-xs font-medium mb-1">Amount (KES)</label>
+                        <label class="label-compact block text-[#3cb371] font-medium">Amount (KES)</label>
                         <input 
                             type="number" 
                             id="amountInput" 
                             placeholder="Enter amount"
                             min="1"
-                            class="input-3d w-full bg-gray-800 text-white text-sm px-3 py-2.5 rounded-lg border border-gray-600 focus:border-[#3cb371] focus:outline-none focus:ring-2 focus:ring-[#3cb371]/50 transition-all"
+                            class="input-compact input-3d w-full bg-gray-800 text-white rounded-lg border border-gray-600 focus:border-[#3cb371] focus:outline-none focus:ring-1 focus:ring-[#3cb371]/50 transition-all"
                         >
+                    </div>
+
+                    <div class="relative">
+                        <label class="label-compact block text-[#3cb371] font-medium">Payment Reason <span class="text-red-400">*</span></label>
+                        <input 
+                            type="text" 
+                            id="reasonInput" 
+                            placeholder="e.g. Service payment, Product purchase"
+                            maxlength="50"
+                            class="input-compact input-3d w-full bg-gray-800 text-white rounded-lg border border-gray-600 focus:border-[#3cb371] focus:outline-none focus:ring-1 focus:ring-[#3cb371]/50 transition-all"
+                        >
+                        <p id="reasonError" class="text-red-400 text-xs mt-0.5 hidden">Payment reason is required</p>
                     </div>
 
                     <button 
                         id="payBtn"
-                        class="btn-3d w-full mpesa-gradient text-white font-bold py-2.5 px-6 rounded-lg text-sm transition-all hover:brightness-110"
+                        class="btn-3d w-full mpesa-gradient text-white font-bold py-2 px-4 rounded-lg text-sm transition-all hover:brightness-110"
                     >
                         Pay with M-Pesa
                     </button>
@@ -734,15 +777,15 @@
     <!-- Success Modal -->
     <div id="successModal" class="success-modal">
         <div class="success-modal-content text-center">
-            <div class="w-12 h-12 mx-auto bg-[#3cb371] rounded-full flex items-center justify-center mb-3">
-                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-10 h-10 mx-auto bg-[#3cb371] rounded-full flex items-center justify-center mb-2">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
                 </svg>
             </div>
-            <h3 class="text-lg font-bold text-white mb-1">Payment Successful!</h3>
-            <p class="text-gray-400 text-xs mb-3">Transaction completed</p>
+            <h3 class="text-base font-bold text-white mb-1">Payment Successful!</h3>
+            <p class="text-gray-400 text-xs mb-2">Transaction completed</p>
             
-            <div class="receipt-section text-left text-xs space-y-2">
+            <div class="receipt-section text-left text-xs space-y-1.5">
                 <div class="flex justify-between items-center">
                     <span class="text-gray-400">Amount</span>
                     <span class="text-white font-bold" id="modalAmount">KES 1,000</span>
@@ -752,14 +795,22 @@
                     <span class="text-white" id="modalPhone">+254 712 345 678</span>
                 </div>
                 <div class="flex justify-between items-center">
+                    <span class="text-gray-400">Reason</span>
+                    <span class="text-white" id="modalReason">Service payment</span>
+                </div>
+                <div class="flex justify-between items-center">
                     <span class="text-gray-400">Date</span>
                     <span class="text-white" id="modalDate">Dec 3, 2025</span>
                 </div>
-                <div class="pt-2 border-t border-gray-600">
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-400">Time</span>
+                    <span class="text-white" id="modalTime">12:00:00</span>
+                </div>
+                <div class="pt-1.5 border-t border-gray-600">
                     <p class="text-gray-400 text-xs mb-1">M-Pesa Receipt</p>
-                    <div class="receipt-code-container flex items-center justify-between bg-[#1a2634] rounded-lg p-2">
-                        <span class="text-[#3cb371] font-bold font-mono tracking-wider" id="modalCode">RKL7H9X2QP</span>
-                        <button id="modalCopyBtn" class="bg-[#3cb371] hover:bg-[#2d9a5e] text-white px-2 py-1 rounded text-xs flex items-center gap-1">
+                    <div class="receipt-code-container flex items-center justify-between bg-[#1a2634] rounded-lg p-1.5">
+                        <span class="text-[#3cb371] font-bold font-mono tracking-wider text-sm" id="modalCode">RKL7H9X2QP</span>
+                        <button id="modalCopyBtn" class="bg-[#3cb371] hover:bg-[#2d9a5e] text-white px-2 py-0.5 rounded text-xs flex items-center gap-1">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
                             </svg>
@@ -769,9 +820,17 @@
                 </div>
             </div>
             
-            <button id="modalCloseBtn" class="make-another-btn w-full mt-4 bg-gradient-to-r from-[#3cb371] to-[#2d9a5e] hover:from-[#2d9a5e] hover:to-[#3cb371] text-white font-semibold py-2 px-4 rounded-lg text-sm transition-all shadow-lg">
-                Make Another Payment
-            </button>
+            <div class="flex gap-2 mt-3">
+                <button id="printReceiptBtn" class="print-btn flex-1 text-white font-semibold py-1.5 px-3 rounded-lg text-xs transition-all flex items-center justify-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                    </svg>
+                    Print
+                </button>
+                <button id="modalCloseBtn" class="make-another-btn flex-1 bg-gradient-to-r from-[#3cb371] to-[#2d9a5e] hover:from-[#2d9a5e] hover:to-[#3cb371] text-white font-semibold py-1.5 px-3 rounded-lg text-xs transition-all">
+                    New Payment
+                </button>
+            </div>
         </div>
     </div>
 
@@ -791,8 +850,10 @@
         const step2 = document.getElementById('step2');
         const phoneInput = document.getElementById('phoneInput');
         const amountInput = document.getElementById('amountInput');
+        const reasonInput = document.getElementById('reasonInput');
         const payBtn = document.getElementById('payBtn');
         const phoneError = document.getElementById('phoneError');
+        const reasonError = document.getElementById('reasonError');
         const displayPhone = document.getElementById('displayPhone');
         const countdown = document.getElementById('countdown');
         const paymentCard = document.getElementById('paymentCard');
@@ -801,11 +862,18 @@
         const successModal = document.getElementById('successModal');
         const modalAmount = document.getElementById('modalAmount');
         const modalPhone = document.getElementById('modalPhone');
+        const modalReason = document.getElementById('modalReason');
         const modalDate = document.getElementById('modalDate');
+        const modalTime = document.getElementById('modalTime');
         const modalCode = document.getElementById('modalCode');
         const modalCopyBtn = document.getElementById('modalCopyBtn');
         const modalCopyText = document.getElementById('modalCopyText');
         const modalCloseBtn = document.getElementById('modalCloseBtn');
+        const printReceiptBtn = document.getElementById('printReceiptBtn');
+
+        // Store payment data for printing
+        let currentPaymentData = {};
+
         // Generate random receipt code
         function generateReceiptCode() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -877,8 +945,9 @@
         payBtn.addEventListener('click', () => {
             const phone = phoneInput.value;
             const amount = amountInput.value;
+            const reason = reasonInput.value.trim();
 
-            // Validate
+            // Validate phone
             if (!validatePhone(phone)) {
                 phoneError.classList.remove('hidden');
                 phoneInput.parentElement.classList.add('shake');
@@ -886,9 +955,18 @@
                 return;
             }
 
+            // Validate amount
             if (!amount || amount <= 0) {
                 amountInput.classList.add('shake');
                 setTimeout(() => amountInput.classList.remove('shake'), 500);
+                return;
+            }
+
+            // Validate reason
+            if (!reason) {
+                reasonError.classList.remove('hidden');
+                reasonInput.classList.add('shake');
+                setTimeout(() => reasonInput.classList.remove('shake'), 500);
                 return;
             }
 
@@ -917,16 +995,34 @@
                 step2.classList.add('hidden');
                 step1.classList.remove('hidden');
                 
+                // Get current time
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
+                const receiptCode = generateReceiptCode();
+                
+                // Store payment data for printing
+                currentPaymentData = {
+                    amount: formatAmount(amount),
+                    phone: formatPhone(phone),
+                    reason: reason,
+                    date: getCurrentDate(),
+                    time: timeStr,
+                    code: receiptCode
+                };
+                
                 // Populate and show success modal
-                modalAmount.textContent = formatAmount(amount);
-                modalPhone.textContent = formatPhone(phone);
-                modalDate.textContent = getCurrentDate();
-                modalCode.textContent = generateReceiptCode();
+                modalAmount.textContent = currentPaymentData.amount;
+                modalPhone.textContent = currentPaymentData.phone;
+                modalReason.textContent = currentPaymentData.reason;
+                modalDate.textContent = currentPaymentData.date;
+                modalTime.textContent = currentPaymentData.time;
+                modalCode.textContent = currentPaymentData.code;
                 successModal.classList.add('show');
                 
                 // Reset form
                 phoneInput.value = '';
                 amountInput.value = '';
+                reasonInput.value = '';
             }, processingTime);
         });
 
@@ -961,6 +1057,98 @@
             successModal.classList.remove('show');
         });
 
+        // Print Receipt Button
+        printReceiptBtn.addEventListener('click', () => {
+            const printWindow = window.open('', '_blank');
+            const receiptHTML = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Payment Receipt - Spectre Tech</title>
+                    <style>
+                        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+                        * { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
+                        body { padding: 20px; background: #f8fafc; }
+                        .receipt { max-width: 350px; margin: 0 auto; background: white; border-radius: 16px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+                        .header { text-align: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px dashed #e2e8f0; }
+                        .logo-placeholder { width: 60px; height: 60px; background: linear-gradient(135deg, #2d4a5e, #3cb371); border-radius: 12px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 10px; }
+                        .company-name { font-size: 20px; font-weight: 700; color: #2d4a5e; }
+                        .subtitle { font-size: 11px; color: #64748b; margin-top: 4px; }
+                        .success-badge { background: #dcfce7; color: #166534; padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block; margin: 12px 0; }
+                        .details { margin: 16px 0; }
+                        .detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9; }
+                        .detail-row:last-child { border-bottom: none; }
+                        .label { color: #64748b; font-size: 12px; }
+                        .value { color: #1e293b; font-size: 12px; font-weight: 500; text-align: right; max-width: 180px; word-wrap: break-word; }
+                        .receipt-code-section { background: linear-gradient(135deg, #2d4a5e, #1e3a4f); border-radius: 10px; padding: 14px; margin: 16px 0; text-align: center; }
+                        .receipt-label { color: #94a3b8; font-size: 10px; margin-bottom: 6px; }
+                        .receipt-code { color: #3cb371; font-size: 18px; font-weight: 700; letter-spacing: 3px; font-family: 'Courier New', monospace; }
+                        .footer { text-align: center; margin-top: 16px; padding-top: 16px; border-top: 2px dashed #e2e8f0; }
+                        .footer p { font-size: 10px; color: #94a3b8; margin: 4px 0; }
+                        .mpesa-badge { background: #4CAF50; color: white; padding: 4px 12px; border-radius: 12px; font-size: 10px; font-weight: 600; display: inline-block; margin-top: 8px; }
+                        @media print {
+                            body { padding: 0; background: white; }
+                            .receipt { box-shadow: none; max-width: 100%; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="receipt">
+                        <div class="header">
+                            <div class="logo-placeholder">SPECTRE</div>
+                            <div class="company-name">Spectre Tech Limited</div>
+                            <div class="subtitle">Reliable Tech Solutions</div>
+                            <div class="success-badge">✓ Payment Successful</div>
+                        </div>
+                        <div class="details">
+                            <div class="detail-row">
+                                <span class="label">Amount Paid</span>
+                                <span class="value" style="font-weight: 700; color: #3cb371;">${currentPaymentData.amount}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Phone Number</span>
+                                <span class="value">${currentPaymentData.phone}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Payment For</span>
+                                <span class="value">${currentPaymentData.reason}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Date</span>
+                                <span class="value">${currentPaymentData.date}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Time</span>
+                                <span class="value">${currentPaymentData.time}</span>
+                            </div>
+                        </div>
+                        <div class="receipt-code-section">
+                            <div class="receipt-label">M-PESA RECEIPT NUMBER</div>
+                            <div class="receipt-code">${currentPaymentData.code}</div>
+                        </div>
+                        <div class="footer">
+                            <p>Thank you for your payment!</p>
+                            <p>For inquiries: support@specter.com</p>
+                            <div class="mpesa-badge">Powered by M-PESA</div>
+                        </div>
+                    </div>
+                    <script>
+                        window.onload = function() {
+                            window.print();
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `;
+            printWindow.document.write(receiptHTML);
+            printWindow.document.close();
+        });
+
+        // Hide reason error on input
+        reasonInput.addEventListener('input', () => {
+            reasonError.classList.add('hidden');
+        });
+
         // Close modal on backdrop click
         successModal.addEventListener('click', (e) => {
             if (e.target === successModal) {
@@ -978,12 +1166,12 @@
         });
 
         // Add focus effects
-        [phoneInput, amountInput].forEach(input => {
+        [phoneInput, amountInput, reasonInput].forEach(input => {
             input.addEventListener('focus', () => {
-                input.parentElement.classList.add('ring-2', 'ring-[#3cb371]/50');
+                input.parentElement.classList.add('ring-1', 'ring-[#3cb371]/50');
             });
             input.addEventListener('blur', () => {
-                input.parentElement.classList.remove('ring-2', 'ring-[#3cb371]/50');
+                input.parentElement.classList.remove('ring-1', 'ring-[#3cb371]/50');
             });
         });
 
