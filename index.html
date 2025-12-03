@@ -427,12 +427,33 @@
             opacity: 1;
         }
 
-        /* Visit Site Button - Fixed Top Right of Page on Desktop */
-        .visit-site-container {
+        /* Desktop Visit Site - Fixed Top Right of Page */
+        .visit-site-desktop {
             position: fixed;
-            top: 20px;
-            right: 25px;
-            z-index: 1000;
+            top: 25px;
+            right: 30px;
+            z-index: 9999;
+            display: none;
+        }
+
+        @media (min-width: 641px) {
+            .visit-site-desktop {
+                display: block;
+            }
+        }
+
+        /* Mobile Visit Site - Above Form */
+        .visit-site-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (min-width: 641px) {
+            .visit-site-container {
+                display: none;
+            }
         }
 
         .visit-site-btn {
@@ -480,17 +501,6 @@
             box-shadow: 
                 0 3px 12px rgba(45, 74, 94, 0.4),
                 0 2px 6px rgba(0, 0, 0, 0.15);
-        }
-
-        /* Mobile: Visit site centered above form with more padding */
-        @media (max-width: 640px) {
-            .visit-site-container {
-                position: static;
-                display: flex;
-                justify-content: center;
-                margin-top: 0.75rem;
-                margin-bottom: 1rem;
-            }
         }
 
         /* Mobile Responsive */
@@ -650,11 +660,6 @@
                 padding: 2rem !important;
             }
 
-            .floating img {
-                width: 5rem !important;
-                height: 5rem !important;
-            }
-
             .success-modal-content {
                 max-width: 380px;
                 padding: 2rem;
@@ -663,6 +668,16 @@
     </style>
 </head>
 <body class="min-h-screen clean-bg overflow-x-hidden">
+    <!-- Visit Site Button (Desktop only: fixed top-right of page) -->
+    <div class="visit-site-desktop">
+        <a href="coming-soon.html" class="visit-site-btn">
+            <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+            </svg>
+            <span class="btn-text">Visit Site</span>
+        </a>
+    </div>
+
     <!-- Main Container -->
     <div class="min-h-screen flex items-center justify-center p-3 perspective-1000 relative z-10 mobile-top-align">
         <div class="w-full max-w-[280px] sm:max-w-[320px] md:max-w-[380px] preserve-3d mx-auto">
@@ -687,7 +702,7 @@
                 </div>
             </div>
 
-            <!-- Visit Site Button (Mobile: above form, Desktop: fixed top-right of page) -->
+            <!-- Visit Site Button (Mobile only: above form) -->
             <div class="visit-site-container">
                 <a href="coming-soon.html" class="visit-site-btn">
                     <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -723,7 +738,7 @@
 
                     <!-- Spectre Logo -->
                     <div class="logo-box floating">
-                        <img src="logo.jpg" alt="Spectre Logo">
+                        <img src="logo-no-bg.png" alt="Spectre Logo" class="!bg-transparent">
                         <span class="glow-text">SPECTRE</span>
                     </div>
                 </div>
