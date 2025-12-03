@@ -1,11 +1,5 @@
-/**
- * Vercel Serverless Function - M-Pesa STK Push
- * Spectre Tech Limited Payment System
- */
+const axios = require('axios');
 
-import axios from 'axios';
-
-// Get timestamp in format YYYYMMDDHHmmss
 function getTimeStamp() {
     const now = new Date();
     const year = now.getFullYear();
@@ -17,7 +11,6 @@ function getTimeStamp() {
     return `${year}${month}${day}${hours}${minutes}${seconds}`;
 }
 
-// Get M-Pesa access token
 async function getAccessToken() {
     const CONSUMER_KEY = process.env.CONSUMER_KEY;
     const CONSUMER_SECRET = process.env.CONSUMER_SECRET;
@@ -25,24 +18,19 @@ async function getAccessToken() {
     const url = 'https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials';
     
     const response = await axios.get(url, {
-        auth: { 
-            username: CONSUMER_KEY, 
-            password: CONSUMER_SECRET 
-        },
+        auth: { username: CONSUMER_KEY, password: CONSUMER_SECRET },
         headers: { 'Accept': 'application/json' }
     });
     
     return response.data.access_token;
 }
 
-export default async function handler(req, res) {
-    // Enable CORS
-    res.setHeader('Access-Control-Allow-Credentials', true);
+module.exports = async function handler(req, res) {
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-    res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-Type, Date, X-Api-Version');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST,PUT');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-    // Handle preflight
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
     }
@@ -55,52 +43,40 @@ export default async function handler(req, res) {
         const { phoneNumber, amount, accountReference, transactionDesc } = req.body;
 
         if (!phoneNumber || !amount) {
-            return res.status(400).json({ 
-                success: false, 
-                error: 'Phone number and amount are required' 
-            });
+            return res.status(400).json({ success: false, error: 'Phone number and amount are required' });
         }
 
-        // Format phone number (remove leading 0, add 254)
         const number = phoneNumber.replace(/^0/, '').replace(/^\+254/, '').replace(/^254/, '');
         const formattedPhone = `254${number}`;
 
-        // Get access token
         const access_token = await getAccessToken();
 
-        // Get credentials from environment
         const BusinessShortCode = process.env.BusinessShortCode;
         const MPESA_PASSKEY = process.env.MPESA_PASSKEY;
         const TILL_NUMBER = process.env.TILL_NUMBER;
 
-        // Generate timestamp and password
         const timestamp = getTimeStamp();
         const password = Buffer.from(`${BusinessShortCode}${MPESA_PASSKEY}${timestamp}`).toString('base64');
 
-        // Callback URL - use the deployed domain
-        const domain = process.env.VERCEL_URL 
-            ? `https://${process.env.VERCEL_URL}` 
-            : process.env.DOMAIN || 'https://your-domain.vercel.app';
-
-        const stkUrl = 'https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest';
+        const domain = 'https://spectre-payment-server.vercel.app';
 
         const body = {
-            "BusinessShortCode": BusinessShortCode,
-            "Password": password,
-            "Timestamp": timestamp,
-            "TransactionType": "CustomerBuyGoodsOnline",
-            "Amount": String(amount),
-            "PartyA": formattedPhone,
-            "PartyB": TILL_NUMBER,
-            "PhoneNumber": formattedPhone,
-            "CallBackURL": `${domain}/api/callback`,
-            "AccountReference": accountReference || 'Spectre Tech',
-            "TransactionDesc": transactionDesc || 'Payment to Spectre Tech'
+            BusinessShortCode: BusinessShortCode,
+            Password: password,
+            Timestamp: timestamp,
+            TransactionType: "CustomerBuyGoodsOnline",
+            Amount: String(amount),
+            PartyA: formattedPhone,
+            PartyB: TILL_NUMBER,
+            PhoneNumber: formattedPhone,
+            CallBackURL: `${domain}/api/callback`,
+            AccountReference: accountReference || 'Spectre Tech',
+            TransactionDesc: transactionDesc || 'Payment to Spectre Tech'
         };
 
         console.log('STK Push Request:', { ...body, Password: '[HIDDEN]' });
 
-        const response = await axios.post(stkUrl, body, {
+        const response = await axios.post('https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest', body, {
             headers: {
                 'Authorization': `Bearer ${access_token}`,
                 'Content-Type': 'application/json'
@@ -115,14 +91,12 @@ export default async function handler(req, res) {
                 success: true,
                 message: 'STK Push sent successfully',
                 checkoutRequestID: stkResponse.CheckoutRequestID,
-                merchantRequestID: stkResponse.MerchantRequestID,
-                responseDescription: stkResponse.ResponseDescription
+                merchantRequestID: stkResponse.MerchantRequestID
             });
         } else {
             return res.status(400).json({
                 success: false,
-                error: stkResponse.ResponseDescription || 'STK Push failed',
-                data: stkResponse
+                error: stkResponse.ResponseDescription || 'STK Push failed'
             });
         }
 
@@ -133,4 +107,4 @@ export default async function handler(req, res) {
             error: error.response?.data?.errorMessage || error.message || 'Internal server error'
         });
     }
-}
+};
