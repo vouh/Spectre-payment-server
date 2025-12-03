@@ -280,77 +280,117 @@
         @media (max-width: 640px) {
             .card-3d {
                 padding: 1rem !important;
-                border-radius: 1.25rem !important;
+                border-radius: 1rem !important;
+                margin: 0 1rem;
             }
 
             .glow-green {
-                box-shadow: 0 0 10px rgba(60, 179, 113, 0.25), 0 0 15px rgba(45, 74, 94, 0.15);
+                box-shadow: 0 0 8px rgba(60, 179, 113, 0.2), 0 0 12px rgba(45, 74, 94, 0.1);
             }
 
             .floating img {
-                width: 3.5rem !important;
-                height: 3.5rem !important;
+                width: 3rem !important;
+                height: 3rem !important;
             }
 
             #liveTime {
-                font-size: 1rem !important;
+                font-size: 0.9rem !important;
             }
 
             #liveDate {
-                font-size: 0.65rem !important;
+                font-size: 0.6rem !important;
             }
 
             .theme-toggle {
-                width: 44px;
-                height: 22px;
+                width: 40px;
+                height: 20px;
             }
 
             .theme-toggle-ball {
-                width: 16px;
-                height: 16px;
+                width: 14px;
+                height: 14px;
             }
 
             .theme-toggle.light .theme-toggle-ball {
-                transform: translateX(22px);
+                transform: translateX(20px);
             }
+        }
 
-            .mobile-website-btn {
-                display: flex !important;
-            }
+        /* Mobile floating bubble for website */
+        .mobile-bubble {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: none;
+        }
 
-            .compact-input {
-                padding: 0.625rem 0.75rem !important;
-                font-size: 0.9rem !important;
+        @media (max-width: 640px) {
+            .mobile-bubble {
+                display: block;
             }
+        }
 
-            .compact-btn {
-                padding: 0.625rem 1rem !important;
-                font-size: 0.9rem !important;
-            }
+        .mobile-bubble a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #2d4a5e 0%, #3cb371 100%);
+            border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(60, 179, 113, 0.4);
+            animation: bubble-float 3s ease-in-out infinite;
+        }
 
-            .mb-8 {
-                margin-bottom: 1rem !important;
-            }
+        .mobile-bubble a:hover {
+            transform: scale(1.1);
+        }
 
-            .mb-6 {
-                margin-bottom: 0.75rem !important;
-            }
+        /* Success Modal Overlay */
+        .success-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 1rem;
+        }
 
-            .space-y-6 > * + * {
-                margin-top: 0.75rem !important;
-            }
+        .success-modal.show {
+            display: flex;
+        }
 
-            .text-2xl {
-                font-size: 1.1rem !important;
-            }
+        .success-modal-content {
+            background: linear-gradient(135deg, #1a2634 0%, #243442 100%);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            max-width: 320px;
+            width: 100%;
+            border: 1px solid rgba(60, 179, 113, 0.3);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            animation: modalSlideIn 0.3s ease-out;
+        }
 
-            .text-xl {
-                font-size: 1rem !important;
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(20px);
             }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
 
-            .text-lg {
-                font-size: 0.9rem !important;
-            }
+        .receipt-section {
+            background: linear-gradient(135deg, #2d4a5e 0%, #1e3a4f 100%);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-top: 1rem;
         }
 
         /* Tablet and Desktop */
@@ -359,13 +399,9 @@
                 padding: 1.5rem !important;
             }
 
-            .mobile-website-btn {
-                display: none !important;
-            }
-
             .floating img {
-                width: 4.5rem !important;
-                height: 4.5rem !important;
+                width: 4rem !important;
+                height: 4rem !important;
             }
         }
     </style>
@@ -375,8 +411,8 @@
     <div id="particles" class="fixed inset-0 pointer-events-none z-0"></div>
     
     <!-- Main Container -->
-    <div class="min-h-screen flex items-center justify-center p-2 perspective-1000 relative z-10">
-        <div class="max-w-sm w-full preserve-3d">
+    <div class="min-h-screen flex items-center justify-center p-3 perspective-1000 relative z-10">
+        <div class="max-w-xs w-full preserve-3d">
             
             <!-- Header with Date/Time and Theme Toggle -->
             <div class="flex items-center justify-between mb-3 px-1">
@@ -496,86 +532,66 @@
                     </div>
                 </div>
 
-                <!-- Step 3: Success with Receipt -->
-                <div id="step3" class="hidden space-y-3 text-center slide-up">
-                    <div class="w-14 h-14 mx-auto bg-[#3cb371] rounded-full flex items-center justify-center">
-                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path class="success-check" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" stroke-dasharray="100" stroke-dashoffset="100" d="M5 13l4 4L19 7"/>
-                        </svg>
-                    </div>
-                    
-                    <div>
-                        <h3 class="text-lg font-bold text-white mb-1">Payment Successful!</h3>
-                        <p class="text-gray-400 text-sm">Transaction completed</p>
-                    </div>
-
-                    <!-- Receipt Card -->
-                    <div class="bg-gray-800/80 rounded-xl p-4 border border-[#3cb371]/30 text-left space-y-2 text-sm">
-                        <div class="flex justify-between items-center pb-2 border-b border-gray-700">
-                            <span class="text-gray-400">Amount Paid</span>
-                            <span class="text-white font-bold text-base" id="displayAmount">KES 1,000</span>
-                        </div>
-                        
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-400">Phone</span>
-                            <span class="text-white" id="receiptPhone">+254 712 345 678</span>
-                        </div>
-                        
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-400">Date</span>
-                            <span class="text-white" id="transactionDate">Dec 3, 2024</span>
-                        </div>
-
-                        <!-- Receipt Code -->
-                        <div class="pt-2 border-t border-gray-700">
-                            <p class="text-gray-400 text-xs mb-1">M-Pesa Receipt Number</p>
-                            <div class="relative">
-                                <div class="bg-gray-900 rounded-lg p-2.5 flex items-center justify-between">
-                                    <span class="receipt-code text-[#3cb371] text-base font-bold" id="receiptCode">RKL7H9X2QP</span>
-                                    <button 
-                                        id="copyBtn"
-                                        class="bg-[#3cb371] hover:bg-[#2d9a5e] text-white px-3 py-1.5 rounded-md transition-all flex items-center gap-1 text-xs"
-                                    >
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                                        </svg>
-                                        <span id="copyText">Copy</span>
-                                    </button>
-                                </div>
-                                <div id="copyTooltip" class="copy-tooltip absolute -top-8 left-1/2 transform -translate-x-1/2 bg-[#3cb371] text-white px-2 py-0.5 rounded text-xs">
-                                    Copied!
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button 
-                        id="newPaymentBtn"
-                        class="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition-all text-sm"
-                    >
-                        Make Another Payment
-                    </button>
-                </div>
-
             </div>
-
-            <!-- Mobile Website Button -->
-            <a 
-                href="https://specter.com" 
-                target="_blank"
-                class="mobile-website-btn hidden mt-4 w-full items-center justify-center gap-2 bg-gradient-to-r from-[#2d4a5e] to-[#3cb371] hover:from-[#3a5d75] hover:to-[#4ac882] text-white font-semibold py-3 px-6 rounded-xl transition-all shadow-lg"
-            >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
-                </svg>
-                Visit Specter Tech Website
-            </a>
 
             <!-- Footer -->
-            <div class="text-center mt-4">
-                <p class="text-gray-500 text-sm">© 2025 Specter Tech Limited. All rights reserved.</p>
+            <div class="text-center mt-3">
+                <p class="text-gray-500 text-xs">© 2025 Specter Tech Limited. All rights reserved.</p>
             </div>
         </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="success-modal">
+        <div class="success-modal-content text-center">
+            <div class="w-12 h-12 mx-auto bg-[#3cb371] rounded-full flex items-center justify-center mb-3">
+                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                </svg>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-1">Payment Successful!</h3>
+            <p class="text-gray-400 text-xs mb-3">Transaction completed</p>
+            
+            <div class="receipt-section text-left text-xs space-y-2">
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-400">Amount</span>
+                    <span class="text-white font-bold" id="modalAmount">KES 1,000</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-400">Phone</span>
+                    <span class="text-white" id="modalPhone">+254 712 345 678</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-400">Date</span>
+                    <span class="text-white" id="modalDate">Dec 3, 2025</span>
+                </div>
+                <div class="pt-2 border-t border-gray-600">
+                    <p class="text-gray-400 text-xs mb-1">M-Pesa Receipt</p>
+                    <div class="flex items-center justify-between bg-[#1a2634] rounded-lg p-2">
+                        <span class="text-[#3cb371] font-bold font-mono tracking-wider" id="modalCode">RKL7H9X2QP</span>
+                        <button id="modalCopyBtn" class="bg-[#3cb371] hover:bg-[#2d9a5e] text-white px-2 py-1 rounded text-xs flex items-center gap-1">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                            </svg>
+                            <span id="modalCopyText">Copy</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <button id="modalCloseBtn" class="w-full mt-4 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg text-sm transition-all">
+                Make Another Payment
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile Website Bubble -->
+    <div class="mobile-bubble">
+        <a href="https://specter.com" target="_blank" title="Visit Specter Tech">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+            </svg>
+        </a>
     </div>
 
     <!-- Floating Website Button (Desktop) -->
@@ -592,23 +608,23 @@
         // DOM Elements
         const step1 = document.getElementById('step1');
         const step2 = document.getElementById('step2');
-        const step3 = document.getElementById('step3');
         const phoneInput = document.getElementById('phoneInput');
         const amountInput = document.getElementById('amountInput');
         const payBtn = document.getElementById('payBtn');
         const phoneError = document.getElementById('phoneError');
         const displayPhone = document.getElementById('displayPhone');
-        const displayAmount = document.getElementById('displayAmount');
-        const receiptPhone = document.getElementById('receiptPhone');
-        const receiptCode = document.getElementById('receiptCode');
-        const transactionDate = document.getElementById('transactionDate');
-        const copyBtn = document.getElementById('copyBtn');
-        const copyText = document.getElementById('copyText');
-        const copyTooltip = document.getElementById('copyTooltip');
-        const newPaymentBtn = document.getElementById('newPaymentBtn');
         const countdown = document.getElementById('countdown');
         const paymentCard = document.getElementById('paymentCard');
-
+        
+        // Modal Elements
+        const successModal = document.getElementById('successModal');
+        const modalAmount = document.getElementById('modalAmount');
+        const modalPhone = document.getElementById('modalPhone');
+        const modalDate = document.getElementById('modalDate');
+        const modalCode = document.getElementById('modalCode');
+        const modalCopyBtn = document.getElementById('modalCopyBtn');
+        const modalCopyText = document.getElementById('modalCopyText');
+        const modalCloseBtn = document.getElementById('modalCloseBtn');
         // Generate random receipt code
         function generateReceiptCode() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -716,38 +732,37 @@
             setTimeout(() => {
                 clearInterval(timer);
                 
-                // Show step 3
+                // Hide step 2 and show step 1 again
                 step2.classList.add('hidden');
-                step3.classList.remove('hidden');
+                step1.classList.remove('hidden');
                 
-                // Populate receipt
-                displayAmount.textContent = formatAmount(amount);
-                receiptPhone.textContent = formatPhone(phone);
-                receiptCode.textContent = generateReceiptCode();
-                transactionDate.textContent = getCurrentDate();
+                // Populate and show success modal
+                modalAmount.textContent = formatAmount(amount);
+                modalPhone.textContent = formatPhone(phone);
+                modalDate.textContent = getCurrentDate();
+                modalCode.textContent = generateReceiptCode();
+                successModal.classList.add('show');
                 
-                // Add success glow
-                paymentCard.style.boxShadow = '0 0 40px rgba(60, 179, 113, 0.4), 0 0 80px rgba(45, 74, 94, 0.3)';
+                // Reset form
+                phoneInput.value = '';
+                amountInput.value = '';
             }, processingTime);
         });
 
-        // Copy button click
-        copyBtn.addEventListener('click', async () => {
-            const code = receiptCode.textContent;
+        // Modal copy button click
+        modalCopyBtn.addEventListener('click', async () => {
+            const code = modalCode.textContent;
             
             try {
                 await navigator.clipboard.writeText(code);
-                copyText.textContent = 'Copied!';
-                copyTooltip.classList.add('show');
-                copyBtn.style.backgroundColor = '#2d9a5e';
+                modalCopyText.textContent = 'Copied!';
+                modalCopyBtn.style.backgroundColor = '#2d9a5e';
                 
                 setTimeout(() => {
-                    copyText.textContent = 'Copy';
-                    copyTooltip.classList.remove('show');
-                    copyBtn.style.backgroundColor = '';
+                    modalCopyText.textContent = 'Copy';
+                    modalCopyBtn.style.backgroundColor = '';
                 }, 2000);
             } catch (err) {
-                // Fallback for older browsers
                 const textarea = document.createElement('textarea');
                 textarea.value = code;
                 document.body.appendChild(textarea);
@@ -755,26 +770,21 @@
                 document.execCommand('copy');
                 document.body.removeChild(textarea);
                 
-                copyText.textContent = 'Copied!';
-                setTimeout(() => copyText.textContent = 'Copy', 2000);
+                modalCopyText.textContent = 'Copied!';
+                setTimeout(() => modalCopyText.textContent = 'Copy', 2000);
             }
         });
 
-        // New payment button
-        newPaymentBtn.addEventListener('click', () => {
-            // Reset form
-            phoneInput.value = '';
-            amountInput.value = '';
-            
-            // Reset card glow
-            paymentCard.style.boxShadow = '';
-            
-            // Show step 1
-            step3.classList.add('hidden');
-            step1.classList.remove('hidden');
-            step1.classList.add('slide-up');
-            
-            setTimeout(() => step1.classList.remove('slide-up'), 500);
+        // Modal close button
+        modalCloseBtn.addEventListener('click', () => {
+            successModal.classList.remove('show');
+        });
+
+        // Close modal on backdrop click
+        successModal.addEventListener('click', (e) => {
+            if (e.target === successModal) {
+                successModal.classList.remove('show');
+            }
         });
 
         // Subtle 3D hover effect
