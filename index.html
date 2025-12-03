@@ -427,78 +427,52 @@
             opacity: 1;
         }
 
-        /* Floating Visit Site Bubble - Bottom Right */
-        .visit-site-bubble {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            display: flex;
+        /* Visit Site Button - Below Header */
+        .visit-site-btn {
+            display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 6px;
-            padding: 12px 18px;
+            padding: 8px 16px;
             background: linear-gradient(145deg, #3cb371, #2d9a5e);
             border-radius: 50px;
             box-shadow: 
-                0 4px 20px rgba(60, 179, 113, 0.5),
-                0 2px 10px rgba(0, 0, 0, 0.3);
+                0 3px 12px rgba(60, 179, 113, 0.4),
+                0 2px 6px rgba(0, 0, 0, 0.2);
             transition: all 0.3s ease;
             text-decoration: none;
             border: none;
-            z-index: 1000;
-            animation: bubblePulse 2s ease-in-out infinite;
         }
 
-        @keyframes bubblePulse {
-            0%, 100% { box-shadow: 0 4px 20px rgba(60, 179, 113, 0.5), 0 2px 10px rgba(0, 0, 0, 0.3); }
-            50% { box-shadow: 0 4px 30px rgba(60, 179, 113, 0.7), 0 2px 15px rgba(0, 0, 0, 0.4); }
-        }
-
-        .visit-site-bubble:hover {
-            transform: translateY(-4px) scale(1.08);
+        .visit-site-btn:hover {
+            transform: translateY(-2px) scale(1.05);
             box-shadow: 
-                0 8px 30px rgba(60, 179, 113, 0.6),
-                0 4px 15px rgba(0, 0, 0, 0.35);
-            animation: none;
+                0 5px 18px rgba(60, 179, 113, 0.5),
+                0 3px 10px rgba(0, 0, 0, 0.25);
         }
 
-        .visit-site-bubble:active {
+        .visit-site-btn:active {
             transform: translateY(0) scale(0.98);
         }
 
-        .visit-site-bubble .bubble-icon {
-            width: 18px;
-            height: 18px;
+        .visit-site-btn .btn-icon {
+            width: 14px;
+            height: 14px;
             color: #ffffff;
         }
 
-        .visit-site-bubble .bubble-text {
+        .visit-site-btn .btn-text {
             color: #ffffff;
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 600;
             letter-spacing: 0.3px;
         }
 
-        .light-mode .visit-site-bubble {
+        .light-mode .visit-site-btn {
             background: linear-gradient(145deg, #2d4a5e, #1e3a4f);
             box-shadow: 
-                0 4px 20px rgba(45, 74, 94, 0.5),
-                0 2px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        @media (max-width: 640px) {
-            .visit-site-bubble {
-                bottom: 15px;
-                right: 15px;
-                padding: 10px 14px;
-            }
-            .visit-site-bubble .bubble-text {
-                font-size: 11px;
-            }
-            .visit-site-bubble .bubble-icon {
-                width: 15px;
-                height: 15px;
-            }
+                0 3px 12px rgba(45, 74, 94, 0.4),
+                0 2px 6px rgba(0, 0, 0, 0.15);
         }
 
         /* Mobile Responsive */
@@ -673,10 +647,10 @@
 <body class="min-h-screen clean-bg overflow-x-hidden">
     <!-- Main Container -->
     <div class="min-h-screen flex items-center justify-center p-3 perspective-1000 relative z-10 mobile-top-align">
-        <div class="w-full max-w-[280px] sm:max-w-[320px] md:max-w-[380px] preserve-3d">
+        <div class="w-full max-w-[280px] sm:max-w-[320px] md:max-w-[380px] preserve-3d mx-auto">
             
             <!-- Header with Date/Time and Theme Toggle -->
-            <div class="flex items-center justify-between mb-3 px-1">
+            <div class="flex items-center justify-between mb-2 px-1">
                 <!-- Live Date/Time Display -->
                 <div class="text-center">
                     <div id="liveTime" class="text-lg font-bold text-white">12:00:00</div>
@@ -693,6 +667,16 @@
                     </div>
                     <span class="text-gray-400 text-sm">☀️</span>
                 </div>
+            </div>
+
+            <!-- Visit Site Button -->
+            <div class="flex justify-center mb-3">
+                <a href="coming-soon.html" class="visit-site-btn">
+                    <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+                    </svg>
+                    <span class="btn-text">Visit Site</span>
+                </a>
             </div>
             
             <!-- Payment Card -->
@@ -888,14 +872,6 @@
     </div>
 
     </div>
-
-    <!-- Floating Visit Site Bubble -->
-    <a href="coming-soon.html" class="visit-site-bubble">
-        <svg class="bubble-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
-        </svg>
-        <span class="bubble-text">Visit Site</span>
-    </a>
 
     <!-- Download Toast -->
     <div id="downloadToast" class="download-toast">
@@ -1143,45 +1119,39 @@
                 // Try to load logo
                 const logoData = await loadImage('logo-no-bg.png');
                 
-                // Top decorative line
-                doc.setDrawColor(...green);
-                doc.setLineWidth(0.8);
-                doc.line(5, 2, 75, 2);
-                
                 if (logoData) {
-                    // Add small centered logo
-                    doc.addImage(logoData, 'PNG', 30, 5, 20, 12);
-                    // Company name below logo
+                    // Logo on left, company name on right - horizontal layout
+                    doc.addImage(logoData, 'PNG', 8, 5, 18, 11);
                     doc.setTextColor(...navy);
-                    doc.setFontSize(10);
+                    doc.setFontSize(11);
                     doc.setFont('helvetica', 'bold');
-                    doc.text('Spectre Tech Limited', 40, 22, { align: 'center' });
+                    doc.text('Spectre Tech', 28, 10);
+                    doc.setFontSize(8);
+                    doc.setFont('helvetica', 'normal');
+                    doc.text('Limited', 28, 14);
                 } else {
                     // Fallback to text header if logo fails
                     doc.setTextColor(...navy);
                     doc.setFontSize(14);
                     doc.setFont('helvetica', 'bold');
-                    doc.text('SPECTRE', 40, 12, { align: 'center' });
-                    doc.setFontSize(8);
-                    doc.setFont('helvetica', 'normal');
-                    doc.text('Tech Limited', 40, 18, { align: 'center' });
+                    doc.text('Spectre Tech Limited', 40, 12, { align: 'center' });
                 }
 
                 // Decorative line under header
                 doc.setDrawColor(...navy);
                 doc.setLineWidth(0.4);
-                doc.line(10, 26, 70, 26);
+                doc.line(8, 19, 72, 19);
 
                 // Success Badge - refined
                 doc.setFillColor(220, 252, 231);
-                doc.roundedRect(18, 29, 44, 7, 2, 2, 'F');
+                doc.roundedRect(18, 22, 44, 7, 2, 2, 'F');
                 doc.setTextColor(22, 101, 52);
                 doc.setFontSize(7);
                 doc.setFont('helvetica', 'bold');
-                doc.text('✓ Payment Successful', 40, 33.5, { align: 'center' });
+                doc.text('✓ Payment Successful', 40, 26.5, { align: 'center' });
 
                 // Details section
-                let y = 42;
+                let y = 34;
                 const details = [
                     ['Amount Paid', currentPaymentData.amount || 'N/A'],
                     ['Phone', currentPaymentData.phone || 'N/A'],
