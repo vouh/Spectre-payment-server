@@ -427,64 +427,78 @@
             opacity: 1;
         }
 
-        /* Website Link - Compact Bubble Style */
-        .visit-site-btn-container {
+        /* Floating Visit Site Bubble - Bottom Right */
+        .visit-site-bubble {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
             display: flex;
-            justify-content: center;
-            margin-top: 16px;
-        }
-
-        .visit-site-btn {
-            display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 6px;
-            padding: 8px 16px;
+            padding: 12px 18px;
             background: linear-gradient(145deg, #3cb371, #2d9a5e);
             border-radius: 50px;
             box-shadow: 
-                0 4px 15px rgba(60, 179, 113, 0.4),
-                0 2px 8px rgba(0, 0, 0, 0.2);
+                0 4px 20px rgba(60, 179, 113, 0.5),
+                0 2px 10px rgba(0, 0, 0, 0.3);
             transition: all 0.3s ease;
             text-decoration: none;
             border: none;
+            z-index: 1000;
+            animation: bubblePulse 2s ease-in-out infinite;
         }
 
-        .visit-site-btn:hover {
-            transform: translateY(-3px) scale(1.05);
+        @keyframes bubblePulse {
+            0%, 100% { box-shadow: 0 4px 20px rgba(60, 179, 113, 0.5), 0 2px 10px rgba(0, 0, 0, 0.3); }
+            50% { box-shadow: 0 4px 30px rgba(60, 179, 113, 0.7), 0 2px 15px rgba(0, 0, 0, 0.4); }
+        }
+
+        .visit-site-bubble:hover {
+            transform: translateY(-4px) scale(1.08);
             box-shadow: 
-                0 6px 20px rgba(60, 179, 113, 0.5),
-                0 4px 12px rgba(0, 0, 0, 0.25);
+                0 8px 30px rgba(60, 179, 113, 0.6),
+                0 4px 15px rgba(0, 0, 0, 0.35);
+            animation: none;
         }
 
-        .visit-site-btn:active {
+        .visit-site-bubble:active {
             transform: translateY(0) scale(0.98);
         }
 
-        .visit-site-btn .link-icon {
-            width: 16px;
-            height: 16px;
+        .visit-site-bubble .bubble-icon {
+            width: 18px;
+            height: 18px;
             color: #ffffff;
         }
 
-        .visit-site-btn .link-text {
+        .visit-site-bubble .bubble-text {
             color: #ffffff;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 600;
             letter-spacing: 0.3px;
         }
 
-        .light-mode .visit-site-btn {
+        .light-mode .visit-site-bubble {
             background: linear-gradient(145deg, #2d4a5e, #1e3a4f);
             box-shadow: 
-                0 4px 15px rgba(45, 74, 94, 0.4),
-                0 2px 8px rgba(0, 0, 0, 0.15);
+                0 4px 20px rgba(45, 74, 94, 0.5),
+                0 2px 10px rgba(0, 0, 0, 0.2);
         }
 
-        .light-mode .visit-site-btn:hover {
-            box-shadow: 
-                0 6px 20px rgba(45, 74, 94, 0.5),
-                0 4px 12px rgba(0, 0, 0, 0.2);
+        @media (max-width: 640px) {
+            .visit-site-bubble {
+                bottom: 15px;
+                right: 15px;
+                padding: 10px 14px;
+            }
+            .visit-site-bubble .bubble-text {
+                font-size: 11px;
+            }
+            .visit-site-bubble .bubble-icon {
+                width: 15px;
+                height: 15px;
+            }
         }
 
         /* Mobile Responsive */
@@ -502,7 +516,7 @@
             .mobile-top-align {
                 align-items: flex-start !important;
                 justify-content: flex-start !important;
-                padding-top: 0.75rem !important;
+                padding-top: 1.5rem !important;
                 padding-bottom: 0.5rem !important;
                 min-height: auto !important;
             }
@@ -659,7 +673,7 @@
 <body class="min-h-screen clean-bg overflow-x-hidden">
     <!-- Main Container -->
     <div class="min-h-screen flex items-center justify-center p-3 perspective-1000 relative z-10 mobile-top-align">
-        <div class="w-full max-w-xs sm:max-w-sm md:max-w-md preserve-3d">
+        <div class="w-full max-w-[280px] sm:max-w-[320px] md:max-w-[380px] preserve-3d">
             
             <!-- Header with Date/Time and Theme Toggle -->
             <div class="flex items-center justify-between mb-3 px-1">
@@ -777,15 +791,6 @@
                         </div>
                     </div>
 
-                    <!-- Visit Website Button -->
-                    <div class="visit-site-btn-container">
-                        <a href="coming-soon.html" class="visit-site-btn">
-                            <svg class="link-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
-                            </svg>
-                            <span class="link-text">Visit Site</span>
-                        </a>
-                    </div>
                 </div>
 
                 <!-- Step 2: Processing STK Push -->
@@ -883,6 +888,14 @@
     </div>
 
     </div>
+
+    <!-- Floating Visit Site Bubble -->
+    <a href="coming-soon.html" class="visit-site-bubble">
+        <svg class="bubble-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+        </svg>
+        <span class="bubble-text">Visit Site</span>
+    </a>
 
     <!-- Download Toast -->
     <div id="downloadToast" class="download-toast">
@@ -1130,40 +1143,45 @@
                 // Try to load logo
                 const logoData = await loadImage('logo-no-bg.png');
                 
-                // Header line
+                // Top decorative line
                 doc.setDrawColor(...green);
-                doc.setLineWidth(0.5);
-                doc.line(10, 2, 70, 2);
+                doc.setLineWidth(0.8);
+                doc.line(5, 2, 75, 2);
                 
                 if (logoData) {
-                    // Add smaller, centered logo
-                    doc.addImage(logoData, 'PNG', 27, 4, 26, 16);
+                    // Add small centered logo
+                    doc.addImage(logoData, 'PNG', 30, 5, 20, 12);
+                    // Company name below logo
+                    doc.setTextColor(...navy);
+                    doc.setFontSize(10);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('Spectre Tech Limited', 40, 22, { align: 'center' });
                 } else {
                     // Fallback to text header if logo fails
                     doc.setTextColor(...navy);
-                    doc.setFontSize(12);
+                    doc.setFontSize(14);
                     doc.setFont('helvetica', 'bold');
                     doc.text('SPECTRE', 40, 12, { align: 'center' });
-                    doc.setFontSize(6);
+                    doc.setFontSize(8);
                     doc.setFont('helvetica', 'normal');
-                    doc.text('Tech Limited', 40, 17, { align: 'center' });
+                    doc.text('Tech Limited', 40, 18, { align: 'center' });
                 }
 
-                // Decorative line under logo
+                // Decorative line under header
                 doc.setDrawColor(...navy);
-                doc.setLineWidth(0.3);
-                doc.line(15, 22, 65, 22);
+                doc.setLineWidth(0.4);
+                doc.line(10, 26, 70, 26);
 
                 // Success Badge - refined
                 doc.setFillColor(220, 252, 231);
-                doc.roundedRect(18, 25, 44, 7, 2, 2, 'F');
+                doc.roundedRect(18, 29, 44, 7, 2, 2, 'F');
                 doc.setTextColor(22, 101, 52);
                 doc.setFontSize(7);
                 doc.setFont('helvetica', 'bold');
-                doc.text('✓ Payment Successful', 40, 29.5, { align: 'center' });
+                doc.text('✓ Payment Successful', 40, 33.5, { align: 'center' });
 
                 // Details section
-                let y = 38;
+                let y = 42;
                 const details = [
                     ['Amount Paid', currentPaymentData.amount || 'N/A'],
                     ['Phone', currentPaymentData.phone || 'N/A'],
