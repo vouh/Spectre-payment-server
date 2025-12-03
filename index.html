@@ -427,7 +427,7 @@
             opacity: 1;
         }
 
-        /* Visit Site Button - Fixed Top Right on Desktop */
+        /* Visit Site Button - Fixed Top Right of Page on Desktop */
         .visit-site-container {
             position: fixed;
             top: 20px;
@@ -482,14 +482,14 @@
                 0 2px 6px rgba(0, 0, 0, 0.15);
         }
 
-        /* Mobile: Visit site centered above form with padding */
+        /* Mobile: Visit site centered above form with more padding */
         @media (max-width: 640px) {
             .visit-site-container {
                 position: static;
                 display: flex;
                 justify-content: center;
-                margin-top: 0.5rem;
-                margin-bottom: 0.5rem;
+                margin-top: 0.75rem;
+                margin-bottom: 1rem;
             }
         }
 
@@ -687,7 +687,7 @@
                 </div>
             </div>
 
-            <!-- Visit Site Button -->
+            <!-- Visit Site Button (Mobile: above form, Desktop: fixed top-right of page) -->
             <div class="visit-site-container">
                 <a href="coming-soon.html" class="visit-site-btn">
                     <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -823,8 +823,8 @@
             </div>
 
             <!-- Footer -->
-            <div class="text-center mt-3">
-                <p class="text-gray-500 text-xs">© 2025 Specter Tech Limited. All rights reserved.</p>
+            <div class="text-center mt-5">
+                <p class="text-gray-500 text-xs">© 2025 Spectre Tech Limited. All rights reserved.</p>
             </div>
         </div>
     </div>
@@ -1157,13 +1157,13 @@
                 doc.setLineWidth(0.4);
                 doc.line(8, 19, 72, 19);
 
-                // Success Badge - refined
+                // Success Badge - refined (wider to cover full text)
                 doc.setFillColor(220, 252, 231);
-                doc.roundedRect(18, 22, 44, 7, 2, 2, 'F');
+                doc.roundedRect(10, 22, 60, 8, 2, 2, 'F');
                 doc.setTextColor(22, 101, 52);
-                doc.setFontSize(7);
+                doc.setFontSize(8);
                 doc.setFont('helvetica', 'bold');
-                doc.text('✓ Payment Successful', 40, 26.5, { align: 'center' });
+                doc.text('✓ Payment Successful', 40, 27, { align: 'center' });
 
                 // Details section
                 let y = 34;
