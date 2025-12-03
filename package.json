@@ -4,7 +4,7 @@
   "description": "Spectre Tech Limited - M-Pesa Payment System",
   "type": "module",
   "engines": {
-    "node": "22.x"
+    "node": "24.x"
   },
   "scripts": {
     "dev": "vercel dev",
