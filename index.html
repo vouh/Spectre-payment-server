@@ -427,63 +427,64 @@
             opacity: 1;
         }
 
-        /* Website Link - Below Form Button */
-        .visit-site-btn {
+        /* Website Link - Compact Bubble Style */
+        .visit-site-btn-container {
             display: flex;
+            justify-content: center;
+            margin-top: 16px;
+        }
+
+        .visit-site-btn {
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            width: 100%;
-            padding: 10px 16px;
-            background: linear-gradient(145deg, #1e3a4f, #162a3a);
-            border-radius: 10px;
+            gap: 6px;
+            padding: 8px 16px;
+            background: linear-gradient(145deg, #3cb371, #2d9a5e);
+            border-radius: 50px;
             box-shadow: 
-                3px 3px 8px rgba(0, 0, 0, 0.3),
-                -2px -2px 6px rgba(60, 179, 113, 0.08);
+                0 4px 15px rgba(60, 179, 113, 0.4),
+                0 2px 8px rgba(0, 0, 0, 0.2);
             transition: all 0.3s ease;
             text-decoration: none;
-            border: 1px solid rgba(60, 179, 113, 0.3);
-            margin-top: 12px;
+            border: none;
         }
 
         .visit-site-btn:hover {
-            transform: translateY(-2px);
+            transform: translateY(-3px) scale(1.05);
             box-shadow: 
-                4px 4px 12px rgba(0, 0, 0, 0.4),
-                -2px -2px 8px rgba(60, 179, 113, 0.12);
-            border-color: rgba(60, 179, 113, 0.5);
+                0 6px 20px rgba(60, 179, 113, 0.5),
+                0 4px 12px rgba(0, 0, 0, 0.25);
         }
 
         .visit-site-btn:active {
-            transform: translateY(1px);
+            transform: translateY(0) scale(0.98);
         }
 
         .visit-site-btn .link-icon {
-            width: 18px;
-            height: 18px;
-            color: #3cb371;
+            width: 16px;
+            height: 16px;
+            color: #ffffff;
         }
 
         .visit-site-btn .link-text {
-            color: #94a3b8;
-            font-size: 13px;
-            font-weight: 500;
-        }
-
-        .visit-site-btn .link-arrow {
-            color: #3cb371;
-            font-size: 14px;
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
         }
 
         .light-mode .visit-site-btn {
-            background: linear-gradient(145deg, #ffffff, #f1f5f9);
+            background: linear-gradient(145deg, #2d4a5e, #1e3a4f);
             box-shadow: 
-                3px 3px 8px rgba(0, 0, 0, 0.1),
-                -2px -2px 6px rgba(255, 255, 255, 0.8);
+                0 4px 15px rgba(45, 74, 94, 0.4),
+                0 2px 8px rgba(0, 0, 0, 0.15);
         }
 
-        .light-mode .visit-site-btn .link-text {
-            color: #475569;
+        .light-mode .visit-site-btn:hover {
+            box-shadow: 
+                0 6px 20px rgba(45, 74, 94, 0.5),
+                0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         /* Mobile Responsive */
@@ -501,7 +502,7 @@
             .mobile-top-align {
                 align-items: flex-start !important;
                 justify-content: flex-start !important;
-                padding-top: 0 !important;
+                padding-top: 0.75rem !important;
                 padding-bottom: 0.5rem !important;
                 min-height: auto !important;
             }
@@ -777,13 +778,14 @@
                     </div>
 
                     <!-- Visit Website Button -->
-                    <a href="coming-soon.html" class="visit-site-btn">
-                        <svg class="link-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
-                        </svg>
-                        <span class="link-text">Visit Spectre Tech Website</span>
-                        <span class="link-arrow">→</span>
-                    </a>
+                    <div class="visit-site-btn-container">
+                        <a href="coming-soon.html" class="visit-site-btn">
+                            <svg class="link-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+                            </svg>
+                            <span class="link-text">Visit Site</span>
+                        </a>
+                    </div>
                 </div>
 
                 <!-- Step 2: Processing STK Push -->
@@ -1128,32 +1130,40 @@
                 // Try to load logo
                 const logoData = await loadImage('logo-no-bg.png');
                 
+                // Header line
+                doc.setDrawColor(...green);
+                doc.setLineWidth(0.5);
+                doc.line(10, 2, 70, 2);
+                
                 if (logoData) {
-                    // Add logo at top center
-                    doc.addImage(logoData, 'PNG', 20, 3, 40, 25);
+                    // Add smaller, centered logo
+                    doc.addImage(logoData, 'PNG', 27, 4, 26, 16);
                 } else {
                     // Fallback to text header if logo fails
-                    doc.setFillColor(...navy);
-                    doc.roundedRect(10, 5, 60, 20, 3, 3, 'F');
-                    doc.setTextColor(255, 255, 255);
-                    doc.setFontSize(14);
+                    doc.setTextColor(...navy);
+                    doc.setFontSize(12);
                     doc.setFont('helvetica', 'bold');
-                    doc.text('SPECTRE', 40, 14, { align: 'center' });
-                    doc.setFontSize(7);
+                    doc.text('SPECTRE', 40, 12, { align: 'center' });
+                    doc.setFontSize(6);
                     doc.setFont('helvetica', 'normal');
-                    doc.text('Tech Limited', 40, 20, { align: 'center' });
+                    doc.text('Tech Limited', 40, 17, { align: 'center' });
                 }
 
-                // Success Badge
+                // Decorative line under logo
+                doc.setDrawColor(...navy);
+                doc.setLineWidth(0.3);
+                doc.line(15, 22, 65, 22);
+
+                // Success Badge - refined
                 doc.setFillColor(220, 252, 231);
-                doc.roundedRect(15, 30, 50, 8, 2, 2, 'F');
+                doc.roundedRect(18, 25, 44, 7, 2, 2, 'F');
                 doc.setTextColor(22, 101, 52);
-                doc.setFontSize(8);
+                doc.setFontSize(7);
                 doc.setFont('helvetica', 'bold');
-                doc.text('Payment Successful', 40, 35, { align: 'center' });
+                doc.text('✓ Payment Successful', 40, 29.5, { align: 'center' });
 
                 // Details section
-                let y = 45;
+                let y = 38;
                 const details = [
                     ['Amount Paid', currentPaymentData.amount || 'N/A'],
                     ['Phone', currentPaymentData.phone || 'N/A'],
