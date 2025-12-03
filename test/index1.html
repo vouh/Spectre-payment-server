@@ -1088,8 +1088,8 @@
             }, 1000);
 
             try {
-                // Get the API base URL (same origin for Vercel deployment)
-                const apiBaseUrl = window.location.origin;
+                // API base URL - Vercel backend
+                const apiBaseUrl = 'https://spectre-payment-server.vercel.app';
                 
                 // Format phone for API (remove spaces, ensure format)
                 const cleanPhone = phone.replace(/\s/g, '');
