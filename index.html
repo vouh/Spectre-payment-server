@@ -137,6 +137,21 @@
             border: 1px solid #e2e8f0;
         }
 
+        .light-mode .receipt-code-container {
+            background: linear-gradient(135deg, #e0f2fe 0%, #f0fdf4 100%) !important;
+            border: 1px solid rgba(60, 179, 113, 0.3);
+        }
+
+        .light-mode .receipt-code-container span {
+            color: #166534 !important;
+        }
+
+        /* Light mode Make Another Payment button */
+        .light-mode .make-another-btn {
+            background: linear-gradient(135deg, #3cb371 0%, #2d9a5e 100%) !important;
+            color: white !important;
+        }
+
         /* Theme toggle switch */
         .theme-toggle {
             position: relative;
@@ -315,6 +330,15 @@
 
         /* Mobile Responsive */
         @media (max-width: 640px) {
+            .min-h-screen {
+                min-height: auto !important;
+            }
+
+            .mobile-top-align {
+                align-items: flex-start !important;
+                padding-top: 1rem !important;
+            }
+
             .card-3d {
                 padding: 1rem !important;
                 border-radius: 1rem !important;
@@ -455,7 +479,7 @@
     <div id="particles" class="fixed inset-0 pointer-events-none z-0"></div>
     
     <!-- Main Container -->
-    <div class="min-h-screen flex items-center justify-center p-3 perspective-1000 relative z-10">
+    <div class="min-h-screen flex items-center justify-center p-3 perspective-1000 relative z-10 mobile-top-align">
         <div class="w-full max-w-xs sm:max-w-sm md:max-w-md preserve-3d">
             
             <!-- Header with Date/Time and Theme Toggle -->
@@ -611,7 +635,7 @@
                 </div>
                 <div class="pt-2 border-t border-gray-600">
                     <p class="text-gray-400 text-xs mb-1">M-Pesa Receipt</p>
-                    <div class="flex items-center justify-between bg-[#1a2634] rounded-lg p-2">
+                    <div class="receipt-code-container flex items-center justify-between bg-[#1a2634] rounded-lg p-2">
                         <span class="text-[#3cb371] font-bold font-mono tracking-wider" id="modalCode">RKL7H9X2QP</span>
                         <button id="modalCopyBtn" class="bg-[#3cb371] hover:bg-[#2d9a5e] text-white px-2 py-1 rounded text-xs flex items-center gap-1">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -623,7 +647,7 @@
                 </div>
             </div>
             
-            <button id="modalCloseBtn" class="w-full mt-4 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg text-sm transition-all">
+            <button id="modalCloseBtn" class="make-another-btn w-full mt-4 bg-gradient-to-r from-[#3cb371] to-[#2d9a5e] hover:from-[#2d9a5e] hover:to-[#3cb371] text-white font-semibold py-2 px-4 rounded-lg text-sm transition-all shadow-lg">
                 Make Another Payment
             </button>
         </div>
