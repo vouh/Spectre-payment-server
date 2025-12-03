@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spectre Secure Payment - M-Pesa</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
         
@@ -495,13 +496,22 @@
 
             .mobile-top-align {
                 align-items: flex-start !important;
-                padding-top: 1rem !important;
+                padding-top: 0.5rem !important;
+                padding-bottom: 1rem !important;
             }
 
             .card-3d {
-                padding: 1rem !important;
+                padding: 0.75rem !important;
                 border-radius: 1rem !important;
-                margin: 0 1rem;
+                margin: 0 0.5rem;
+            }
+
+            .mb-3 {
+                margin-bottom: 0.5rem !important;
+            }
+
+            .mb-4 {
+                margin-bottom: 0.75rem !important;
             }
 
             .glow-green {
@@ -1026,91 +1036,98 @@
             successModal.classList.remove('show');
         });
 
-        // Print Receipt Button
-        printReceiptBtn.addEventListener('click', () => {
-            const printWindow = window.open('', '_blank');
-            const receiptHTML = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>Payment Receipt - Spectre Tech</title>
-                    <style>
-                        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-                        * { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
-                        body { padding: 20px; background: #f8fafc; }
-                        .receipt { max-width: 350px; margin: 0 auto; background: white; border-radius: 16px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-                        .header { text-align: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px dashed #e2e8f0; }
-                        .logo-placeholder { width: 60px; height: 60px; background: linear-gradient(135deg, #2d4a5e, #3cb371); border-radius: 12px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 10px; }
-                        .company-name { font-size: 20px; font-weight: 700; color: #2d4a5e; }
-                        .subtitle { font-size: 11px; color: #64748b; margin-top: 4px; }
-                        .success-badge { background: #dcfce7; color: #166534; padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block; margin: 12px 0; }
-                        .details { margin: 16px 0; }
-                        .detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9; }
-                        .detail-row:last-child { border-bottom: none; }
-                        .label { color: #64748b; font-size: 12px; }
-                        .value { color: #1e293b; font-size: 12px; font-weight: 500; text-align: right; max-width: 180px; word-wrap: break-word; }
-                        .receipt-code-section { background: linear-gradient(135deg, #2d4a5e, #1e3a4f); border-radius: 10px; padding: 14px; margin: 16px 0; text-align: center; }
-                        .receipt-label { color: #94a3b8; font-size: 10px; margin-bottom: 6px; }
-                        .receipt-code { color: #3cb371; font-size: 18px; font-weight: 700; letter-spacing: 3px; font-family: 'Courier New', monospace; }
-                        .footer { text-align: center; margin-top: 16px; padding-top: 16px; border-top: 2px dashed #e2e8f0; }
-                        .footer p { font-size: 10px; color: #94a3b8; margin: 4px 0; }
-                        .mpesa-badge { background: #4CAF50; color: white; padding: 4px 12px; border-radius: 12px; font-size: 10px; font-weight: 600; display: inline-block; margin-top: 8px; }
-                        @media print {
-                            body { padding: 0; background: white; }
-                            .receipt { box-shadow: none; max-width: 100%; }
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="receipt">
-                        <div class="header">
-                            <div class="logo-placeholder">SPECTRE</div>
-                            <div class="company-name">Spectre Tech Limited</div>
-                            <div class="subtitle">Reliable Tech Solutions</div>
-                            <div class="success-badge">✓ Payment Successful</div>
-                        </div>
-                        <div class="details">
-                            <div class="detail-row">
-                                <span class="label">Amount Paid</span>
-                                <span class="value" style="font-weight: 700; color: #3cb371;">${currentPaymentData.amount}</span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="label">Phone Number</span>
-                                <span class="value">${currentPaymentData.phone}</span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="label">Payment For</span>
-                                <span class="value">${currentPaymentData.reason}</span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="label">Date</span>
-                                <span class="value">${currentPaymentData.date}</span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="label">Time</span>
-                                <span class="value">${currentPaymentData.time}</span>
-                            </div>
-                        </div>
-                        <div class="receipt-code-section">
-                            <div class="receipt-label">M-PESA RECEIPT NUMBER</div>
-                            <div class="receipt-code">${currentPaymentData.code}</div>
-                        </div>
-                        <div class="footer">
-                            <p>Thank you for your payment!</p>
-                            <p>For inquiries: support@specter.com</p>
-                            <div class="mpesa-badge">Powered by M-PESA</div>
-                        </div>
-                    </div>
-                    <script>
-                        window.onload = function() {
-                            window.print();
-                        };
-                    <\/script>
-                </body>
-                </html>
-            `;
-            printWindow.document.write(receiptHTML);
-            printWindow.document.close();
+        // Print Receipt Button - Direct PDF Download
+        printReceiptBtn.addEventListener('click', async () => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: [80, 150]
+            });
+
+            // Colors
+            const green = [60, 179, 113];
+            const navy = [45, 74, 94];
+            const gray = [100, 116, 139];
+            const darkText = [30, 41, 59];
+
+            // Header
+            doc.setFillColor(...navy);
+            doc.roundedRect(10, 5, 60, 20, 3, 3, 'F');
+            
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.text('SPECTRE', 40, 14, { align: 'center' });
+            
+            doc.setFontSize(7);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Tech Limited', 40, 20, { align: 'center' });
+
+            // Success Badge
+            doc.setFillColor(220, 252, 231);
+            doc.roundedRect(15, 30, 50, 8, 2, 2, 'F');
+            doc.setTextColor(22, 101, 52);
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'bold');
+            doc.text('\u2713 Payment Successful', 40, 35, { align: 'center' });
+
+            // Details section
+            let y = 45;
+            const details = [
+                ['Amount Paid', currentPaymentData.amount],
+                ['Phone', currentPaymentData.phone],
+                ['Reason', currentPaymentData.reason],
+                ['Date', currentPaymentData.date],
+                ['Time', currentPaymentData.time]
+            ];
+
+            doc.setFontSize(8);
+            details.forEach(([label, value]) => {
+                doc.setTextColor(...gray);
+                doc.setFont('helvetica', 'normal');
+                doc.text(label, 10, y);
+                
+                doc.setTextColor(...darkText);
+                doc.setFont('helvetica', 'bold');
+                const truncatedValue = value.length > 20 ? value.substring(0, 20) + '...' : value;
+                doc.text(truncatedValue, 70, y, { align: 'right' });
+                
+                y += 8;
+            });
+
+            // Receipt Code Section
+            y += 2;
+            doc.setFillColor(...navy);
+            doc.roundedRect(10, y, 60, 18, 3, 3, 'F');
+            
+            doc.setTextColor(148, 163, 184);
+            doc.setFontSize(6);
+            doc.setFont('helvetica', 'normal');
+            doc.text('M-PESA RECEIPT NUMBER', 40, y + 5, { align: 'center' });
+            
+            doc.setTextColor(...green);
+            doc.setFontSize(12);
+            doc.setFont('courier', 'bold');
+            doc.text(currentPaymentData.code, 40, y + 13, { align: 'center' });
+
+            // Footer
+            y += 25;
+            doc.setTextColor(...gray);
+            doc.setFontSize(6);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Thank you for your payment!', 40, y, { align: 'center' });
+            doc.text('support@specter.com', 40, y + 4, { align: 'center' });
+
+            // M-Pesa badge
+            doc.setFillColor(76, 175, 80);
+            doc.roundedRect(25, y + 7, 30, 6, 2, 2, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(6);
+            doc.text('Powered by M-PESA', 40, y + 11, { align: 'center' });
+
+            // Download the PDF
+            doc.save(`Spectre_Receipt_${currentPaymentData.code}.pdf`);
         });
 
         // Hide reason error on input
