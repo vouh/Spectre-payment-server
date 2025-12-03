@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spectre Secure Payment - M-Pesa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+
+        .preserve-3d {
+            transform-style: preserve-3d;
+        }
+
+        .card-3d {
+            transform: rotateX(0deg) rotateY(0deg);
+            transition: transform 0.5s ease, box-shadow 0.5s ease;
+        }
+
+        .card-3d:hover {
+            transform: translateZ(20px) scale(1.02);
+            box-shadow: 0 25px 60px rgba(60, 179, 113, 0.3);
+        }
+
+        .mpesa-gradient {
+            background: linear-gradient(135deg, #2d4a5e 0%, #3cb371 100%);
+        }
+
+        .dark-gradient {
+            background: linear-gradient(135deg, #1a2634 0%, #2d4a5e 50%, #1e3a4f 100%);
+        }
+
+        .light-gradient {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #bae6fd 100%);
+        }
+
+        /* Light theme styles */
+        .light-mode .card-3d {
+            background: linear-gradient(135deg, #ffffff, #f8fafc, #f1f5f9) !important;
+            border-color: rgba(60, 179, 113, 0.5) !important;
+        }
+
+        .light-mode .glow-green {
+            box-shadow: 0 10px 40px rgba(60, 179, 113, 0.2), 0 0 40px rgba(45, 74, 94, 0.1);
+        }
+
+        .light-mode .text-white {
+            color: #1e293b !important;
+        }
+
+        .light-mode .text-gray-400 {
+            color: #64748b !important;
+        }
+
+        .light-mode .text-gray-500 {
+            color: #475569 !important;
+        }
+
+        .light-mode .bg-gray-700 {
+            background-color: #e2e8f0 !important;
+            color: #1e293b !important;
+        }
+
+        .light-mode .bg-gray-800 {
+            background-color: #f1f5f9 !important;
+            color: #1e293b !important;
+        }
+
+        .light-mode .bg-gray-900 {
+            background-color: #e2e8f0 !important;
+        }
+
+        .light-mode .border-gray-600 {
+            border-color: #cbd5e1 !important;
+        }
+
+        .light-mode .border-gray-700 {
+            border-color: #e2e8f0 !important;
+        }
+
+        .light-mode .glow-text {
+            text-shadow: none;
+            color: #2d4a5e !important;
+        }
+
+        .light-mode .input-3d {
+            box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.1), 
+                        inset -1px -1px 3px rgba(255, 255, 255, 0.8);
+        }
+
+        .light-mode .particle {
+            background: #3cb371;
+        }
+
+        /* Theme toggle switch */
+        .theme-toggle {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: linear-gradient(135deg, #1e293b, #334155);
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle.light {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        }
+
+        .theme-toggle-ball {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-toggle.light .theme-toggle-ball {
+            transform: translateX(30px);
+        }
+
+        .glow-green {
+            box-shadow: 0 0 20px rgba(60, 179, 113, 0.3), 0 0 40px rgba(45, 74, 94, 0.2);
+        }
+
+        .glow-text {
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            color: #3cb371;
+        }
+
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .pulse-ring {
+            animation: pulse-ring 2s infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        .slide-up {
+            animation: slideUp 0.5s ease-out forwards;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .success-check {
+            animation: checkmark 0.5s ease-in-out forwards;
+        }
+
+        @keyframes checkmark {
+            0% { stroke-dashoffset: 100; }
+            100% { stroke-dashoffset: 0; }
+        }
+
+        .input-3d {
+            box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.3), 
+                        inset -2px -2px 5px rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-3d {
+            box-shadow: 0 6px 0 #2d4a5e, 0 8px 20px rgba(60, 179, 113, 0.3);
+            transform: translateY(0);
+            transition: all 0.15s ease;
+        }
+
+        .btn-3d:active {
+            box-shadow: 0 2px 0 #2d4a5e, 0 4px 10px rgba(60, 179, 113, 0.3);
+            transform: translateY(4px);
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #3cb371;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .receipt-code {
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+        }
+
+        .copy-tooltip {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .copy-tooltip.show {
+            opacity: 1;
+        }
+
+        /* Floating Website Button */
+        .floating-website-btn {
+            position: fixed;
+            bottom: 50%;
+            right: calc(50% - 280px);
+            transform: translateY(50%);
+            z-index: 1000;
+            animation: bubble-float 3s ease-in-out infinite;
+        }
+
+        .floating-website-btn a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #2d4a5e 0%, #3cb371 100%);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(60, 179, 113, 0.3), 0 0 30px rgba(45, 74, 94, 0.2);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            gap: 6px;
+        }
+
+        .floating-website-btn a:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 30px rgba(60, 179, 113, 0.5), 0 0 40px rgba(45, 74, 94, 0.3);
+        }
+
+        .floating-website-btn .btn-text {
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        @keyframes bubble-float {
+            0%, 100% { transform: translateY(50%); }
+            50% { transform: translateY(calc(50% - 8px)); }
+        }
+
+        /* Hide on smaller screens and show inside card instead */
+        @media (max-width: 1100px) {
+            .floating-website-btn {
+                display: none;
+            }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 640px) {
+            .card-3d {
+                padding: 1.5rem !important;
+                border-radius: 1.5rem !important;
+            }
+
+            .glow-green {
+                box-shadow: 0 0 15px rgba(60, 179, 113, 0.3), 0 0 20px rgba(45, 74, 94, 0.2);
+            }
+
+            .floating img {
+                width: 5rem !important;
+                height: 5rem !important;
+            }
+
+            #liveTime {
+                font-size: 1.25rem !important;
+            }
+
+            #liveDate {
+                font-size: 0.75rem !important;
+            }
+
+            .theme-toggle {
+                width: 50px;
+                height: 26px;
+            }
+
+            .theme-toggle-ball {
+                width: 20px;
+                height: 20px;
+            }
+
+            .theme-toggle.light .theme-toggle-ball {
+                transform: translateX(24px);
+            }
+
+            .mobile-website-btn {
+                display: flex !important;
+            }
+        }
+
+        /* Tablet and Desktop */
+        @media (min-width: 641px) {
+            .card-3d {
+                padding: 2.5rem !important;
+            }
+
+            .mobile-website-btn {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen dark-gradient overflow-x-hidden">
+    <!-- Floating Particles Background -->
+    <div id="particles" class="fixed inset-0 pointer-events-none z-0"></div>
+    
+    <!-- Main Container -->
+    <div class="min-h-screen flex items-center justify-center p-4 perspective-1000 relative z-10">
+        <div class="max-w-lg w-full preserve-3d">
+            
+            <!-- Header with Date/Time and Theme Toggle -->
+            <div class="flex items-center justify-between mb-6 px-2">
+                <!-- Live Date/Time Display -->
+                <div class="text-center">
+                    <div id="liveTime" class="text-2xl font-bold text-white">12:00:00</div>
+                    <div id="liveDate" class="text-sm text-[#3cb371] font-medium">3 Dec 2025 WED</div>
+                </div>
+                
+                <!-- Theme Toggle -->
+                <div class="flex items-center gap-3">
+                    <span class="text-gray-400 text-sm">🌙</span>
+                    <div id="themeToggle" class="theme-toggle">
+                        <div class="theme-toggle-ball">
+                            <span id="toggleIcon" class="text-xs">🌙</span>
+                        </div>
+                    </div>
+                    <span class="text-gray-400 text-sm">☀️</span>
+                </div>
+            </div>
+            
+            <!-- Payment Card -->
+            <div id="paymentCard" class="card-3d bg-gradient-to-br from-[#1a2634] via-[#243442] to-[#1a2634] rounded-3xl p-8 border border-[#3cb371]/30 glow-green">
+                
+                <!-- Logo Section -->
+                <div class="text-center mb-8">
+                    <div class="floating inline-block">
+                        <img src="logo.jpg" alt="Spectre Logo" class="w-24 h-24 mx-auto rounded-2xl shadow-lg mb-4 border-2 border-[#3cb371]/50">
+                    </div>
+                    <h1 class="text-2xl font-bold glow-text">SPECTRE</h1>
+                    <p class="text-[#3cb371] text-sm mt-1">Reliable Tech Solutions | Powered by M-Pesa</p>
+                </div>
+
+                <!-- M-Pesa Badge -->
+                <div class="flex items-center justify-center gap-2 mb-8">
+                    <div class="bg-[#3cb371] text-white px-4 py-2 rounded-full flex items-center gap-2 shadow-lg">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                        <span class="font-semibold">M-PESA</span>
+                    </div>
+                </div>
+
+                <!-- Step 1: Phone Number Input -->
+                <div id="step1" class="space-y-6">
+                    <div class="relative">
+                        <label class="block text-[#3cb371] text-sm font-medium mb-2">Phone Number</label>
+                        <div class="flex items-center">
+                            <span class="bg-gray-700 text-white px-4 py-4 rounded-l-xl border border-r-0 border-gray-600">+254</span>
+                            <input 
+                                type="tel" 
+                                id="phoneInput" 
+                                placeholder="712 345 678"
+                                maxlength="12"
+                                class="input-3d w-full bg-gray-800 text-white text-lg px-4 py-4 rounded-r-xl border border-gray-600 focus:border-[#3cb371] focus:outline-none focus:ring-2 focus:ring-[#3cb371]/50 transition-all"
+                            >
+                        </div>
+                        <p id="phoneError" class="text-red-400 text-sm mt-2 hidden">Please enter a valid phone number</p>
+                    </div>
+
+                    <div class="relative">
+                        <label class="block text-[#3cb371] text-sm font-medium mb-2">Amount (KES)</label>
+                        <input 
+                            type="number" 
+                            id="amountInput" 
+                            placeholder="Enter amount"
+                            min="1"
+                            class="input-3d w-full bg-gray-800 text-white text-lg px-4 py-4 rounded-xl border border-gray-600 focus:border-[#3cb371] focus:outline-none focus:ring-2 focus:ring-[#3cb371]/50 transition-all"
+                        >
+                    </div>
+
+                    <button 
+                        id="payBtn"
+                        class="btn-3d w-full mpesa-gradient text-white font-bold py-4 px-8 rounded-xl text-lg transition-all hover:brightness-110"
+                    >
+                        Pay with M-Pesa
+                    </button>
+
+                    <div class="flex items-center justify-center gap-4 text-gray-400 text-sm">
+                        <div class="flex items-center gap-1">
+                            <svg class="w-4 h-4 text-[#3cb371]" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>
+                            </svg>
+                            <span>Secure</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <svg class="w-4 h-4 text-[#3cb371]" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+                            </svg>
+                            <span>Encrypted</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Processing STK Push -->
+                <div id="step2" class="hidden space-y-6 text-center">
+                    <div class="relative w-24 h-24 mx-auto">
+                        <div class="absolute inset-0 border-4 border-[#3cb371]/30 rounded-full pulse-ring"></div>
+                        <div class="absolute inset-0 border-4 border-[#3cb371]/30 rounded-full pulse-ring" style="animation-delay: 0.5s"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <svg class="w-12 h-12 text-[#3cb371] animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold text-white">STK Push Sent!</h3>
+                    <p class="text-gray-400">Check your phone for the M-Pesa prompt</p>
+                    <p class="text-[#3cb371] font-medium" id="displayPhone">+254 712 345 678</p>
+                    <div class="flex items-center justify-center gap-2 text-yellow-400">
+                        <svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                        <span>Waiting for confirmation...</span>
+                    </div>
+                    <div class="text-gray-500 text-sm">
+                        <span id="countdown">30</span> seconds remaining
+                    </div>
+                </div>
+
+                <!-- Step 3: Success with Receipt -->
+                <div id="step3" class="hidden space-y-6 text-center slide-up">
+                    <div class="w-24 h-24 mx-auto bg-[#3cb371] rounded-full flex items-center justify-center">
+                        <svg class="w-14 h-14 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path class="success-check" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" stroke-dasharray="100" stroke-dashoffset="100" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-2xl font-bold text-white mb-2">Payment Successful!</h3>
+                        <p class="text-gray-400">Transaction completed</p>
+                    </div>
+
+                    <!-- Receipt Card -->
+                    <div class="bg-gray-800/80 rounded-2xl p-6 border border-[#3cb371]/30 text-left space-y-4">
+                        <div class="flex justify-between items-center pb-4 border-b border-gray-700">
+                            <span class="text-gray-400">Amount Paid</span>
+                            <span class="text-white font-bold text-xl" id="displayAmount">KES 1,000</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400">Phone</span>
+                            <span class="text-white" id="receiptPhone">+254 712 345 678</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400">Date</span>
+                            <span class="text-white" id="transactionDate">Dec 3, 2024</span>
+                        </div>
+
+                        <!-- Receipt Code -->
+                        <div class="pt-4 border-t border-gray-700">
+                            <p class="text-gray-400 text-sm mb-2">M-Pesa Receipt Number</p>
+                            <div class="relative">
+                                <div class="bg-gray-900 rounded-xl p-4 flex items-center justify-between">
+                                    <span class="receipt-code text-[#3cb371] text-xl font-bold" id="receiptCode">RKL7H9X2QP</span>
+                                    <button 
+                                        id="copyBtn"
+                                        class="bg-[#3cb371] hover:bg-[#2d9a5e] text-white px-4 py-2 rounded-lg transition-all flex items-center gap-2"
+                                    >
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                        </svg>
+                                        <span id="copyText">Copy</span>
+                                    </button>
+                                </div>
+                                <div id="copyTooltip" class="copy-tooltip absolute -top-10 left-1/2 transform -translate-x-1/2 bg-[#3cb371] text-white px-3 py-1 rounded-lg text-sm">
+                                    Copied!
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button 
+                        id="newPaymentBtn"
+                        class="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-xl transition-all"
+                    >
+                        Make Another Payment
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- Mobile Website Button -->
+            <a 
+                href="https://specter.com" 
+                target="_blank"
+                class="mobile-website-btn hidden mt-4 w-full items-center justify-center gap-2 bg-gradient-to-r from-[#2d4a5e] to-[#3cb371] hover:from-[#3a5d75] hover:to-[#4ac882] text-white font-semibold py-3 px-6 rounded-xl transition-all shadow-lg"
+            >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+                </svg>
+                Visit Specter Tech Website
+            </a>
+
+            <!-- Footer -->
+            <div class="text-center mt-4">
+                <p class="text-gray-500 text-sm">© 2025 Specter Tech Limited. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Website Button (Desktop) -->
+    <div class="floating-website-btn">
+        <a href="https://specter.com" target="_blank" title="Visit Specter Tech Website">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+            </svg>
+            <span class="btn-text">Visit Our<br/>Website</span>
+        </a>
+    </div>
+
+    <script>
+        // DOM Elements
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+        const step3 = document.getElementById('step3');
+        const phoneInput = document.getElementById('phoneInput');
+        const amountInput = document.getElementById('amountInput');
+        const payBtn = document.getElementById('payBtn');
+        const phoneError = document.getElementById('phoneError');
+        const displayPhone = document.getElementById('displayPhone');
+        const displayAmount = document.getElementById('displayAmount');
+        const receiptPhone = document.getElementById('receiptPhone');
+        const receiptCode = document.getElementById('receiptCode');
+        const transactionDate = document.getElementById('transactionDate');
+        const copyBtn = document.getElementById('copyBtn');
+        const copyText = document.getElementById('copyText');
+        const copyTooltip = document.getElementById('copyTooltip');
+        const newPaymentBtn = document.getElementById('newPaymentBtn');
+        const countdown = document.getElementById('countdown');
+        const paymentCard = document.getElementById('paymentCard');
+
+        // Generate random receipt code
+        function generateReceiptCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let code = '';
+            for (let i = 0; i < 10; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return code;
+        }
+
+        // Format phone number
+        function formatPhone(phone) {
+            const cleaned = phone.replace(/\s/g, '');
+            return `+254 ${cleaned.slice(0, 3)} ${cleaned.slice(3, 6)} ${cleaned.slice(6)}`;
+        }
+
+        // Format amount
+        function formatAmount(amount) {
+            return `KES ${parseInt(amount).toLocaleString()}`;
+        }
+
+        // Format date
+        function getCurrentDate() {
+            const options = { month: 'short', day: 'numeric', year: 'numeric' };
+            return new Date().toLocaleDateString('en-US', options);
+        }
+
+        // Validate phone number
+        function validatePhone(phone) {
+            const cleaned = phone.replace(/\s/g, '');
+            return cleaned.length >= 9 && /^\d+$/.test(cleaned);
+        }
+
+        // Create floating particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.opacity = Math.random() * 0.5 + 0.1;
+                particle.style.animation = `floating ${3 + Math.random() * 4}s ease-in-out infinite`;
+                particle.style.animationDelay = Math.random() * 2 + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        // Initialize particles
+        createParticles();
+
+        // Phone input formatting
+        phoneInput.addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 9) value = value.slice(0, 9);
+            
+            // Add spaces for formatting
+            if (value.length > 6) {
+                value = value.slice(0, 3) + ' ' + value.slice(3, 6) + ' ' + value.slice(6);
+            } else if (value.length > 3) {
+                value = value.slice(0, 3) + ' ' + value.slice(3);
+            }
+            
+            e.target.value = value;
+            phoneError.classList.add('hidden');
+        });
+
+        // Pay button click
+        payBtn.addEventListener('click', () => {
+            const phone = phoneInput.value;
+            const amount = amountInput.value;
+
+            // Validate
+            if (!validatePhone(phone)) {
+                phoneError.classList.remove('hidden');
+                phoneInput.parentElement.classList.add('shake');
+                setTimeout(() => phoneInput.parentElement.classList.remove('shake'), 500);
+                return;
+            }
+
+            if (!amount || amount <= 0) {
+                amountInput.classList.add('shake');
+                setTimeout(() => amountInput.classList.remove('shake'), 500);
+                return;
+            }
+
+            // Show step 2
+            step1.classList.add('hidden');
+            step2.classList.remove('hidden');
+            displayPhone.textContent = formatPhone(phone);
+
+            // Countdown timer
+            let timeLeft = 30;
+            const timer = setInterval(() => {
+                timeLeft--;
+                countdown.textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                }
+            }, 1000);
+
+            // Simulate processing (5-8 seconds)
+            const processingTime = 5000 + Math.random() * 3000;
+            setTimeout(() => {
+                clearInterval(timer);
+                
+                // Show step 3
+                step2.classList.add('hidden');
+                step3.classList.remove('hidden');
+                
+                // Populate receipt
+                displayAmount.textContent = formatAmount(amount);
+                receiptPhone.textContent = formatPhone(phone);
+                receiptCode.textContent = generateReceiptCode();
+                transactionDate.textContent = getCurrentDate();
+                
+                // Add success glow
+                paymentCard.style.boxShadow = '0 0 40px rgba(60, 179, 113, 0.4), 0 0 80px rgba(45, 74, 94, 0.3)';
+            }, processingTime);
+        });
+
+        // Copy button click
+        copyBtn.addEventListener('click', async () => {
+            const code = receiptCode.textContent;
+            
+            try {
+                await navigator.clipboard.writeText(code);
+                copyText.textContent = 'Copied!';
+                copyTooltip.classList.add('show');
+                copyBtn.style.backgroundColor = '#2d9a5e';
+                
+                setTimeout(() => {
+                    copyText.textContent = 'Copy';
+                    copyTooltip.classList.remove('show');
+                    copyBtn.style.backgroundColor = '';
+                }, 2000);
+            } catch (err) {
+                // Fallback for older browsers
+                const textarea = document.createElement('textarea');
+                textarea.value = code;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                
+                copyText.textContent = 'Copied!';
+                setTimeout(() => copyText.textContent = 'Copy', 2000);
+            }
+        });
+
+        // New payment button
+        newPaymentBtn.addEventListener('click', () => {
+            // Reset form
+            phoneInput.value = '';
+            amountInput.value = '';
+            
+            // Reset card glow
+            paymentCard.style.boxShadow = '';
+            
+            // Show step 1
+            step3.classList.add('hidden');
+            step1.classList.remove('hidden');
+            step1.classList.add('slide-up');
+            
+            setTimeout(() => step1.classList.remove('slide-up'), 500);
+        });
+
+        // Subtle 3D hover effect
+        paymentCard.addEventListener('mouseenter', () => {
+            paymentCard.style.transform = 'translateZ(20px) scale(1.02)';
+        });
+
+        paymentCard.addEventListener('mouseleave', () => {
+            paymentCard.style.transform = 'rotateX(0deg) rotateY(0deg)';
+        });
+
+        // Add focus effects
+        [phoneInput, amountInput].forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.classList.add('ring-2', 'ring-[#3cb371]/50');
+            });
+            input.addEventListener('blur', () => {
+                input.parentElement.classList.remove('ring-2', 'ring-[#3cb371]/50');
+            });
+        });
+
+        // Live Date/Time Display
+        const liveTime = document.getElementById('liveTime');
+        const liveDate = document.getElementById('liveDate');
+        
+        function updateDateTime() {
+            const now = new Date();
+            
+            // Time format: HH:MM:SS
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            liveTime.textContent = `${hours}:${minutes}:${seconds}`;
+            
+            // Date format: 3 Dec 2025 WED
+            const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const day = now.getDate();
+            const month = months[now.getMonth()];
+            const year = now.getFullYear();
+            const dayName = days[now.getDay()];
+            liveDate.textContent = `${day} ${month} ${year} ${dayName}`;
+        }
+        
+        // Update immediately and then every second
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const toggleIcon = document.getElementById('toggleIcon');
+        const body = document.body;
+        let isDarkMode = true;
+
+        themeToggle.addEventListener('click', () => {
+            isDarkMode = !isDarkMode;
+            
+            if (isDarkMode) {
+                body.classList.remove('light-mode', 'light-gradient');
+                body.classList.add('dark-gradient');
+                themeToggle.classList.remove('light');
+                toggleIcon.textContent = '🌙';
+            } else {
+                body.classList.remove('dark-gradient');
+                body.classList.add('light-mode', 'light-gradient');
+                themeToggle.classList.add('light');
+                toggleIcon.textContent = '☀️';
+            }
+        });
+    </script>
+</body>
+</html>
