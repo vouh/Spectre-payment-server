@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Spectre Tech</title>
-    <link rel="icon" href="../logo-no-bg.png" type="image/png">
+    <link rel="icon" href="../logo.jpg" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -182,6 +182,160 @@
         .light-mode .input-dark {
             background: #f1f5f9;
             border-color: #cbd5e1;
+        }
+
+        /* Custom Dropdown */
+        .custom-select-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .custom-select {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .custom-select-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+
+        .custom-select-trigger:hover {
+            border-color: #3cb371;
+        }
+
+        .custom-select.open .custom-select-trigger {
+            border-color: #3cb371;
+            box-shadow: 0 0 0 2px rgba(60, 179, 113, 0.2);
+        }
+
+        .custom-select-trigger svg {
+            width: 16px;
+            height: 16px;
+            color: var(--text-muted);
+            transition: transform 0.2s;
+        }
+
+        .custom-select.open .custom-select-trigger svg {
+            transform: rotate(180deg);
+        }
+
+        .custom-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            margin-top: 4px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 50;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .custom-select.open .custom-options {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .custom-option {
+            padding: 10px 12px;
+            font-size: 14px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: background 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .custom-option:hover {
+            background: rgba(60, 179, 113, 0.1);
+        }
+
+        .custom-option.selected {
+            background: rgba(60, 179, 113, 0.15);
+            color: #3cb371;
+        }
+
+        .custom-option:first-child {
+            border-radius: 8px 8px 0 0;
+        }
+
+        .custom-option:last-child {
+            border-radius: 0 0 8px 8px;
+        }
+
+        .light-mode .custom-select-trigger {
+            background: #f1f5f9;
+        }
+
+        .light-mode .custom-options {
+            background: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        /* Filter Toggle Button */
+        .filter-toggle {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: 100%;
+            padding: 10px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+            margin-bottom: 12px;
+        }
+
+        .filter-toggle:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .filter-toggle svg {
+            width: 18px;
+            height: 18px;
+            transition: transform 0.3s;
+        }
+
+        .filter-toggle.open svg {
+            transform: rotate(180deg);
+        }
+
+        .filter-container {
+            transition: all 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .filter-toggle {
+                display: flex;
+            }
+
+            .filter-container.collapsed {
+                display: none;
+            }
         }
 
         /* Hamburger Menu */
@@ -415,7 +569,7 @@
     <nav class="nav-bar text-white shadow-lg sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-2">
-                <img src="../logo-no-bg.png" alt="Spectre" class="w-7 h-7" onerror="this.style.display='none'">
+                <img src="../logo.jpg" alt="Spectre" class="w-7 h-7 rounded" onerror="this.style.display='none'">
                 <span class="font-bold text-lg">Spectre Admin</span>
             </div>
             
@@ -522,23 +676,45 @@
             </div>
         </div>
 
+        <!-- Filter Toggle Button (Mobile Only) -->
+        <button id="filterToggle" class="filter-toggle" onclick="toggleFilters()">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            <span id="filterToggleText">Show Filters</span>
+        </button>
+
         <!-- Filters & Actions -->
-        <div class="card-container p-3 sm:p-4 mb-4">
+        <div id="filterContainer" class="filter-container card-container p-3 sm:p-4 mb-4 collapsed">
             <!-- Search - Full Width on Mobile -->
             <div class="mb-2 sm:mb-0 filter-row-1">
                 <div class="relative">
                     <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--text-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    <input type="text" id="searchInput" placeholder="Search..." class="input-dark w-full pl-9 pr-3 py-2 text-sm rounded-lg">
+                    <input type="text" id="searchInput" placeholder="Search phone..." class="input-dark w-full pl-9 pr-3 py-2 text-sm rounded-lg" inputmode="tel">
                 </div>
             </div>
             <!-- Other Filters - 2 columns on mobile -->
             <div class="filter-row-2 flex flex-wrap gap-2 sm:gap-3 items-center mt-2">
-                <select id="statusFilter" class="input-dark px-3 py-2 text-sm rounded-lg flex-1 min-w-[100px]">
-                    <option value="">All Status</option>
-                    <option value="completed">Completed</option>
-                    <option value="pending">Pending</option>
-                    <option value="failed">Failed</option>
-                </select>
+                <!-- Custom Dropdown for Status -->
+                <div class="custom-select-wrapper flex-1 min-w-[100px]">
+                    <div id="statusSelect" class="custom-select">
+                        <div class="custom-select-trigger" onclick="toggleStatusDropdown()">
+                            <span id="statusSelectText">All Status</span>
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                        <div class="custom-options">
+                            <div class="custom-option selected" data-value="" onclick="selectStatus('', 'All Status')">All Status</div>
+                            <div class="custom-option" data-value="completed" onclick="selectStatus('completed', 'Completed')">
+                                <span style="color: #3cb371;">●</span> Completed
+                            </div>
+                            <div class="custom-option" data-value="pending" onclick="selectStatus('pending', 'Pending')">
+                                <span style="color: #eab308;">●</span> Pending
+                            </div>
+                            <div class="custom-option" data-value="failed" onclick="selectStatus('failed', 'Failed')">
+                                <span style="color: #ef4444;">●</span> Failed
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="statusFilter" value="">
+                </div>
                 <input type="date" id="fromDate" class="input-dark px-2 sm:px-3 py-2 text-xs sm:text-sm rounded-lg flex-1 min-w-[100px]">
                 <input type="date" id="toDate" class="input-dark px-2 sm:px-3 py-2 text-xs sm:text-sm rounded-lg flex-1 min-w-[100px]">
                 <button onclick="clearFilters()" class="text-sm hover:text-[#3cb371] px-2" style="color: var(--text-muted);">Clear</button>
@@ -682,16 +858,15 @@
         }
 
         function applyFilters() {
-            const search = searchInput.value.toLowerCase().trim();
+            const search = searchInput.value.toLowerCase().trim().replace(/\D/g, ''); // Only digits for phone search
             const status = statusFilter.value;
             const start = fromDate.value ? new Date(fromDate.value) : null;
             const end = toDate.value ? new Date(toDate.value + 'T23:59:59') : null;
 
             filteredPayments = allPayments.filter(p => {
                 if (search) {
-                    const phone = (p.phone || p.phoneRaw || '').toLowerCase();
-                    const code = (p.mpesaReceiptNumber || p.code || '').toLowerCase();
-                    if (!phone.includes(search) && !code.includes(search)) return false;
+                    const phone = (p.phone || p.phoneRaw || '').replace(/\D/g, '');
+                    if (!phone.includes(search)) return false;
                 }
                 if (status && p.status !== status) return false;
                 if (start || end) {
@@ -758,7 +933,17 @@
         function debounce(fn, w) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), w); }; }
 
         window.refreshData = loadPayments;
-        window.clearFilters = () => { searchInput.value = ''; statusFilter.value = ''; fromDate.value = ''; toDate.value = ''; applyFilters(); };
+        window.clearFilters = () => { 
+            searchInput.value = ''; 
+            statusFilter.value = ''; 
+            document.getElementById('statusSelectText').textContent = 'All Status';
+            document.querySelectorAll('#statusSelect .custom-option').forEach(opt => {
+                opt.classList.toggle('selected', opt.dataset.value === '');
+            });
+            fromDate.value = ''; 
+            toDate.value = ''; 
+            applyFilters(); 
+        };
         
         window.viewPayment = id => {
             const p = allPayments.find(x => x.id === id);
@@ -954,6 +1139,52 @@
                 clearInterval(checkMobileEmail);
             }
         }, 500);
+
+        // Filter Toggle (Mobile)
+        window.toggleFilters = function() {
+            const filterContainer = document.getElementById('filterContainer');
+            const filterToggle = document.getElementById('filterToggle');
+            const filterToggleText = document.getElementById('filterToggleText');
+            
+            filterContainer.classList.toggle('collapsed');
+            filterToggle.classList.toggle('open');
+            
+            if (filterContainer.classList.contains('collapsed')) {
+                filterToggleText.textContent = 'Show Filters';
+            } else {
+                filterToggleText.textContent = 'Hide Filters';
+            }
+        };
+
+        // Custom Status Dropdown
+        const statusSelect = document.getElementById('statusSelect');
+        
+        window.toggleStatusDropdown = function() {
+            statusSelect.classList.toggle('open');
+        };
+
+        window.selectStatus = function(value, text) {
+            document.getElementById('statusFilter').value = value;
+            document.getElementById('statusSelectText').textContent = text;
+            
+            // Update selected state
+            document.querySelectorAll('#statusSelect .custom-option').forEach(opt => {
+                opt.classList.toggle('selected', opt.dataset.value === value);
+            });
+            
+            statusSelect.classList.remove('open');
+            
+            // Trigger filter
+            const event = new Event('change');
+            document.getElementById('statusFilter').dispatchEvent(event);
+        };
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (statusSelect && !statusSelect.contains(e.target)) {
+                statusSelect.classList.remove('open');
+            }
+        });
     </script>
 </body>
 </html>
