@@ -724,8 +724,8 @@
                             <div class="custom-option" data-value="timeout" onclick="selectReason('timeout', 'Timed Out')">
                                 <span style="color: #ef4444;">●</span> Timed Out
                             </div>
-                            <div class="custom-option" data-value="other" onclick="selectReason('other', 'Other')">
-                                <span style="color: #8b5cf6;">●</span> Other
+                            <div class="custom-option" data-value="insufficient" onclick="selectReason('insufficient', 'Insufficient')">
+                                <span style="color: #eab308;">●</span> Insufficient
                             </div>
                         </div>
                     </div>
@@ -1079,20 +1079,10 @@
             const fromDate = document.getElementById('fromDate').value;
             const toDate = document.getElementById('toDate').value;
 
-            // Define main error types
-            const mainErrorTypes = ['wrong_pin', 'cancelled', 'timeout'];
-
             filteredPayments = failedPayments.filter(p => {
                 const phone = (p.phone || p.phoneRaw || '').replace(/\D/g, '');
                 const matchSearch = !search || phone.includes(search);
-                
-                // Handle "other" filter - anything not in main types
-                let matchReason = true;
-                if (reason === 'other') {
-                    matchReason = !mainErrorTypes.includes(p.errorType);
-                } else if (reason) {
-                    matchReason = p.errorType === reason;
-                }
+                const matchReason = !reason || p.errorType === reason;
                 
                 let matchDate = true;
                 if (fromDate || toDate) {
