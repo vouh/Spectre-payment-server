@@ -688,7 +688,7 @@
             <div class="mb-2 sm:mb-0 filter-row-1">
                 <div class="relative">
                     <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--text-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    <input type="text" id="searchInput" placeholder="Search phone..." class="input-dark w-full pl-9 pr-3 py-2 text-sm rounded-lg" inputmode="tel">
+                    <input type="text" id="searchInput" placeholder="Search phone or receipt..." class="input-dark w-full pl-9 pr-3 py-2 text-sm rounded-lg">
                 </div>
             </div>
             <!-- Other Filters - 2 columns on mobile -->
@@ -863,15 +863,20 @@
         }
 
         function applyFilters() {
-            const search = searchInput.value.toLowerCase().trim().replace(/\D/g, ''); // Only digits for phone search
+            const searchRaw = searchInput.value.trim();
+            const searchLower = searchRaw.toLowerCase();
+            const searchDigits = searchRaw.replace(/\D/g, ''); // Extract digits for phone search
             const status = statusFilter.value;
             const start = fromDate.value ? new Date(fromDate.value) : null;
             const end = toDate.value ? new Date(toDate.value + 'T23:59:59') : null;
 
             filteredPayments = allPayments.filter(p => {
-                if (search) {
+                if (searchRaw) {
                     const phone = (p.phone || p.phoneRaw || '').replace(/\D/g, '');
-                    if (!phone.includes(search)) return false;
+                    const receipt = (p.mpesaReceiptNumber || p.code || '').toLowerCase();
+                    const matchPhone = searchDigits && phone.includes(searchDigits);
+                    const matchReceipt = receipt.includes(searchLower);
+                    if (!matchPhone && !matchReceipt) return false;
                 }
                 if (status && p.status !== status) return false;
                 if (start || end) {
