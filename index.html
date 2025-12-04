@@ -1384,7 +1384,8 @@
                         } else if (queryData.status === 'failed') {
                             clearInterval(timer);
                             clearInterval(pollInterval);
-                            handlePaymentFailure(queryData.message || 'Payment failed.', phone, amount, reason);
+                            // Pass the result code for better error detection
+                            handlePaymentFailure(queryData.message || 'Payment failed.', phone, amount, reason, queryData.resultCode);
                         } else if (queryData.status === 'timeout') {
                             clearInterval(timer);
                             clearInterval(pollInterval);
@@ -1477,32 +1478,32 @@
 
         // Detect error type from message (improved detection)
         function detectErrorType(message) {
-            const lowerMsg = message.toLowerCase();
+            const lowerMsg = (message || '').toLowerCase();
             
             // Wrong PIN detection - check for specific M-Pesa error codes or messages
             if (lowerMsg.includes('wrong pin') || lowerMsg.includes('incorrect pin') || 
-                lowerMsg.includes('invalid pin') || lowerMsg.includes('1032') ||
+                lowerMsg.includes('invalid pin') || lowerMsg.includes('2001') ||
                 (lowerMsg.includes('pin') && (lowerMsg.includes('incorrect') || lowerMsg.includes('wrong') || lowerMsg.includes('invalid')))) {
                 return 'wrong_pin';
             }
             
             // Insufficient balance detection
             if (lowerMsg.includes('insufficient') || lowerMsg.includes('not enough') || 
-                lowerMsg.includes('balance') || lowerMsg.includes('funds') || lowerMsg.includes('1037')) {
+                lowerMsg.includes('low balance') || lowerMsg.includes('balance') && lowerMsg.includes('funds')) {
                 return 'insufficient';
             }
             
             // Timeout detection - request expired (check before cancelled to avoid false positives)
             if (lowerMsg.includes('timed out') || lowerMsg.includes('timeout') || 
                 lowerMsg.includes('expired') || lowerMsg.includes('too long') ||
-                lowerMsg.includes('verification timed out') || lowerMsg.includes('1036')) {
+                lowerMsg.includes('verification timed out') || lowerMsg.includes('1037')) {
                 return 'timeout';
             }
             
             // Cancelled detection - user rejected the request
             if (lowerMsg.includes('cancelled') || lowerMsg.includes('canceled') || 
                 lowerMsg.includes('cancel') || lowerMsg.includes('rejected') || 
-                lowerMsg.includes('declined') || lowerMsg.includes('1031')) {
+                lowerMsg.includes('declined') || lowerMsg.includes('1032')) {
                 return 'cancelled';
             }
             
@@ -1515,13 +1516,33 @@
             return 'default';
         }
 
+        // Detect error type from result code (M-Pesa specific)
+        function detectErrorFromResultCode(resultCode) {
+            const code = String(resultCode);
+            switch(code) {
+                case '2001': return 'wrong_pin';
+                case '1': return 'insufficient';
+                case '1032': return 'cancelled';
+                case '1037': return 'timeout';
+                case '1025': return 'failed'; // Transaction limit exceeded
+                default: return null;
+            }
+        }
+
         // Handle payment failure with styled modal
-        async function handlePaymentFailure(message, phone = null, amount = null, reason = null) {
+        async function handlePaymentFailure(message, phone = null, amount = null, reason = null, resultCode = null) {
             step2.classList.add('hidden');
             step1.classList.remove('hidden');
             
-            // Detect error type
-            const errorType = detectErrorType(message);
+            // Detect error type - first try result code, then fallback to message
+            let errorType = null;
+            if (resultCode) {
+                errorType = detectErrorFromResultCode(resultCode);
+            }
+            if (!errorType) {
+                errorType = detectErrorType(message);
+            }
+            
             const config = errorConfigs[errorType];
             
             // Save failed transaction to Firebase if we have the data
@@ -1538,7 +1559,8 @@
                     status: 'failed',
                     failureReason: config.title,
                     failureMessage: message,
-                    errorType: errorType
+                    errorType: errorType,
+                    resultCode: resultCode
                 };
                 
                 try {
