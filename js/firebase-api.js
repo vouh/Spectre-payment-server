@@ -1,6 +1,9 @@
 /**
- * Firebase API - Database Operations Handler
+ * Firebase API - Database Operations Handler (Legacy Compatibility)
  * Spectre Tech Limited Payment System
+ * 
+ * This file maintains backward compatibility with existing code.
+ * For new features, use the modular API in /api folder.
  */
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
@@ -21,7 +24,7 @@ import {
     serverTimestamp
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-// Firebase Configuration
+// Firebase Configuration (shared across all modules)
 const firebaseConfig = {
     apiKey: "AIzaSyB2CXyFin6LNLTXe4C_Dj8HrAkwIhbuQPs",
     authDomain: "spectre-payment.firebaseapp.com",
@@ -32,12 +35,22 @@ const firebaseConfig = {
     measurementId: "G-J0BZ9STKZ1"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const db = getFirestore(app);
+// Initialize Firebase (singleton pattern)
+let app;
+let db;
+let analytics;
 
-console.log("🔥 Firebase API initialized");
+try {
+    app = initializeApp(firebaseConfig);
+    db = getFirestore(app);
+    if (typeof window !== 'undefined') {
+        analytics = getAnalytics(app);
+    }
+    console.log("🔥 Firebase initialized");
+} catch (error) {
+    // App might already be initialized
+    console.log("Firebase already initialized or error:", error.message);
+}
 
 // ============================================
 // DATABASE API CLASS

@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Spectre Tech</title>
+    <link rel="icon" href="../logo-no-bg.png" type="image/png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .stat-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-action {
+            transition: all 0.2s;
+        }
+        
+        .btn-action:hover {
+            transform: scale(1.05);
+        }
+        
+        .table-row {
+            transition: background-color 0.2s;
+        }
+        
+        .table-row:hover {
+            background-color: #f8fafc;
+        }
+        
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-completed {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+        
+        .status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-failed {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #22c55e;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            background: #22c55e;
+            color: white;
+            border-radius: 8px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .toast.error {
+            background: #ef4444;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-green-600 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <img src="../logo-no-bg.png" alt="Spectre Tech" class="w-8 h-8" onerror="this.style.display='none'">
+                <h1 class="text-xl font-bold">AdminDashboard</h1>
+            </div>
+            <div class="flex items-center gap-4">
+                <span id="userEmail" class="text-sm hidden md:block">25495@student.embuni.ac.ke</span>
+                <button onclick="syncData()" class="btn-action bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    Sync
+                </button>
+                <button onclick="refreshData()" class="btn-action bg-white text-green-600 px-4 py-2 rounded-lg flex items-center gap-2 border border-white hover:bg-gray-100">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    Refresh
+                </button>
+                <button onclick="logout()" class="btn-action bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                    </svg>
+                    Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Total -->
+            <div class="stat-card bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-gray-500 text-sm">Total</p>
+                        <h2 id="statTotal" class="text-3xl font-bold text-gray-800 mt-1">0</h2>
+                    </div>
+                    <div class="bg-blue-100 p-3 rounded-lg">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Completed -->
+            <div class="stat-card bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-gray-500 text-sm">Completed</p>
+                        <h2 id="statCompleted" class="text-3xl font-bold text-green-600 mt-1">0</h2>
+                    </div>
+                    <div class="bg-green-100 p-3 rounded-lg">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Failed -->
+            <div class="stat-card bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-gray-500 text-sm">Failed</p>
+                        <h2 id="statFailed" class="text-3xl font-bold text-red-600 mt-1">0</h2>
+                    </div>
+                    <div class="bg-red-100 p-3 rounded-lg">
+                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Revenue -->
+            <div class="stat-card bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-gray-500 text-sm">Revenue</p>
+                        <h2 id="statRevenue" class="text-3xl font-bold text-gray-800 mt-1">KSH 0</h2>
+                    </div>
+                    <div class="bg-yellow-100 p-3 rounded-lg">
+                        <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+            <div class="flex flex-wrap gap-4 items-end">
+                <!-- Search -->
+                <div class="flex-1 min-w-64">
+                    <div class="relative">
+                        <svg class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <input type="text" id="searchInput" placeholder="Search phone, M-Pesa code..." 
+                            class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                    </div>
+                </div>
+
+                <!-- Status Filter -->
+                <div>
+                    <select id="statusFilter" class="px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white">
+                        <option value="">All Status</option>
+                        <option value="completed">Completed</option>
+                        <option value="pending">Pending</option>
+                        <option value="failed">Failed</option>
+                    </select>
+                </div>
+
+                <!-- Category Filter -->
+                <div>
+                    <select id="categoryFilter" class="px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white">
+                        <option value="">All Categories</option>
+                    </select>
+                </div>
+
+                <!-- Rows Limit -->
+                <div>
+                    <select id="rowsLimit" class="px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white">
+                        <option value="100">100 rows</option>
+                        <option value="50">50 rows</option>
+                        <option value="25">25 rows</option>
+                    </select>
+                </div>
+
+                <!-- Clear Filters -->
+                <button onclick="clearFilters()" class="text-gray-600 hover:text-gray-800 flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    Clear
+                </button>
+            </div>
+
+            <!-- Date Range -->
+            <div class="flex flex-wrap gap-4 mt-4">
+                <div class="flex items-center gap-2">
+                    <label class="text-sm text-gray-600">From Date</label>
+                    <input type="date" id="fromDate" class="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                </div>
+                <div class="flex items-center gap-2">
+                    <label class="text-sm text-gray-600">To Date</label>
+                    <input type="date" id="toDate" class="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                </div>
+            </div>
+
+            <!-- Export Buttons -->
+            <div class="flex gap-3 mt-4">
+                <button onclick="exportCSV()" class="btn-action bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    CSV
+                </button>
+                <button onclick="exportPDF()" class="btn-action bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
+                    PDF
+                </button>
+                <button onclick="deleteSelected()" id="deleteBtn" class="btn-action bg-gray-200 text-gray-600 px-4 py-2 rounded-lg flex items-center gap-2" disabled>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                    <span id="deleteCount">(0)</span>
+                </button>
+            </div>
+
+            <!-- Transaction Count -->
+            <p id="transactionCount" class="text-sm text-gray-500 mt-4">Showing 0 of 0 transactions</p>
+            <p id="lastUpdated" class="text-sm text-gray-400 mt-1"></p>
+        </div>
+
+        <!-- Transaction Logs Table -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="p-4 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="font-semibold text-gray-800 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                    </svg>
+                    Transaction Logs
+                </h3>
+                <label class="flex items-center gap-2 text-sm text-gray-600">
+                    <input type="checkbox" id="selectAll" class="rounded text-green-500 focus:ring-green-500">
+                    Select All
+                </label>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50 border-b border-gray-100">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <input type="checkbox" id="selectAllHeader" class="rounded text-green-500 focus:ring-green-500">
+                            </th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">M-Pesa Code</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionTable" class="divide-y divide-gray-100">
+                        <!-- Transactions will be loaded here -->
+                        <tr>
+                            <td colspan="8" class="px-4 py-8 text-center text-gray-500">
+                                <div class="loader mx-auto mb-3"></div>
+                                Loading transactions...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <span id="toastMessage">Action completed successfully</span>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { 
+            getFirestore, 
+            collection, 
+            getDocs, 
+            getDoc,
+            doc,
+            deleteDoc,
+            query,
+            orderBy,
+            limit
+        } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+        import {
+            getAuth,
+            onAuthStateChanged,
+            signOut
+        } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyB2CXyFin6LNLTXe4C_Dj8HrAkwIhbuQPs",
+            authDomain: "spectre-payment.firebaseapp.com",
+            projectId: "spectre-payment",
+            storageBucket: "spectre-payment.firebasestorage.app",
+            messagingSenderId: "384792827904",
+            appId: "1:384792827904:web:4a08eed1fe885f9cab60e5",
+            measurementId: "G-J0BZ9STKZ1"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        console.log("🔥 Firebase Admin Dashboard initialized");
+
+        // Global state
+        let allPayments = [];
+        let filteredPayments = [];
+        let selectedIds = new Set();
+        let categories = new Set();
+
+        // DOM Elements
+        const statTotal = document.getElementById('statTotal');
+        const statCompleted = document.getElementById('statCompleted');
+        const statFailed = document.getElementById('statFailed');
+        const statRevenue = document.getElementById('statRevenue');
+        const transactionTable = document.getElementById('transactionTable');
+        const transactionCount = document.getElementById('transactionCount');
+        const lastUpdated = document.getElementById('lastUpdated');
+        const searchInput = document.getElementById('searchInput');
+        const statusFilter = document.getElementById('statusFilter');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const rowsLimit = document.getElementById('rowsLimit');
+        const fromDate = document.getElementById('fromDate');
+        const toDate = document.getElementById('toDate');
+        const selectAll = document.getElementById('selectAll');
+        const selectAllHeader = document.getElementById('selectAllHeader');
+        const deleteBtn = document.getElementById('deleteBtn');
+        const deleteCount = document.getElementById('deleteCount');
+
+        // Load all payments
+        async function loadPayments() {
+            try {
+                transactionTable.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="px-4 py-8 text-center text-gray-500">
+                            <div class="loader mx-auto mb-3"></div>
+                            Loading transactions...
+                        </td>
+                    </tr>
+                `;
+
+                const limitValue = parseInt(rowsLimit.value) || 100;
+                const q = query(
+                    collection(db, 'payments'),
+                    orderBy("createdAt", "desc"),
+                    limit(limitValue)
+                );
+
+                const querySnapshot = await getDocs(q);
+                allPayments = [];
+                categories.clear();
+
+                querySnapshot.forEach((doc) => {
+                    const data = { id: doc.id, ...doc.data() };
+                    allPayments.push(data);
+                    
+                    // Collect categories
+                    if (data.reason || data.category) {
+                        categories.add(data.reason || data.category);
+                    }
+                });
+
+                // Update category filter
+                updateCategoryFilter();
+
+                // Apply filters
+                applyFilters();
+
+                // Update stats
+                updateStats();
+
+                // Update last updated time
+                lastUpdated.textContent = new Date().toLocaleTimeString();
+
+                console.log(`✅ Loaded ${allPayments.length} payments`);
+
+            } catch (error) {
+                console.error("❌ Error loading payments:", error);
+                transactionTable.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="px-4 py-8 text-center text-red-500">
+                            Error loading transactions. Please try again.
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // Update stats
+        function updateStats() {
+            let total = allPayments.length;
+            let completed = 0;
+            let failed = 0;
+            let revenue = 0;
+
+            allPayments.forEach(payment => {
+                if (payment.status === 'completed' || payment.status === 'success') {
+                    completed++;
+                    const amount = parseFloat(payment.amountRaw || payment.amount || 0);
+                    if (!isNaN(amount)) {
+                        revenue += amount;
+                    }
+                } else if (payment.status === 'failed' || payment.status === 'cancelled') {
+                    failed++;
+                }
+            });
+
+            statTotal.textContent = total;
+            statCompleted.textContent = completed;
+            statFailed.textContent = failed;
+            statRevenue.textContent = `KSH ${revenue.toLocaleString()}`;
+        }
+
+        // Update category filter
+        function updateCategoryFilter() {
+            categoryFilter.innerHTML = '<option value="">All Categories</option>';
+            categories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat;
+                option.textContent = cat;
+                categoryFilter.appendChild(option);
+            });
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const status = statusFilter.value;
+            const category = categoryFilter.value;
+            const startDate = fromDate.value ? new Date(fromDate.value) : null;
+            const endDate = toDate.value ? new Date(toDate.value + 'T23:59:59') : null;
+
+            filteredPayments = allPayments.filter(payment => {
+                // Search filter
+                if (searchTerm) {
+                    const phone = (payment.phone || payment.phoneRaw || '').toLowerCase();
+                    const code = (payment.mpesaReceiptNumber || payment.code || '').toLowerCase();
+                    if (!phone.includes(searchTerm) && !code.includes(searchTerm)) {
+                        return false;
+                    }
+                }
+
+                // Status filter
+                if (status && payment.status !== status) {
+                    return false;
+                }
+
+                // Category filter
+                if (category && (payment.reason !== category && payment.category !== category)) {
+                    return false;
+                }
+
+                // Date range filter
+                if (startDate || endDate) {
+                    const paymentDate = new Date(payment.createdAt || payment.date);
+                    if (startDate && paymentDate < startDate) {
+                        return false;
+                    }
+                    if (endDate && paymentDate > endDate) {
+                        return false;
+                    }
+                }
+
+                return true;
+            });
+
+            renderTable();
+        }
+
+        // Render table
+        function renderTable() {
+            if (filteredPayments.length === 0) {
+                transactionTable.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="px-4 py-8 text-center text-gray-500">
+                            No transactions found
+                        </td>
+                    </tr>
+                `;
+                transactionCount.textContent = 'Showing 0 of 0 transactions';
+                return;
+            }
+
+            transactionTable.innerHTML = filteredPayments.map(payment => {
+                const statusClass = getStatusClass(payment.status);
+                const date = payment.createdAt ? new Date(payment.createdAt).toLocaleDateString() : payment.date || 'N/A';
+                const time = payment.createdAt ? new Date(payment.createdAt).toLocaleTimeString() : payment.time || '';
+                
+                return `
+                    <tr class="table-row" data-id="${payment.id}">
+                        <td class="px-4 py-3">
+                            <input type="checkbox" class="row-checkbox rounded text-green-500 focus:ring-green-500" 
+                                data-id="${payment.id}" ${selectedIds.has(payment.id) ? 'checked' : ''}>
+                        </td>
+                        <td class="px-4 py-3 text-sm text-gray-600">
+                            <div>${date}</div>
+                            <div class="text-xs text-gray-400">${time}</div>
+                        </td>
+                        <td class="px-4 py-3 text-sm font-medium text-gray-800">${payment.phone || payment.phoneRaw || 'N/A'}</td>
+                        <td class="px-4 py-3 text-sm font-semibold text-gray-800">${payment.amount || `KES ${payment.amountRaw || 0}`}</td>
+                        <td class="px-4 py-3 text-sm text-gray-600">${payment.reason || payment.category || 'N/A'}</td>
+                        <td class="px-4 py-3">
+                            <span class="status-badge ${statusClass}">${payment.status || 'pending'}</span>
+                        </td>
+                        <td class="px-4 py-3 text-sm font-mono text-green-600">${payment.mpesaReceiptNumber || payment.code || 'N/A'}</td>
+                        <td class="px-4 py-3">
+                            <div class="flex gap-2">
+                                <button onclick="viewPayment('${payment.id}')" class="text-blue-500 hover:text-blue-700" title="View">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                    </svg>
+                                </button>
+                                <button onclick="deletePayment('${payment.id}')" class="text-red-500 hover:text-red-700" title="Delete">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            transactionCount.textContent = `Showing ${filteredPayments.length} of ${allPayments.length} transactions`;
+
+            // Add checkbox listeners
+            document.querySelectorAll('.row-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', handleCheckboxChange);
+            });
+        }
+
+        // Get status class
+        function getStatusClass(status) {
+            switch (status) {
+                case 'completed':
+                case 'success':
+                    return 'status-completed';
+                case 'pending':
+                    return 'status-pending';
+                case 'failed':
+                case 'cancelled':
+                    return 'status-failed';
+                default:
+                    return 'status-pending';
+            }
+        }
+
+        // Handle checkbox change
+        function handleCheckboxChange(e) {
+            const id = e.target.dataset.id;
+            if (e.target.checked) {
+                selectedIds.add(id);
+            } else {
+                selectedIds.delete(id);
+            }
+            updateDeleteButton();
+        }
+
+        // Update delete button
+        function updateDeleteButton() {
+            const count = selectedIds.size;
+            deleteCount.textContent = `(${count})`;
+            deleteBtn.disabled = count === 0;
+            deleteBtn.classList.toggle('bg-red-500', count > 0);
+            deleteBtn.classList.toggle('text-white', count > 0);
+            deleteBtn.classList.toggle('bg-gray-200', count === 0);
+            deleteBtn.classList.toggle('text-gray-600', count === 0);
+        }
+
+        // Select all handler
+        function handleSelectAll(e) {
+            const checked = e.target.checked;
+            document.querySelectorAll('.row-checkbox').forEach(checkbox => {
+                checkbox.checked = checked;
+                if (checked) {
+                    selectedIds.add(checkbox.dataset.id);
+                } else {
+                    selectedIds.delete(checkbox.dataset.id);
+                }
+            });
+            updateDeleteButton();
+        }
+
+        // Event listeners
+        selectAll.addEventListener('change', handleSelectAll);
+        selectAllHeader.addEventListener('change', handleSelectAll);
+        searchInput.addEventListener('input', debounce(applyFilters, 300));
+        statusFilter.addEventListener('change', applyFilters);
+        categoryFilter.addEventListener('change', applyFilters);
+        rowsLimit.addEventListener('change', loadPayments);
+        fromDate.addEventListener('change', applyFilters);
+        toDate.addEventListener('change', applyFilters);
+
+        // Debounce helper
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Global functions
+        window.refreshData = loadPayments;
+        
+        window.syncData = async function() {
+            showToast('Syncing data...');
+            await loadPayments();
+            showToast('Data synced successfully!');
+        };
+
+        window.clearFilters = function() {
+            searchInput.value = '';
+            statusFilter.value = '';
+            categoryFilter.value = '';
+            fromDate.value = '';
+            toDate.value = '';
+            applyFilters();
+        };
+
+        window.viewPayment = function(id) {
+            const payment = allPayments.find(p => p.id === id);
+            if (payment) {
+                alert(JSON.stringify(payment, null, 2));
+            }
+        };
+
+        window.deletePayment = async function(id) {
+            if (!confirm('Are you sure you want to delete this transaction?')) return;
+            
+            try {
+                await deleteDoc(doc(db, 'payments', id));
+                showToast('Transaction deleted successfully');
+                await loadPayments();
+            } catch (error) {
+                console.error('Delete error:', error);
+                showToast('Failed to delete transaction', true);
+            }
+        };
+
+        window.deleteSelected = async function() {
+            if (selectedIds.size === 0) return;
+            if (!confirm(`Are you sure you want to delete ${selectedIds.size} transaction(s)?`)) return;
+
+            try {
+                for (const id of selectedIds) {
+                    await deleteDoc(doc(db, 'payments', id));
+                }
+                selectedIds.clear();
+                updateDeleteButton();
+                showToast(`${selectedIds.size} transaction(s) deleted`);
+                await loadPayments();
+            } catch (error) {
+                console.error('Delete error:', error);
+                showToast('Failed to delete transactions', true);
+            }
+        };
+
+        window.exportCSV = function() {
+            const headers = ['Date', 'Phone', 'Amount', 'Category', 'Status', 'M-Pesa Code'];
+            const rows = filteredPayments.map(p => [
+                p.createdAt || p.date || '',
+                p.phone || p.phoneRaw || '',
+                p.amountRaw || p.amount || '',
+                p.reason || p.category || '',
+                p.status || '',
+                p.mpesaReceiptNumber || p.code || ''
+            ]);
+
+            const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `spectre_transactions_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('CSV exported successfully');
+        };
+
+        window.exportPDF = function() {
+            if (!window.jspdf) {
+                showToast('PDF library loading...', true);
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFontSize(18);
+            doc.text('Spectre Tech - Transaction Report', 14, 20);
+            
+            doc.setFontSize(10);
+            doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 28);
+            doc.text(`Total Transactions: ${filteredPayments.length}`, 14, 34);
+
+            let y = 45;
+            doc.setFontSize(8);
+            
+            // Headers
+            doc.setFont('helvetica', 'bold');
+            doc.text('Date', 14, y);
+            doc.text('Phone', 40, y);
+            doc.text('Amount', 80, y);
+            doc.text('Status', 110, y);
+            doc.text('M-Pesa Code', 140, y);
+            y += 6;
+
+            doc.setFont('helvetica', 'normal');
+            filteredPayments.slice(0, 40).forEach(p => {
+                doc.text((p.date || p.createdAt || '').substring(0, 10), 14, y);
+                doc.text((p.phone || p.phoneRaw || '').substring(0, 15), 40, y);
+                doc.text(String(p.amountRaw || p.amount || ''), 80, y);
+                doc.text(p.status || '', 110, y);
+                doc.text((p.mpesaReceiptNumber || p.code || '').substring(0, 15), 140, y);
+                y += 5;
+
+                if (y > 280) {
+                    doc.addPage();
+                    y = 20;
+                }
+            });
+
+            doc.save(`spectre_transactions_${new Date().toISOString().split('T')[0]}.pdf`);
+            showToast('PDF exported successfully');
+        };
+
+        window.logout = async function() {
+            try {
+                await signOut(auth);
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error('Logout error:', error);
+                // Just redirect anyway
+                window.location.href = 'login.html';
+            }
+        };
+
+        // Toast notification
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            toastMessage.textContent = message;
+            toast.classList.toggle('error', isError);
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Check auth state
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('userEmail').textContent = user.email;
+            }
+            // Load payments regardless of auth for now
+            loadPayments();
+        });
+
+        // Initial load
+        loadPayments();
+    </script>
+</body>
+</html>

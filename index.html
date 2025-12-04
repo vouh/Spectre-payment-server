@@ -1150,7 +1150,8 @@
                         if (queryData.status === 'success') {
                             clearInterval(timer);
                             clearInterval(pollInterval);
-                            await handlePaymentSuccess(phone, amount, reason);
+                            // Pass the M-Pesa receipt number from callback
+                            await handlePaymentSuccess(phone, amount, reason, queryData.mpesaReceiptNumber);
                         } else if (queryData.status === 'cancelled') {
                             clearInterval(timer);
                             clearInterval(pollInterval);
@@ -1194,8 +1195,8 @@
             alert('❌ Payment Failed\n\n' + message);
         }
 
-        // Handle payment success
-        async function handlePaymentSuccess(phone, amount, reason) {
+        // Handle payment success - now accepts mpesaReceiptNumber from callback
+        async function handlePaymentSuccess(phone, amount, reason, mpesaReceiptNumber = null) {
             // Hide step 2 and show step 1 again
             step2.classList.add('hidden');
             step1.classList.remove('hidden');
@@ -1203,7 +1204,10 @@
             // Get current time
             const now = new Date();
             const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
-            const receiptCode = generateReceiptCode();
+            
+            // Use real M-Pesa receipt number if available, otherwise generate fallback
+            const receiptCode = mpesaReceiptNumber || generateReceiptCode();
+            console.log('📄 M-Pesa Receipt Number:', receiptCode);
             
             // Store payment data for printing
             currentPaymentData = {
@@ -1214,7 +1218,9 @@
                 reason: reason,
                 date: getCurrentDate(),
                 time: timeStr,
-                code: receiptCode
+                code: receiptCode,
+                mpesaReceiptNumber: mpesaReceiptNumber, // Store explicitly
+                status: 'completed'
             };
 
             // Save payment to Firebase
