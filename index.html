@@ -1088,15 +1088,16 @@
             }, 1000);
 
             try {
-                // Get the API base URL (same origin for Vercel deployment)
-                const apiBaseUrl = window.location.origin;
+                // API base URL - Vercel backend
+                const apiBaseUrl = 'https://spectre-payment-server.vercel.app';
+                console.log('🔗 Using API:', apiBaseUrl);
                 
                 // Format phone for API (remove spaces, ensure format)
                 const cleanPhone = phone.replace(/\s/g, '');
                 const formattedPhone = cleanPhone.startsWith('0') ? cleanPhone : '0' + cleanPhone;
 
                 // Send STK Push request
-                console.log('📱 Sending STK Push request...');
+                console.log('📱 Sending STK Push request to:', `${apiBaseUrl}/api/stkpush`);
                 const stkResponse = await fetch(`${apiBaseUrl}/api/stkpush`, {
                     method: 'POST',
                     headers: {
