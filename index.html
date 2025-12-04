@@ -778,35 +778,19 @@
             margin-bottom: 1.5rem;
         }
 
-        .error-details {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            border-radius: 0.75rem;
-            padding: 1rem;
+        .error-type-container {
             margin-bottom: 1.5rem;
         }
 
-        .error-details-row {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            justify-content: center;
-        }
-
-        .error-code {
+        .error-type-badge-simple {
+            display: inline-block;
             background: rgba(239, 68, 68, 0.15);
-            color: #ef4444;
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.375rem;
-            font-family: monospace;
-        }
-
-        .error-type-badge {
-            font-size: 0.85rem;
             color: #fca5a5;
-            font-weight: 500;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
         .error-btn {
@@ -1153,12 +1137,9 @@
                 Something went wrong with your payment. Please try again.
             </p>
 
-            <!-- Error Details Box -->
-            <div class="error-details">
-                <div class="error-details-row">
-                    <span id="errorCode" class="error-code">ERR_000</span>
-                    <span id="errorTypeBadge" class="error-type-badge">Unknown Error</span>
-                </div>
+            <!-- Error Type Badge -->
+            <div class="error-type-container">
+                <span id="errorTypeBadge" class="error-type-badge-simple">Unknown Error</span>
             </div>
 
             <!-- Try Again Button -->
@@ -1410,50 +1391,51 @@
         const errorModalContent = document.getElementById('errorModalContent');
         const errorTitle = document.getElementById('errorTitle');
         const errorMessage = document.getElementById('errorMessage');
-        const errorCode = document.getElementById('errorCode');
         const errorTypeBadge = document.getElementById('errorTypeBadge');
         const errorIcon = document.getElementById('errorIcon');
         const errorCloseBtn = document.getElementById('errorCloseBtn');
 
-        // Error type configurations
+        // Error type configurations (user-friendly, no error codes shown)
         const errorConfigs = {
             'wrong_pin': {
                 title: 'Wrong PIN Entered',
                 message: 'The M-Pesa PIN you entered is incorrect. Please check your PIN and try again.',
-                code: 'ERR_2001',
-                badge: 'Authentication Error',
+                badge: 'Incorrect PIN',
                 icon: 'lock',
                 class: ''
             },
             'insufficient': {
                 title: 'Insufficient Balance',
                 message: 'Your M-Pesa account does not have enough funds to complete this transaction.',
-                code: 'ERR_001',
-                badge: 'Balance Error',
+                badge: 'Low Balance',
                 icon: 'wallet',
                 class: 'insufficient-funds'
             },
             'cancelled': {
                 title: 'Payment Cancelled',
                 message: 'You cancelled the payment request. No money was deducted from your account.',
-                code: 'ERR_1032',
-                badge: 'User Cancelled',
+                badge: 'Cancelled',
                 icon: 'cancel',
                 class: 'cancelled'
             },
             'timeout': {
                 title: 'Request Timed Out',
                 message: 'The payment request expired before you could complete it. Please try again.',
-                code: 'ERR_1037',
-                badge: 'Timeout',
+                badge: 'Expired',
                 icon: 'clock',
                 class: 'timeout'
             },
-            'default': {
+            'failed': {
                 title: 'Payment Failed',
-                message: 'Something went wrong with your payment. Please try again.',
-                code: 'ERR_000',
-                badge: 'Unknown Error',
+                message: 'The transaction could not be completed. Please check your M-Pesa and try again.',
+                badge: 'Failed',
+                icon: 'warning',
+                class: ''
+            },
+            'default': {
+                title: 'Payment Unsuccessful',
+                message: 'We could not process your payment. Please try again or contact support if the issue persists.',
+                badge: 'Try Again',
                 icon: 'warning',
                 class: ''
             }
@@ -1468,18 +1450,40 @@
             'warning': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>'
         };
 
-        // Detect error type from message
+        // Detect error type from message (improved detection)
         function detectErrorType(message) {
             const lowerMsg = message.toLowerCase();
-            if (lowerMsg.includes('wrong pin') || lowerMsg.includes('incorrect pin')) {
+            
+            // Wrong PIN detection
+            if (lowerMsg.includes('wrong pin') || lowerMsg.includes('incorrect pin') || 
+                lowerMsg.includes('invalid pin') || lowerMsg.includes('pin') && lowerMsg.includes('incorrect')) {
                 return 'wrong_pin';
-            } else if (lowerMsg.includes('insufficient') || lowerMsg.includes('not enough')) {
+            }
+            
+            // Insufficient balance detection
+            if (lowerMsg.includes('insufficient') || lowerMsg.includes('not enough') || 
+                lowerMsg.includes('balance') || lowerMsg.includes('funds')) {
                 return 'insufficient';
-            } else if (lowerMsg.includes('cancelled') || lowerMsg.includes('canceled')) {
+            }
+            
+            // Cancelled detection
+            if (lowerMsg.includes('cancelled') || lowerMsg.includes('canceled') || 
+                lowerMsg.includes('cancel') || lowerMsg.includes('rejected') || lowerMsg.includes('declined')) {
                 return 'cancelled';
-            } else if (lowerMsg.includes('timed out') || lowerMsg.includes('timeout') || lowerMsg.includes('expired')) {
+            }
+            
+            // Timeout detection
+            if (lowerMsg.includes('timed out') || lowerMsg.includes('timeout') || 
+                lowerMsg.includes('expired') || lowerMsg.includes('too long')) {
                 return 'timeout';
             }
+            
+            // General failure detection
+            if (lowerMsg.includes('failed') || lowerMsg.includes('unsuccessful') || 
+                lowerMsg.includes('could not') || lowerMsg.includes('unable')) {
+                return 'failed';
+            }
+            
             return 'default';
         }
 
@@ -1498,10 +1502,9 @@
                 errorModalContent.classList.add(config.class);
             }
             
-            // Update modal content
+            // Update modal content (no error codes shown to user)
             errorTitle.textContent = config.title;
             errorMessage.textContent = config.message;
-            errorCode.textContent = config.code;
             errorTypeBadge.textContent = config.badge;
             errorIcon.innerHTML = iconPaths[config.icon];
             
