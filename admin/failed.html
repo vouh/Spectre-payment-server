@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Failed Transactions - Spectre Admin</title>
+    <link rel="icon" href="../logo-no-bg.png" type="image/png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        spectre: {
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        .loader { border: 2px solid #f3f3f3; border-top: 2px solid #ef4444; border-radius: 50%; width: 18px; height: 18px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .toast { position: fixed; bottom: 20px; right: 20px; padding: 12px 20px; background: #22c55e; color: white; border-radius: 8px; transform: translateY(100px); opacity: 0; transition: all 0.3s; z-index: 1000; font-size: 14px; }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.error { background: #ef4444; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        .table-row:hover { background-color: #fef2f2; }
+        .btn { transition: all 0.15s; }
+        .btn:hover { transform: scale(1.02); }
+        .btn:active { transform: scale(0.98); }
+        .error-badge { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Auth Check Overlay -->
+    <div id="authOverlay" class="fixed inset-0 bg-white z-50 flex items-center justify-center">
+        <div class="text-center">
+            <div class="loader mx-auto mb-4"></div>
+            <p class="text-gray-500 text-sm">Authenticating...</p>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <a href="index.html" class="flex items-center gap-2 hover:opacity-80">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    <span class="text-sm">Back to Dashboard</span>
+                </a>
+                <span class="text-white/50">|</span>
+                <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span class="font-bold">Failed Transactions</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="refreshData()" class="btn bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    Refresh
+                </button>
+                <button onclick="logout()" class="btn bg-gray-800 hover:bg-gray-900 px-3 py-1.5 rounded-lg text-sm">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-6">
+        <!-- Stats Summary -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div class="bg-white rounded-xl p-4 shadow-sm border border-red-100">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-gray-500 text-xs uppercase">Total Failed</p>
+                        <h2 id="statTotalFailed" class="text-2xl font-bold text-red-600">0</h2>
+                    </div>
+                    <div class="bg-red-100 p-2.5 rounded-lg">
+                        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl p-4 shadow-sm border border-orange-100">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-gray-500 text-xs uppercase">Wrong PIN</p>
+                        <h2 id="statWrongPin" class="text-2xl font-bold text-orange-600">0</h2>
+                    </div>
+                    <div class="bg-orange-100 p-2.5 rounded-lg">
+                        <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl p-4 shadow-sm border border-yellow-100">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-gray-500 text-xs uppercase">Insufficient</p>
+                        <h2 id="statInsufficient" class="text-2xl font-bold text-yellow-600">0</h2>
+                    </div>
+                    <div class="bg-yellow-100 p-2.5 rounded-lg">
+                        <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-gray-500 text-xs uppercase">Cancelled</p>
+                        <h2 id="statCancelled" class="text-2xl font-bold text-gray-600">0</h2>
+                    </div>
+                    <div class="bg-gray-100 p-2.5 rounded-lg">
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-4">
+            <div class="flex flex-wrap gap-3 items-center">
+                <div class="flex-1 min-w-[200px]">
+                    <div class="relative">
+                        <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        <input type="text" id="searchInput" placeholder="Search by phone number..." class="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
+                    </div>
+                </div>
+                <select id="reasonFilter" class="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-white">
+                    <option value="">All Failure Reasons</option>
+                    <option value="wrong_pin">Wrong PIN</option>
+                    <option value="insufficient">Insufficient Balance</option>
+                    <option value="cancelled">Cancelled by User</option>
+                    <option value="timeout">Timed Out</option>
+                </select>
+                <input type="date" id="fromDate" class="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
+                <input type="date" id="toDate" class="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
+                <button onclick="clearFilters()" class="text-gray-500 hover:text-gray-700 text-sm">Clear</button>
+            </div>
+            <div class="flex flex-wrap gap-2 mt-3 pt-3 border-t border-gray-100">
+                <button onclick="exportCSV()" class="btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    Export CSV
+                </button>
+                <button onclick="exportPDF()" class="btn bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                    Export PDF
+                </button>
+                <div class="flex-1"></div>
+                <span id="transactionCount" class="text-xs text-gray-500 self-center">0 failed transactions</span>
+            </div>
+        </div>
+
+        <!-- Failed Transactions Table -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-red-50 border-b border-red-100">
+                        <tr>
+                            <th class="px-3 py-3 text-left text-xs font-medium text-red-700 uppercase">Date/Time</th>
+                            <th class="px-3 py-3 text-left text-xs font-medium text-red-700 uppercase">Phone</th>
+                            <th class="px-3 py-3 text-left text-xs font-medium text-red-700 uppercase">Amount</th>
+                            <th class="px-3 py-3 text-left text-xs font-medium text-red-700 uppercase">Payment Reason</th>
+                            <th class="px-3 py-3 text-left text-xs font-medium text-red-700 uppercase">Failure Reason</th>
+                            <th class="px-3 py-3 text-left text-xs font-medium text-red-700 uppercase">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="failedTable" class="divide-y divide-gray-50">
+                        <tr><td colspan="6" class="px-3 py-8 text-center text-gray-400"><div class="loader mx-auto mb-2"></div>Loading failed transactions...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"><span id="toastMessage"></span></div>
+
+    <!-- View Details Modal -->
+    <div id="viewModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-semibold text-red-700 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Failed Transaction Details
+                </h3>
+                <button onclick="closeViewModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+            </div>
+            <div id="viewModalContent" class="space-y-3 text-sm"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { PaymentService, AuthService } from '../firebase/client.js';
+
+        let failedPayments = [];
+        let filteredPayments = [];
+
+        // Check auth
+        AuthService.onAuthChange((user) => {
+            document.getElementById('authOverlay').classList.add('hidden');
+            if (!user) {
+                window.location.href = 'login.html';
+            } else {
+                loadFailedPayments();
+            }
+        });
+
+        // Load failed payments from Firebase
+        async function loadFailedPayments() {
+            try {
+                const result = await PaymentService.getAll(500);
+                if (result.success) {
+                    // Filter only failed payments
+                    failedPayments = result.data.filter(p => p.status === 'failed');
+                    filteredPayments = [...failedPayments];
+                    updateStats();
+                    renderTable();
+                }
+            } catch (error) {
+                console.error('Error loading failed payments:', error);
+                showToast('Failed to load data', true);
+            }
+        }
+
+        // Update stats
+        function updateStats() {
+            const total = failedPayments.length;
+            const wrongPin = failedPayments.filter(p => p.errorType === 'wrong_pin').length;
+            const insufficient = failedPayments.filter(p => p.errorType === 'insufficient').length;
+            const cancelled = failedPayments.filter(p => p.errorType === 'cancelled').length;
+            
+            document.getElementById('statTotalFailed').textContent = total;
+            document.getElementById('statWrongPin').textContent = wrongPin;
+            document.getElementById('statInsufficient').textContent = insufficient;
+            document.getElementById('statCancelled').textContent = cancelled;
+        }
+
+        // Render table
+        function renderTable() {
+            const tbody = document.getElementById('failedTable');
+            
+            if (filteredPayments.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="px-3 py-8 text-center text-gray-400">No failed transactions found</td></tr>';
+                document.getElementById('transactionCount').textContent = '0 failed transactions';
+                return;
+            }
+
+            tbody.innerHTML = filteredPayments.map(p => `
+                <tr class="table-row">
+                    <td class="px-3 py-2.5 text-gray-600">
+                        <div class="text-sm">${p.date || ''}</div>
+                        <div class="text-xs text-gray-400">${p.time || ''}</div>
+                    </td>
+                    <td class="px-3 py-2.5 font-medium text-gray-800">${p.phone || p.phoneRaw || ''}</td>
+                    <td class="px-3 py-2.5 font-medium text-gray-800">${p.amount || 'KES ' + (p.amountRaw || 0)}</td>
+                    <td class="px-3 py-2.5 text-gray-600 max-w-[120px] truncate" title="${p.reason || ''}">${p.reason || '-'}</td>
+                    <td class="px-3 py-2.5">
+                        <span class="error-badge text-xs px-2 py-1 rounded-full">${p.failureReason || 'Unknown'}</span>
+                    </td>
+                    <td class="px-3 py-2.5">
+                        <button onclick="viewDetails('${p.id}')" class="text-red-600 hover:text-red-800 text-xs font-medium">View</button>
+                    </td>
+                </tr>
+            `).join('');
+            
+            document.getElementById('transactionCount').textContent = `${filteredPayments.length} failed transaction${filteredPayments.length !== 1 ? 's' : ''}`;
+        }
+
+        // View details
+        window.viewDetails = function(id) {
+            const p = failedPayments.find(x => x.id === id);
+            if (!p) return;
+            
+            document.getElementById('viewModalContent').innerHTML = `
+                <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                    <div class="flex items-center gap-2 text-red-700 font-medium mb-1">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        ${p.failureReason || 'Payment Failed'}
+                    </div>
+                    <p class="text-red-600 text-sm">${p.failureMessage || 'Transaction could not be completed'}</p>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="text-gray-500">Date:</div><div class="font-medium">${p.date || '-'}</div>
+                    <div class="text-gray-500">Time:</div><div class="font-medium">${p.time || '-'}</div>
+                    <div class="text-gray-500">Phone:</div><div class="font-medium">${p.phone || p.phoneRaw || '-'}</div>
+                    <div class="text-gray-500">Amount:</div><div class="font-medium">${p.amount || 'KES ' + (p.amountRaw || 0)}</div>
+                    <div class="text-gray-500">Payment Reason:</div><div class="font-medium">${p.reason || '-'}</div>
+                    <div class="text-gray-500">Error Type:</div><div class="font-medium">${p.errorType || '-'}</div>
+                </div>
+            `;
+            document.getElementById('viewModal').classList.remove('hidden');
+            document.getElementById('viewModal').classList.add('flex');
+        };
+
+        window.closeViewModal = function() {
+            document.getElementById('viewModal').classList.add('hidden');
+            document.getElementById('viewModal').classList.remove('flex');
+        };
+
+        // Filter functionality
+        document.getElementById('searchInput').addEventListener('input', applyFilters);
+        document.getElementById('reasonFilter').addEventListener('change', applyFilters);
+        document.getElementById('fromDate').addEventListener('change', applyFilters);
+        document.getElementById('toDate').addEventListener('change', applyFilters);
+
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const reason = document.getElementById('reasonFilter').value;
+            const fromDate = document.getElementById('fromDate').value;
+            const toDate = document.getElementById('toDate').value;
+
+            filteredPayments = failedPayments.filter(p => {
+                const matchSearch = !search || 
+                    (p.phone || '').toLowerCase().includes(search) || 
+                    (p.phoneRaw || '').includes(search);
+                const matchReason = !reason || p.errorType === reason;
+                
+                let matchDate = true;
+                if (fromDate || toDate) {
+                    const pDate = p.createdAt ? new Date(p.createdAt) : null;
+                    if (pDate) {
+                        if (fromDate) matchDate = matchDate && pDate >= new Date(fromDate);
+                        if (toDate) matchDate = matchDate && pDate <= new Date(toDate + 'T23:59:59');
+                    }
+                }
+                
+                return matchSearch && matchReason && matchDate;
+            });
+            
+            renderTable();
+        }
+
+        window.clearFilters = function() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('reasonFilter').value = '';
+            document.getElementById('fromDate').value = '';
+            document.getElementById('toDate').value = '';
+            filteredPayments = [...failedPayments];
+            renderTable();
+        };
+
+        // Export CSV
+        window.exportCSV = function() {
+            if (filteredPayments.length === 0) {
+                showToast('No data to export', true);
+                return;
+            }
+            
+            const headers = ['Date', 'Time', 'Phone', 'Amount', 'Payment Reason', 'Failure Reason', 'Error Type'];
+            const rows = filteredPayments.map(p => [
+                p.date || '', p.time || '', p.phone || p.phoneRaw || '', 
+                p.amountRaw || '', p.reason || '', p.failureReason || '', p.errorType || ''
+            ]);
+            
+            const csv = [headers.join(','), ...rows.map(r => r.map(c => `"${c}"`).join(','))].join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `failed-transactions-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            showToast('CSV exported successfully');
+        };
+
+        // Export PDF
+        window.exportPDF = function() {
+            if (filteredPayments.length === 0) {
+                showToast('No data to export', true);
+                return;
+            }
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFontSize(18);
+            doc.setTextColor(220, 38, 38);
+            doc.text('Failed Transactions Report', 14, 22);
+            doc.setFontSize(10);
+            doc.setTextColor(100);
+            doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 30);
+            doc.text(`Total Failed: ${filteredPayments.length}`, 14, 36);
+            
+            let y = 48;
+            doc.setFontSize(9);
+            doc.setTextColor(0);
+            
+            filteredPayments.slice(0, 30).forEach((p, i) => {
+                if (y > 270) {
+                    doc.addPage();
+                    y = 20;
+                }
+                doc.setFillColor(254, 242, 242);
+                doc.rect(14, y - 4, 182, 18, 'F');
+                doc.text(`${p.date} ${p.time}`, 16, y);
+                doc.text(`Phone: ${p.phone || p.phoneRaw}`, 16, y + 5);
+                doc.text(`Amount: KES ${p.amountRaw} | Reason: ${p.reason || '-'}`, 16, y + 10);
+                doc.setTextColor(220, 38, 38);
+                doc.text(`Failed: ${p.failureReason || 'Unknown'}`, 120, y + 5);
+                doc.setTextColor(0);
+                y += 22;
+            });
+            
+            doc.save(`failed-transactions-${new Date().toISOString().split('T')[0]}.pdf`);
+            showToast('PDF exported successfully');
+        };
+
+        // Refresh
+        window.refreshData = loadFailedPayments;
+
+        // Logout
+        window.logout = async function() {
+            await AuthService.logout();
+            window.location.href = 'login.html';
+        };
+
+        // Toast
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.toggle('error', isError);
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+</html>

@@ -1355,15 +1355,15 @@
                         } else if (queryData.status === 'cancelled') {
                             clearInterval(timer);
                             clearInterval(pollInterval);
-                            handlePaymentFailure('Payment was cancelled by user.');
+                            handlePaymentFailure('Payment was cancelled by user.', phone, amount, reason);
                         } else if (queryData.status === 'failed') {
                             clearInterval(timer);
                             clearInterval(pollInterval);
-                            handlePaymentFailure(queryData.message || 'Payment failed.');
+                            handlePaymentFailure(queryData.message || 'Payment failed.', phone, amount, reason);
                         } else if (queryData.status === 'timeout') {
                             clearInterval(timer);
                             clearInterval(pollInterval);
-                            handlePaymentFailure('Payment request timed out. Please try again.');
+                            handlePaymentFailure('Payment request timed out. Please try again.', phone, amount, reason);
                         }
                         // If still pending, continue polling
 
@@ -1375,14 +1375,14 @@
                     if (pollCount >= maxPolls) {
                         clearInterval(timer);
                         clearInterval(pollInterval);
-                        handlePaymentFailure('Payment verification timed out. If you completed the payment, please contact support.');
+                        handlePaymentFailure('Payment verification timed out. If you completed the payment, please contact support.', phone, amount, reason);
                     }
                 }, 5000); // Poll every 5 seconds
 
             } catch (error) {
                 clearInterval(timer);
                 console.error('Payment error:', error);
-                handlePaymentFailure(error.message || 'Failed to process payment. Please try again.');
+                handlePaymentFailure(error.message || 'Failed to process payment. Please try again.', phone, amount, reason);
             }
         });
 
@@ -1488,13 +1488,40 @@
         }
 
         // Handle payment failure with styled modal
-        function handlePaymentFailure(message) {
+        async function handlePaymentFailure(message, phone = null, amount = null, reason = null) {
             step2.classList.add('hidden');
             step1.classList.remove('hidden');
             
             // Detect error type
             const errorType = detectErrorType(message);
             const config = errorConfigs[errorType];
+            
+            // Save failed transaction to Firebase if we have the data
+            if (phone && amount && window.savePaymentToFirebase) {
+                const now = new Date();
+                const failedPaymentData = {
+                    phone: phone.replace(/(\d{3})(\d{3})(\d{3})/, '+254 $1 $2 $3'),
+                    phoneRaw: phone,
+                    amount: `KES ${parseInt(amount).toLocaleString()}`,
+                    amountRaw: parseInt(amount),
+                    reason: reason || 'Payment',
+                    date: now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+                    time: now.toLocaleTimeString('en-US', { hour12: false }),
+                    status: 'failed',
+                    failureReason: config.title,
+                    failureMessage: message,
+                    errorType: errorType
+                };
+                
+                try {
+                    const result = await window.savePaymentToFirebase(failedPaymentData);
+                    if (result.success) {
+                        console.log("📝 Failed payment logged:", result.id);
+                    }
+                } catch (e) {
+                    console.error("Could not log failed payment:", e);
+                }
+            }
             
             // Remove all error type classes
             errorModalContent.classList.remove('insufficient-funds', 'cancelled', 'timeout');
