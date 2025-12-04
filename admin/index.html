@@ -7,62 +7,419 @@
     <link rel="icon" href="../logo-no-bg.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        spectre: {
-                            50: '#f0fdf4',
-                            100: '#dcfce7',
-                            500: '#22c55e',
-                            600: '#16a34a',
-                            700: '#15803d',
-                            800: '#166534',
-                            900: '#14532d'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { font-family: 'Inter', sans-serif; }
-        .loader { border: 2px solid #f3f3f3; border-top: 2px solid #22c55e; border-radius: 50%; width: 18px; height: 18px; animation: spin 1s linear infinite; }
+        * { font-family: 'Poppins', sans-serif; }
+        
+        /* Dark mode (default) */
+        :root {
+            --bg-primary: #0f1a24;
+            --bg-secondary: #1a2634;
+            --bg-card: #243442;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-color: rgba(60, 179, 113, 0.3);
+            --accent: #3cb371;
+            --accent-dark: #2d4a5e;
+        }
+
+        .light-mode {
+            --bg-primary: #f8fafc;
+            --bg-secondary: #e2e8f0;
+            --bg-card: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --border-color: rgba(60, 179, 113, 0.4);
+        }
+
+        body {
+            background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-primary) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(60, 179, 113, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(45, 74, 94, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .light-mode::before {
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(60, 179, 113, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(45, 74, 94, 0.08) 0%, transparent 50%);
+        }
+
+        .loader { 
+            border: 2px solid rgba(60, 179, 113, 0.3); 
+            border-top: 2px solid #3cb371; 
+            border-radius: 50%; 
+            width: 18px; 
+            height: 18px; 
+            animation: spin 1s linear infinite; 
+        }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .toast { position: fixed; bottom: 20px; right: 20px; padding: 12px 20px; background: #22c55e; color: white; border-radius: 8px; transform: translateY(100px); opacity: 0; transition: all 0.3s; z-index: 1000; font-size: 14px; }
+        
+        .toast { 
+            position: fixed; 
+            bottom: 20px; 
+            right: 20px; 
+            padding: 12px 20px; 
+            background: linear-gradient(135deg, #3cb371, #2d9a5e); 
+            color: white; 
+            border-radius: 8px; 
+            transform: translateY(100px); 
+            opacity: 0; 
+            transition: all 0.3s; 
+            z-index: 1000; 
+            font-size: 14px;
+            box-shadow: 0 4px 15px rgba(60, 179, 113, 0.3);
+        }
         .toast.show { transform: translateY(0); opacity: 1; }
-        .toast.error { background: #ef4444; }
+        .toast.error { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-        .stat-card { transition: all 0.2s; }
-        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
-        .table-row:hover { background-color: #f8fafc; }
+        ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
+        
+        .stat-card { 
+            transition: all 0.3s ease;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+        }
+        .stat-card:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 10px 30px rgba(60, 179, 113, 0.2);
+        }
+        
+        .table-row:hover { background: rgba(60, 179, 113, 0.05); }
+        
         .btn { transition: all 0.15s; }
         .btn:hover { transform: scale(1.02); }
         .btn:active { transform: scale(0.98); }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            background: linear-gradient(135deg, #1e293b, #334155);
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle.light {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        }
+
+        .theme-toggle-ball {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+        }
+
+        .theme-toggle.light .theme-toggle-ball {
+            transform: translateX(24px);
+        }
+
+        /* Card styles */
+        .card-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .light-mode .card-container {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Table horizontal scroll */
+        .table-scroll-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table-scroll-container table {
+            min-width: 700px;
+        }
+
+        /* Navbar */
+        .nav-bar {
+            background: linear-gradient(135deg, #2d4a5e 0%, #3cb371 100%);
+        }
+
+        /* Input styles */
+        .input-dark {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .input-dark:focus {
+            border-color: #3cb371;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(60, 179, 113, 0.2);
+        }
+
+        .light-mode .input-dark {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        /* Hamburger Menu */
+        .hamburger-btn {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            background: rgba(255,255,255,0.2);
+            border-radius: 6px;
+            padding: 6px;
+        }
+
+        .hamburger-btn span {
+            display: block;
+            width: 18px;
+            height: 2px;
+            background: white;
+            margin: 2px 0;
+            transition: all 0.3s ease;
+            border-radius: 1px;
+        }
+
+        .hamburger-btn.active span:nth-child(1) {
+            transform: rotate(45deg) translate(4px, 4px);
+        }
+
+        .hamburger-btn.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-btn.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(4px, -4px);
+        }
+
+        .mobile-menu {
+            position: fixed;
+            top: 56px;
+            right: 0;
+            width: 200px;
+            background: linear-gradient(135deg, #2d4a5e 0%, #1e3a4d 100%);
+            border-radius: 0 0 0 12px;
+            padding: 1rem;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 50;
+            box-shadow: -4px 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
+
+        .mobile-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background 0.2s;
+            font-size: 14px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .mobile-menu-item:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .mobile-menu-divider {
+            height: 1px;
+            background: rgba(255,255,255,0.2);
+            margin: 10px 0;
+        }
+
+        .desktop-nav-items {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Confirm Modal */
+        .confirm-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .confirm-modal-overlay.show {
+            display: flex;
+        }
+
+        .confirm-modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 360px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            animation: modalSlideIn 0.25s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from { opacity: 0; transform: scale(0.95) translateY(-10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .confirm-modal-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(239, 68, 68, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
+
+        .confirm-modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .confirm-modal-message {
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .confirm-modal-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .confirm-modal-btn {
+            flex: 1;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .confirm-modal-btn.cancel {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .confirm-modal-btn.cancel:hover {
+            background: var(--bg-primary);
+        }
+
+        .confirm-modal-btn.confirm {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .confirm-modal-btn.confirm:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .hamburger-btn {
+                display: flex;
+            }
+            .desktop-nav-items {
+                display: none;
+            }
+            .stat-card {
+                padding: 0.75rem !important;
+            }
+            .stat-card h2 {
+                font-size: 1.25rem !important;
+            }
+            .stat-card p {
+                font-size: 0.6rem !important;
+            }
+            .filter-container {
+                flex-direction: column;
+            }
+            .filter-container > * {
+                width: 100%;
+            }
+        }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body>
     <!-- Auth Check Overlay -->
-    <div id="authOverlay" class="fixed inset-0 bg-white z-50 flex items-center justify-center">
+    <div id="authOverlay" class="fixed inset-0 z-50 flex items-center justify-center" style="background: var(--bg-primary);">
         <div class="text-center">
             <div class="loader mx-auto mb-4"></div>
-            <p class="text-gray-500 text-sm">Authenticating...</p>
+            <p class="text-sm" style="color: var(--text-muted);">Authenticating...</p>
         </div>
     </div>
 
     <!-- Navigation -->
-    <nav class="bg-gradient-to-r from-spectre-600 to-spectre-700 text-white shadow-lg sticky top-0 z-40">
+    <nav class="nav-bar text-white shadow-lg sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-2">
                 <img src="../logo-no-bg.png" alt="Spectre" class="w-7 h-7" onerror="this.style.display='none'">
                 <span class="font-bold text-lg">Spectre Admin</span>
             </div>
-            <div class="flex items-center gap-3">
-                <span id="userEmail" class="text-xs bg-white/20 px-3 py-1 rounded-full hidden md:block"></span>
+            
+            <!-- Desktop Navigation -->
+            <div class="desktop-nav-items">
+                <!-- Theme Toggle -->
+                <div id="themeToggle" class="theme-toggle">
+                    <div class="theme-toggle-ball">
+                        <span id="toggleIcon">🌙</span>
+                    </div>
+                </div>
+                <span id="userEmail" class="text-xs bg-white/20 px-3 py-1 rounded-full"></span>
                 <button onclick="refreshData()" class="btn bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                     Refresh
@@ -72,116 +429,147 @@
                     Logout
                 </button>
             </div>
+
+            <!-- Hamburger Menu Button (Mobile) -->
+            <div id="hamburgerBtn" class="hamburger-btn" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
         </div>
     </nav>
 
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="mobile-menu">
+        <div class="text-xs text-white/70 px-3 mb-2">Signed in as:</div>
+        <div id="mobileUserEmail" class="text-sm text-white px-3 mb-2 truncate"></div>
+        <div class="mobile-menu-divider"></div>
+        
+        <button class="mobile-menu-item" onclick="toggleMobileTheme()">
+            <span id="mobileThemeIcon">🌙</span>
+            <span id="mobileThemeText">Dark Mode</span>
+        </button>
+        
+        <button class="mobile-menu-item" onclick="refreshData(); closeMobileMenu();">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            Refresh Data
+        </button>
+        
+        <div class="mobile-menu-divider"></div>
+        
+        <button class="mobile-menu-item" style="color: #f87171;" onclick="logout()">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+            Logout
+        </button>
+    </div>
+
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 py-6">
-        <!-- Stats Grid -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div class="stat-card bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+    <main class="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
+        <!-- Stats Grid - 2 rows on mobile -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
+            <div class="stat-card rounded-xl p-3 sm:p-4">
                 <div class="flex justify-between items-center">
                     <div>
-                        <p class="text-gray-500 text-xs uppercase tracking-wide">Total</p>
-                        <h2 id="statTotal" class="text-2xl font-bold text-gray-800">0</h2>
+                        <p class="text-xs uppercase tracking-wide" style="color: var(--text-muted);">Total</p>
+                        <h2 id="statTotal" class="text-xl sm:text-2xl font-bold" style="color: var(--text-primary);">0</h2>
                     </div>
-                    <div class="bg-blue-100 p-2.5 rounded-lg">
-                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                    <div class="bg-blue-500/20 p-2 sm:p-2.5 rounded-lg">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
                     </div>
                 </div>
             </div>
-            <div class="stat-card bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+            <div class="stat-card rounded-xl p-3 sm:p-4">
                 <div class="flex justify-between items-center">
                     <div>
-                        <p class="text-gray-500 text-xs uppercase tracking-wide">Completed</p>
-                        <h2 id="statCompleted" class="text-2xl font-bold text-green-600">0</h2>
+                        <p class="text-xs uppercase tracking-wide" style="color: var(--text-muted);">Completed</p>
+                        <h2 id="statCompleted" class="text-xl sm:text-2xl font-bold text-[#3cb371]">0</h2>
                     </div>
-                    <div class="bg-green-100 p-2.5 rounded-lg">
-                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <div class="bg-[#3cb371]/20 p-2 sm:p-2.5 rounded-lg">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-[#3cb371]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                     </div>
                 </div>
             </div>
-            <a href="failed.html" class="stat-card bg-white rounded-xl p-4 shadow-sm border border-red-100 hover:border-red-300 cursor-pointer">
+            <a href="failed.html" class="stat-card rounded-xl p-3 sm:p-4 hover:border-red-400 cursor-pointer" style="border-color: rgba(239, 68, 68, 0.3);">
                 <div class="flex justify-between items-center">
                     <div>
-                        <p class="text-gray-500 text-xs uppercase tracking-wide">Failed</p>
-                        <h2 id="statFailed" class="text-2xl font-bold text-red-600">0</h2>
-                        <p class="text-xs text-red-400 mt-1">Click to view details →</p>
+                        <p class="text-xs uppercase tracking-wide" style="color: var(--text-muted);">Failed</p>
+                        <h2 id="statFailed" class="text-xl sm:text-2xl font-bold text-red-500">0</h2>
+                        <p class="text-[10px] sm:text-xs text-red-400 mt-0.5">View details →</p>
                     </div>
-                    <div class="bg-red-100 p-2.5 rounded-lg">
-                        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    <div class="bg-red-500/20 p-2 sm:p-2.5 rounded-lg">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </div>
                 </div>
             </a>
-            <div class="stat-card bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+            <div class="stat-card rounded-xl p-3 sm:p-4">
                 <div class="flex justify-between items-center">
                     <div>
-                        <p class="text-gray-500 text-xs uppercase tracking-wide">Revenue</p>
-                        <h2 id="statRevenue" class="text-2xl font-bold text-gray-800">KSH 0</h2>
+                        <p class="text-xs uppercase tracking-wide" style="color: var(--text-muted);">Revenue</p>
+                        <h2 id="statRevenue" class="text-lg sm:text-2xl font-bold" style="color: var(--text-primary);">KSH 0</h2>
                     </div>
-                    <div class="bg-yellow-100 p-2.5 rounded-lg">
-                        <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <div class="bg-yellow-500/20 p-2 sm:p-2.5 rounded-lg">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Filters & Actions -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-4">
-            <div class="flex flex-wrap gap-3 items-center">
-                <div class="flex-1 min-w-[200px]">
+        <div class="card-container p-3 sm:p-4 mb-4">
+            <div class="flex flex-wrap gap-2 sm:gap-3 items-center filter-container">
+                <div class="flex-1 min-w-[150px] sm:min-w-[200px]">
                     <div class="relative">
-                        <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                        <input type="text" id="searchInput" placeholder="Search phone, M-Pesa code..." class="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-spectre-500 focus:border-transparent">
+                        <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--text-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        <input type="text" id="searchInput" placeholder="Search..." class="input-dark w-full pl-9 pr-3 py-2 text-sm rounded-lg">
                     </div>
                 </div>
-                <select id="statusFilter" class="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-spectre-500 bg-white">
+                <select id="statusFilter" class="input-dark px-3 py-2 text-sm rounded-lg">
                     <option value="">All Status</option>
                     <option value="completed">Completed</option>
                     <option value="pending">Pending</option>
                     <option value="failed">Failed</option>
                 </select>
-                <input type="date" id="fromDate" class="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-spectre-500">
-                <input type="date" id="toDate" class="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-spectre-500">
-                <button onclick="clearFilters()" class="text-gray-500 hover:text-gray-700 text-sm">Clear</button>
+                <input type="date" id="fromDate" class="input-dark px-2 sm:px-3 py-2 text-xs sm:text-sm rounded-lg">
+                <input type="date" id="toDate" class="input-dark px-2 sm:px-3 py-2 text-xs sm:text-sm rounded-lg">
+                <button onclick="clearFilters()" class="text-sm hover:text-[#3cb371]" style="color: var(--text-muted);">Clear</button>
             </div>
-            <div class="flex flex-wrap gap-2 mt-3 pt-3 border-t border-gray-100">
-                <button onclick="exportCSV()" class="btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            <div class="flex flex-wrap gap-2 mt-3 pt-3 border-t" style="border-color: var(--border-color);">
+                <button onclick="exportCSV()" class="btn bg-blue-500 hover:bg-blue-600 text-white px-2 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm flex items-center gap-1">
+                    <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                     CSV
                 </button>
-                <button onclick="exportPDF()" class="btn bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                <button onclick="exportPDF()" class="btn bg-red-500 hover:bg-red-600 text-white px-2 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm flex items-center gap-1">
+                    <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
                     PDF
                 </button>
-                <button onclick="deleteSelected()" id="deleteBtn" class="btn bg-gray-200 text-gray-500 px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5" disabled>
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                    Delete (<span id="deleteCount">0</span>)
+                <button onclick="deleteSelected()" id="deleteBtn" class="btn bg-gray-600 text-gray-400 px-2 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm flex items-center gap-1" disabled>
+                    <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    (<span id="deleteCount">0</span>)
                 </button>
                 <div class="flex-1"></div>
-                <span id="transactionCount" class="text-xs text-gray-500 self-center">0 transactions</span>
-                <span id="lastUpdated" class="text-xs text-gray-400 self-center"></span>
+                <span id="transactionCount" class="text-xs self-center" style="color: var(--text-muted);">0 transactions</span>
+                <span id="lastUpdated" class="text-xs self-center hidden sm:block" style="color: var(--text-muted);"></span>
             </div>
         </div>
 
         <!-- Transaction Table -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                    <thead class="bg-gray-50 border-b border-gray-100">
+        <div class="card-container overflow-hidden">
+            <div class="table-scroll-container">
+                <table class="w-full text-xs sm:text-sm">
+                    <thead style="background: var(--bg-secondary); border-bottom: 1px solid var(--border-color);">
                         <tr>
-                            <th class="px-3 py-3 text-left"><input type="checkbox" id="selectAll" class="rounded text-spectre-500 focus:ring-spectre-500"></th>
-                            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phone</th>
-                            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-                            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reason</th>
-                            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">M-Pesa Code</th>
-                            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                            <th class="px-2 sm:px-3 py-2 sm:py-3 text-left"><input type="checkbox" id="selectAll" class="rounded"></th>
+                            <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-medium uppercase" style="color: var(--text-muted);">Date</th>
+                            <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-medium uppercase" style="color: var(--text-muted);">Phone</th>
+                            <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-medium uppercase" style="color: var(--text-muted);">Amount</th>
+                            <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-medium uppercase" style="color: var(--text-muted);">Reason</th>
+                            <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-medium uppercase" style="color: var(--text-muted);">Status</th>
+                            <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-medium uppercase" style="color: var(--text-muted);">M-Pesa</th>
+                            <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-medium uppercase" style="color: var(--text-muted);">Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="transactionTable" class="divide-y divide-gray-50">
-                        <tr><td colspan="8" class="px-3 py-8 text-center text-gray-400"><div class="loader mx-auto mb-2"></div>Loading...</td></tr>
+                    <tbody id="transactionTable" class="divide-y" style="border-color: var(--border-color);">
+                        <tr><td colspan="8" class="px-3 py-8 text-center" style="color: var(--text-muted);"><div class="loader mx-auto mb-2"></div>Loading...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -192,14 +580,31 @@
     <div id="toast" class="toast"><span id="toastMessage"></span></div>
 
     <!-- View Payment Modal -->
-    <div id="viewModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4">
-        <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl">
+    <div id="viewModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="card-container max-w-md w-full p-6 shadow-2xl">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="font-semibold text-gray-800">Transaction Details</h3>
-                <button onclick="closeViewModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+                <h3 class="font-semibold" style="color: var(--text-primary);">Transaction Details</h3>
+                <button onclick="closeViewModal()" class="text-2xl hover:text-red-400" style="color: var(--text-muted);">&times;</button>
             </div>
             <div id="viewModalContent" class="space-y-3 text-sm"></div>
-            <button onclick="closeViewModal()" class="mt-4 w-full bg-spectre-500 hover:bg-spectre-600 text-white py-2 rounded-lg">Close</button>
+            <button onclick="closeViewModal()" class="mt-4 w-full bg-gradient-to-r from-[#3cb371] to-[#2d9a5e] hover:from-[#2d9a5e] hover:to-[#3cb371] text-white py-2 rounded-lg font-medium">Close</button>
+        </div>
+    </div>
+
+    <!-- Confirm Delete Modal -->
+    <div id="confirmModal" class="confirm-modal-overlay">
+        <div class="confirm-modal">
+            <div class="confirm-modal-icon">
+                <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+            </div>
+            <h3 id="confirmTitle" class="confirm-modal-title">Confirm Delete</h3>
+            <p id="confirmMessage" class="confirm-modal-message">Are you sure you want to delete this transaction? This action cannot be undone.</p>
+            <div class="confirm-modal-buttons">
+                <button id="confirmCancelBtn" class="confirm-modal-btn cancel">Cancel</button>
+                <button id="confirmDeleteBtn" class="confirm-modal-btn confirm">Delete</button>
+            </div>
         </div>
     </div>
 
@@ -240,7 +645,7 @@
 
         async function loadPayments() {
             try {
-                transactionTable.innerHTML = `<tr><td colspan="8" class="px-3 py-8 text-center text-gray-400"><div class="loader mx-auto mb-2"></div>Loading...</td></tr>`;
+                transactionTable.innerHTML = `<tr><td colspan="8" class="px-3 py-8 text-center" style="color: var(--text-muted);"><div class="loader mx-auto mb-2"></div>Loading...</td></tr>`;
                 const q = query(collection(db, COLLECTIONS.PAYMENTS), orderBy("createdAt", "desc"), limit(200));
                 const snap = await getDocs(q);
                 allPayments = [];
@@ -291,30 +696,30 @@
 
         function renderTable() {
             if (filteredPayments.length === 0) {
-                transactionTable.innerHTML = `<tr><td colspan="8" class="px-3 py-8 text-center text-gray-400">No transactions found</td></tr>`;
+                transactionTable.innerHTML = `<tr><td colspan="8" class="px-3 py-8 text-center" style="color: var(--text-muted);">No transactions found</td></tr>`;
                 transactionCount.textContent = '0 transactions';
                 return;
             }
             transactionTable.innerHTML = filteredPayments.map(p => {
-                const sc = p.status === 'completed' || p.status === 'success' ? 'bg-green-100 text-green-700' : p.status === 'failed' || p.status === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700';
+                const sc = p.status === 'completed' || p.status === 'success' ? 'bg-[#3cb371]/20 text-[#3cb371]' : p.status === 'failed' || p.status === 'cancelled' ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400';
                 const d = p.createdAt ? new Date(p.createdAt) : null;
                 const ds = d ? d.toLocaleDateString() : p.date || '-';
                 const ts = d ? d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
                 return `<tr class="table-row">
-                    <td class="px-3 py-2.5"><input type="checkbox" class="row-cb rounded text-spectre-500" data-id="${p.id}" ${selectedIds.has(p.id) ? 'checked' : ''}></td>
-                    <td class="px-3 py-2.5 text-gray-600"><div class="text-xs">${ds}</div><div class="text-[10px] text-gray-400">${ts}</div></td>
-                    <td class="px-3 py-2.5 font-medium text-gray-800">${p.phone || p.phoneRaw || '-'}</td>
-                    <td class="px-3 py-2.5 font-semibold">${p.amount || `KES ${p.amountRaw || 0}`}</td>
-                    <td class="px-3 py-2.5 text-gray-600 max-w-[120px] truncate" title="${p.reason || ''}">${p.reason || '-'}</td>
-                    <td class="px-3 py-2.5"><span class="px-2 py-0.5 rounded-full text-xs font-medium ${sc}">${p.status || 'pending'}</span></td>
-                    <td class="px-3 py-2.5 font-mono text-xs text-spectre-600">${p.mpesaReceiptNumber || p.code || '-'}</td>
-                    <td class="px-3 py-2.5"><div class="flex gap-1">
-                        <button onclick="viewPayment('${p.id}')" class="p-1 text-blue-500 hover:bg-blue-50 rounded"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg></button>
-                        <button onclick="deletePayment('${p.id}')" class="p-1 text-red-500 hover:bg-red-50 rounded"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                    <td class="px-2 sm:px-3 py-2"><input type="checkbox" class="row-cb rounded" data-id="${p.id}" ${selectedIds.has(p.id) ? 'checked' : ''}></td>
+                    <td class="px-2 sm:px-3 py-2" style="color: var(--text-secondary);"><div class="text-xs">${ds}</div><div class="text-[9px] sm:text-[10px]" style="color: var(--text-muted);">${ts}</div></td>
+                    <td class="px-2 sm:px-3 py-2 font-medium" style="color: var(--text-primary);">${p.phone || p.phoneRaw || '-'}</td>
+                    <td class="px-2 sm:px-3 py-2 font-semibold" style="color: var(--text-primary);">${p.amount || `KES ${p.amountRaw || 0}`}</td>
+                    <td class="px-2 sm:px-3 py-2 max-w-[80px] sm:max-w-[120px] truncate" style="color: var(--text-secondary);" title="${p.reason || ''}">${p.reason || '-'}</td>
+                    <td class="px-2 sm:px-3 py-2"><span class="px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium ${sc}">${p.status || 'pending'}</span></td>
+                    <td class="px-2 sm:px-3 py-2 font-mono text-[10px] sm:text-xs text-[#3cb371]">${p.mpesaReceiptNumber || p.code || '-'}</td>
+                    <td class="px-2 sm:px-3 py-2"><div class="flex gap-1">
+                        <button onclick="viewPayment('${p.id}')" class="p-1 text-blue-400 hover:bg-blue-500/20 rounded"><svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg></button>
+                        <button onclick="deletePayment('${p.id}')" class="p-1 text-red-400 hover:bg-red-500/20 rounded"><svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
                     </div></td>
                 </tr>`;
             }).join('');
-            transactionCount.textContent = `${filteredPayments.length} of ${allPayments.length} transactions`;
+            transactionCount.textContent = `${filteredPayments.length} of ${allPayments.length}`;
             document.querySelectorAll('.row-cb').forEach(cb => {
                 cb.addEventListener('change', e => { e.target.checked ? selectedIds.add(e.target.dataset.id) : selectedIds.delete(e.target.dataset.id); updateDeleteBtn(); });
             });
@@ -326,8 +731,8 @@
             deleteBtn.disabled = c === 0;
             deleteBtn.classList.toggle('bg-red-500', c > 0);
             deleteBtn.classList.toggle('text-white', c > 0);
-            deleteBtn.classList.toggle('bg-gray-200', c === 0);
-            deleteBtn.classList.toggle('text-gray-500', c === 0);
+            deleteBtn.classList.toggle('bg-gray-600', c === 0);
+            deleteBtn.classList.toggle('text-gray-400', c === 0);
         }
 
         selectAll.addEventListener('change', e => {
@@ -349,13 +754,13 @@
             const p = allPayments.find(x => x.id === id);
             if (!p) return;
             document.getElementById('viewModalContent').innerHTML = `<div class="grid grid-cols-2 gap-2">
-                <div class="text-gray-500">Phone:</div><div class="font-medium">${p.phone || p.phoneRaw || '-'}</div>
-                <div class="text-gray-500">Amount:</div><div class="font-medium">${p.amount || `KES ${p.amountRaw}`}</div>
-                <div class="text-gray-500">Reason:</div><div class="font-medium">${p.reason || '-'}</div>
-                <div class="text-gray-500">Status:</div><div class="font-medium capitalize">${p.status || 'pending'}</div>
-                <div class="text-gray-500">M-Pesa Code:</div><div class="font-medium text-spectre-600">${p.mpesaReceiptNumber || p.code || '-'}</div>
-                <div class="text-gray-500">Date:</div><div class="font-medium">${p.date || new Date(p.createdAt).toLocaleDateString()}</div>
-                <div class="text-gray-500">Time:</div><div class="font-medium">${p.time || new Date(p.createdAt).toLocaleTimeString()}</div>
+                <div style="color: var(--text-muted);">Phone:</div><div class="font-medium" style="color: var(--text-primary);">${p.phone || p.phoneRaw || '-'}</div>
+                <div style="color: var(--text-muted);">Amount:</div><div class="font-medium" style="color: var(--text-primary);">${p.amount || `KES ${p.amountRaw}`}</div>
+                <div style="color: var(--text-muted);">Reason:</div><div class="font-medium" style="color: var(--text-primary);">${p.reason || '-'}</div>
+                <div style="color: var(--text-muted);">Status:</div><div class="font-medium capitalize" style="color: var(--text-primary);">${p.status || 'pending'}</div>
+                <div style="color: var(--text-muted);">M-Pesa Code:</div><div class="font-medium text-[#3cb371]">${p.mpesaReceiptNumber || p.code || '-'}</div>
+                <div style="color: var(--text-muted);">Date:</div><div class="font-medium" style="color: var(--text-primary);">${p.date || new Date(p.createdAt).toLocaleDateString()}</div>
+                <div style="color: var(--text-muted);">Time:</div><div class="font-medium" style="color: var(--text-primary);">${p.time || new Date(p.createdAt).toLocaleTimeString()}</div>
             </div>`;
             document.getElementById('viewModal').classList.remove('hidden');
             document.getElementById('viewModal').classList.add('flex');
@@ -363,12 +768,72 @@
 
         window.closeViewModal = () => { document.getElementById('viewModal').classList.add('hidden'); document.getElementById('viewModal').classList.remove('flex'); };
 
-        window.deletePayment = async id => { if (!confirm('Delete this transaction?')) return; try { await deleteDoc(doc(db, COLLECTIONS.PAYMENTS, id)); showToast('Deleted'); loadPayments(); } catch (e) { showToast('Failed', true); } };
+        // Custom Confirm Modal
+        let confirmCallback = null;
+        const confirmModal = document.getElementById('confirmModal');
+        const confirmTitle = document.getElementById('confirmTitle');
+        const confirmMessage = document.getElementById('confirmMessage');
+        const confirmCancelBtn = document.getElementById('confirmCancelBtn');
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+
+        function showConfirmModal(title, message, onConfirm) {
+            confirmTitle.textContent = title;
+            confirmMessage.textContent = message;
+            confirmCallback = onConfirm;
+            confirmModal.classList.add('show');
+        }
+
+        function hideConfirmModal() {
+            confirmModal.classList.remove('show');
+            confirmCallback = null;
+        }
+
+        confirmCancelBtn.addEventListener('click', hideConfirmModal);
+        confirmDeleteBtn.addEventListener('click', () => {
+            if (confirmCallback) confirmCallback();
+            hideConfirmModal();
+        });
+
+        // Close modal on backdrop click
+        confirmModal.addEventListener('click', (e) => {
+            if (e.target === confirmModal) hideConfirmModal();
+        });
+
+        window.deletePayment = async id => {
+            showConfirmModal(
+                'Delete Transaction',
+                'Are you sure you want to delete this transaction? This action cannot be undone.',
+                async () => {
+                    try { 
+                        await deleteDoc(doc(db, COLLECTIONS.PAYMENTS, id)); 
+                        showToast('Deleted'); 
+                        loadPayments(); 
+                    } catch (e) { 
+                        showToast('Failed', true); 
+                    }
+                }
+            );
+        };
 
         window.deleteSelected = async () => {
             if (selectedIds.size === 0) return;
-            if (!confirm(`Delete ${selectedIds.size} transaction(s)?`)) return;
-            try { for (const id of selectedIds) { await deleteDoc(doc(db, COLLECTIONS.PAYMENTS, id)); } selectedIds.clear(); updateDeleteBtn(); showToast('Deleted'); loadPayments(); } catch (e) { showToast('Failed', true); }
+            showConfirmModal(
+                'Delete Multiple Transactions',
+                `Are you sure you want to delete ${selectedIds.size} transaction(s)? This action cannot be undone.`,
+                async () => {
+                    try { 
+                        for (const id of selectedIds) { 
+                            await deleteDoc(doc(db, COLLECTIONS.PAYMENTS, id)); 
+                        } 
+                        selectedIds.clear(); 
+                        updateDeleteBtn(); 
+                        showToast('Deleted'); 
+                        loadPayments(); 
+                    } catch (e) { 
+                        showToast('Failed', true); 
+                    }
+                }
+            );
         };
 
         window.exportCSV = () => {
@@ -398,6 +863,87 @@
         window.logout = async () => { try { await signOut(auth); } catch (e) {} window.location.href = 'login.html'; };
 
         function showToast(m, e = false) { const t = document.getElementById('toast'); document.getElementById('toastMessage').textContent = m; t.classList.toggle('error', e); t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
+    </script>
+
+    <!-- Theme Toggle Script -->
+    <script>
+        const themeToggle = document.getElementById('themeToggle');
+        const toggleIcon = document.getElementById('toggleIcon');
+        const mobileThemeIcon = document.getElementById('mobileThemeIcon');
+        const mobileThemeText = document.getElementById('mobileThemeText');
+        let isDarkMode = true;
+
+        // Check for saved theme preference
+        const savedTheme = localStorage.getItem('adminTheme');
+        if (savedTheme === 'light') {
+            isDarkMode = false;
+            document.body.classList.add('light-mode');
+            themeToggle.classList.add('light');
+            toggleIcon.textContent = '☀️';
+            if (mobileThemeIcon) mobileThemeIcon.textContent = '☀️';
+            if (mobileThemeText) mobileThemeText.textContent = 'Light Mode';
+        }
+
+        function updateThemeUI() {
+            if (isDarkMode) {
+                document.body.classList.remove('light-mode');
+                themeToggle.classList.remove('light');
+                toggleIcon.textContent = '🌙';
+                if (mobileThemeIcon) mobileThemeIcon.textContent = '🌙';
+                if (mobileThemeText) mobileThemeText.textContent = 'Dark Mode';
+                localStorage.setItem('adminTheme', 'dark');
+            } else {
+                document.body.classList.add('light-mode');
+                themeToggle.classList.add('light');
+                toggleIcon.textContent = '☀️';
+                if (mobileThemeIcon) mobileThemeIcon.textContent = '☀️';
+                if (mobileThemeText) mobileThemeText.textContent = 'Light Mode';
+                localStorage.setItem('adminTheme', 'light');
+            }
+        }
+
+        themeToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            isDarkMode = !isDarkMode;
+            updateThemeUI();
+        });
+
+        // Mobile theme toggle function
+        window.toggleMobileTheme = function() {
+            isDarkMode = !isDarkMode;
+            updateThemeUI();
+        };
+
+        // Hamburger Menu
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+
+        window.toggleMobileMenu = function() {
+            hamburgerBtn.classList.toggle('active');
+            mobileMenu.classList.toggle('open');
+        };
+
+        window.closeMobileMenu = function() {
+            hamburgerBtn.classList.remove('active');
+            mobileMenu.classList.remove('open');
+        };
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!hamburgerBtn.contains(e.target) && !mobileMenu.contains(e.target)) {
+                closeMobileMenu();
+            }
+        });
+
+        // Update mobile menu user email when auth loads
+        const checkMobileEmail = setInterval(() => {
+            const email = document.getElementById('userEmail')?.textContent;
+            if (email) {
+                const mobileEmail = document.getElementById('mobileUserEmail');
+                if (mobileEmail) mobileEmail.textContent = email;
+                clearInterval(checkMobileEmail);
+            }
+        }, 500);
     </script>
 </body>
 </html>

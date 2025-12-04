@@ -7,172 +7,480 @@
     <link rel="icon" href="../logo-no-bg.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        spectre: {
-                            500: '#22c55e',
-                            600: '#16a34a',
-                            700: '#15803d'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { font-family: 'Inter', sans-serif; }
-        .loader { border: 2px solid #f3f3f3; border-top: 2px solid #ef4444; border-radius: 50%; width: 18px; height: 18px; animation: spin 1s linear infinite; }
+        * { font-family: 'Poppins', sans-serif; }
+        
+        /* Dark mode (default) */
+        :root {
+            --bg-primary: #0f1a24;
+            --bg-secondary: #1a2634;
+            --bg-card: #243442;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-color: rgba(239, 68, 68, 0.3);
+            --accent: #ef4444;
+            --accent-dark: #dc2626;
+        }
+
+        .light-mode {
+            --bg-primary: #f8fafc;
+            --bg-secondary: #e2e8f0;
+            --bg-card: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --border-color: rgba(239, 68, 68, 0.4);
+        }
+
+        body {
+            background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-primary) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(239, 68, 68, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(45, 74, 94, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .light-mode::before {
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(239, 68, 68, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(45, 74, 94, 0.08) 0%, transparent 50%);
+        }
+
+        .loader { 
+            border: 2px solid rgba(239, 68, 68, 0.3); 
+            border-top: 2px solid #ef4444; 
+            border-radius: 50%; 
+            width: 18px; 
+            height: 18px; 
+            animation: spin 1s linear infinite; 
+        }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .toast { position: fixed; bottom: 20px; right: 20px; padding: 12px 20px; background: #22c55e; color: white; border-radius: 8px; transform: translateY(100px); opacity: 0; transition: all 0.3s; z-index: 1000; font-size: 14px; }
+        
+        .toast { 
+            position: fixed; 
+            bottom: 20px; 
+            right: 20px; 
+            padding: 12px 20px; 
+            background: linear-gradient(135deg, #ef4444, #dc2626); 
+            color: white; 
+            border-radius: 8px; 
+            transform: translateY(100px); 
+            opacity: 0; 
+            transition: all 0.3s; 
+            z-index: 1000; 
+            font-size: 14px;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
         .toast.show { transform: translateY(0); opacity: 1; }
-        .toast.error { background: #ef4444; }
+        .toast.success { background: linear-gradient(135deg, #3cb371, #2d9a5e); }
+        
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-        .table-row:hover { background-color: #fef2f2; }
+        ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
+        
+        .stat-card { 
+            transition: all 0.3s ease;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+        }
+        .stat-card:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.2);
+        }
+        
+        .table-row:hover { background: rgba(239, 68, 68, 0.05); }
+        
         .btn { transition: all 0.15s; }
         .btn:hover { transform: scale(1.02); }
         .btn:active { transform: scale(0.98); }
-        .error-badge { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            background: linear-gradient(135deg, #1e293b, #334155);
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle.light {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        }
+
+        .theme-toggle-ball {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+        }
+
+        .theme-toggle.light .theme-toggle-ball {
+            transform: translateX(24px);
+        }
+
+        /* Card styles */
+        .card-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .light-mode .card-container {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Table horizontal scroll */
+        .table-scroll-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table-scroll-container table {
+            min-width: 650px;
+        }
+
+        /* Navbar */
+        .nav-bar {
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+        }
+
+        /* Input styles */
+        .input-dark {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .input-dark:focus {
+            border-color: #ef4444;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+        }
+
+        .light-mode .input-dark {
+            background: #f1f5f9;
+            border-color: #fecaca;
+        }
+
+        .error-badge {
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .light-mode .error-badge {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        /* Hamburger Menu */
+        .hamburger-btn {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            background: rgba(255,255,255,0.2);
+            border-radius: 6px;
+            padding: 6px;
+        }
+
+        .hamburger-btn span {
+            display: block;
+            width: 18px;
+            height: 2px;
+            background: white;
+            margin: 2px 0;
+            transition: all 0.3s ease;
+            border-radius: 1px;
+        }
+
+        .hamburger-btn.active span:nth-child(1) {
+            transform: rotate(45deg) translate(4px, 4px);
+        }
+
+        .hamburger-btn.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-btn.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(4px, -4px);
+        }
+
+        .mobile-menu {
+            position: fixed;
+            top: 56px;
+            right: 0;
+            width: 180px;
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            border-radius: 0 0 0 12px;
+            padding: 1rem;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 50;
+            box-shadow: -4px 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
+
+        .mobile-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background 0.2s;
+            font-size: 14px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .mobile-menu-item:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .mobile-menu-divider {
+            height: 1px;
+            background: rgba(255,255,255,0.2);
+            margin: 10px 0;
+        }
+
+        .desktop-nav-items {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .hamburger-btn {
+                display: flex;
+            }
+            .desktop-nav-items {
+                display: none;
+            }
+            .stat-card {
+                padding: 0.75rem !important;
+            }
+            .stat-card h2 {
+                font-size: 1.25rem !important;
+            }
+            .stat-card p {
+                font-size: 0.6rem !important;
+            }
+            .filter-container {
+                flex-direction: column;
+            }
+            .filter-container > * {
+                width: 100%;
+            }
+        }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body>
     <!-- Auth Check Overlay -->
-    <div id="authOverlay" class="fixed inset-0 bg-white z-50 flex items-center justify-center">
+    <div id="authOverlay" class="fixed inset-0 z-50 flex items-center justify-center" style="background: var(--bg-primary);">
         <div class="text-center">
             <div class="loader mx-auto mb-4"></div>
-            <p class="text-gray-500 text-sm">Authenticating...</p>
+            <p class="text-sm" style="color: var(--text-muted);">Authenticating...</p>
         </div>
     </div>
 
     <!-- Navigation -->
-    <nav class="bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg sticky top-0 z-40">
+    <nav class="nav-bar text-white shadow-lg sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-3">
                 <a href="index.html" class="flex items-center gap-2 hover:opacity-80">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                    <span class="text-sm">Back to Dashboard</span>
+                    <span class="text-sm hidden sm:inline">Back</span>
                 </a>
-                <span class="text-white/50">|</span>
+                <span class="text-white/50 hidden sm:inline">|</span>
                 <div class="flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <span class="font-bold">Failed Transactions</span>
+                    <svg class="w-5 h-5 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span class="font-bold text-sm sm:text-base">Failed</span>
                 </div>
             </div>
-            <div class="flex items-center gap-3">
+            
+            <!-- Desktop Navigation -->
+            <div class="desktop-nav-items">
+                <!-- Theme Toggle -->
+                <div id="themeToggle" class="theme-toggle">
+                    <div class="theme-toggle-ball">
+                        <span id="toggleIcon">🌙</span>
+                    </div>
+                </div>
                 <button onclick="refreshData()" class="btn bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                     Refresh
                 </button>
-                <button onclick="logout()" class="btn bg-gray-800 hover:bg-gray-900 px-3 py-1.5 rounded-lg text-sm">Logout</button>
+                <button onclick="logout()" class="btn bg-gray-800 hover:bg-gray-900 px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                    Logout
+                </button>
+            </div>
+
+            <!-- Hamburger Menu Button (Mobile) -->
+            <div id="hamburgerBtn" class="hamburger-btn" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
             </div>
         </div>
     </nav>
 
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="mobile-menu">
+        <button class="mobile-menu-item" onclick="toggleMobileTheme()">
+            <span id="mobileThemeIcon">🌙</span>
+            <span id="mobileThemeText">Dark Mode</span>
+        </button>
+        
+        <button class="mobile-menu-item" onclick="refreshData(); closeMobileMenu();">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            Refresh Data
+        </button>
+        
+        <div class="mobile-menu-divider"></div>
+        
+        <button class="mobile-menu-item" onclick="logout()">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+            Logout
+        </button>
+    </div>
+
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 py-6">
-        <!-- Stats Summary -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div class="bg-white rounded-xl p-4 shadow-sm border border-red-100">
+    <main class="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
+        <!-- Stats Grid - 2 rows on mobile -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
+            <div class="stat-card rounded-xl p-3 sm:p-4">
                 <div class="flex justify-between items-center">
                     <div>
-                        <p class="text-gray-500 text-xs uppercase">Total Failed</p>
-                        <h2 id="statTotalFailed" class="text-2xl font-bold text-red-600">0</h2>
+                        <p class="text-xs uppercase tracking-wide" style="color: var(--text-muted);">Total Failed</p>
+                        <h2 id="statTotalFailed" class="text-xl sm:text-2xl font-bold text-red-500">0</h2>
                     </div>
-                    <div class="bg-red-100 p-2.5 rounded-lg">
-                        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    <div class="bg-red-500/20 p-2 sm:p-2.5 rounded-lg">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </div>
                 </div>
             </div>
-            <div class="bg-white rounded-xl p-4 shadow-sm border border-orange-100">
+            <div class="stat-card rounded-xl p-3 sm:p-4">
                 <div class="flex justify-between items-center">
                     <div>
-                        <p class="text-gray-500 text-xs uppercase">Wrong PIN</p>
-                        <h2 id="statWrongPin" class="text-2xl font-bold text-orange-600">0</h2>
+                        <p class="text-xs uppercase tracking-wide" style="color: var(--text-muted);">Wrong PIN</p>
+                        <h2 id="statWrongPin" class="text-xl sm:text-2xl font-bold text-orange-500">0</h2>
                     </div>
-                    <div class="bg-orange-100 p-2.5 rounded-lg">
-                        <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    <div class="bg-orange-500/20 p-2 sm:p-2.5 rounded-lg">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                     </div>
                 </div>
             </div>
-            <div class="bg-white rounded-xl p-4 shadow-sm border border-yellow-100">
+            <div class="stat-card rounded-xl p-3 sm:p-4">
                 <div class="flex justify-between items-center">
                     <div>
-                        <p class="text-gray-500 text-xs uppercase">Insufficient</p>
-                        <h2 id="statInsufficient" class="text-2xl font-bold text-yellow-600">0</h2>
+                        <p class="text-xs uppercase tracking-wide" style="color: var(--text-muted);">Insufficient</p>
+                        <h2 id="statInsufficient" class="text-xl sm:text-2xl font-bold text-yellow-500">0</h2>
                     </div>
-                    <div class="bg-yellow-100 p-2.5 rounded-lg">
-                        <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                    <div class="bg-yellow-500/20 p-2 sm:p-2.5 rounded-lg">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
                     </div>
                 </div>
             </div>
-            <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+            <div class="stat-card rounded-xl p-3 sm:p-4">
                 <div class="flex justify-between items-center">
                     <div>
-                        <p class="text-gray-500 text-xs uppercase">Cancelled</p>
-                        <h2 id="statCancelled" class="text-2xl font-bold text-gray-600">0</h2>
+                        <p class="text-xs uppercase tracking-wide" style="color: var(--text-muted);">Cancelled</p>
+                        <h2 id="statCancelled" class="text-xl sm:text-2xl font-bold" style="color: var(--text-secondary);">0</h2>
                     </div>
-                    <div class="bg-gray-100 p-2.5 rounded-lg">
-                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
+                    <div class="bg-gray-500/20 p-2 sm:p-2.5 rounded-lg">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Filters -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-4">
-            <div class="flex flex-wrap gap-3 items-center">
-                <div class="flex-1 min-w-[200px]">
+        <div class="card-container p-3 sm:p-4 mb-4">
+            <div class="flex flex-wrap gap-2 sm:gap-3 items-center filter-container">
+                <div class="flex-1 min-w-[150px] sm:min-w-[200px]">
                     <div class="relative">
-                        <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                        <input type="text" id="searchInput" placeholder="Search by phone number..." class="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--text-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        <input type="text" id="searchInput" placeholder="Search phone..." class="input-dark w-full pl-9 pr-3 py-2 text-sm rounded-lg">
                     </div>
                 </div>
-                <select id="reasonFilter" class="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-white">
-                    <option value="">All Failure Reasons</option>
+                <select id="reasonFilter" class="input-dark px-3 py-2 text-sm rounded-lg">
+                    <option value="">All Reasons</option>
                     <option value="wrong_pin">Wrong PIN</option>
-                    <option value="insufficient">Insufficient Balance</option>
-                    <option value="cancelled">Cancelled by User</option>
+                    <option value="insufficient">Insufficient</option>
+                    <option value="cancelled">Cancelled</option>
                     <option value="timeout">Timed Out</option>
                 </select>
-                <input type="date" id="fromDate" class="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
-                <input type="date" id="toDate" class="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
-                <button onclick="clearFilters()" class="text-gray-500 hover:text-gray-700 text-sm">Clear</button>
+                <input type="date" id="fromDate" class="input-dark px-2 sm:px-3 py-2 text-xs sm:text-sm rounded-lg">
+                <input type="date" id="toDate" class="input-dark px-2 sm:px-3 py-2 text-xs sm:text-sm rounded-lg">
+                <button onclick="clearFilters()" class="text-sm hover:text-red-400" style="color: var(--text-muted);">Clear</button>
             </div>
-            <div class="flex flex-wrap gap-2 mt-3 pt-3 border-t border-gray-100">
-                <button onclick="exportCSV()" class="btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    Export CSV
+            <div class="flex flex-wrap gap-2 mt-3 pt-3 border-t" style="border-color: var(--border-color);">
+                <button onclick="exportCSV()" class="btn bg-blue-500 hover:bg-blue-600 text-white px-2 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm flex items-center gap-1">
+                    <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    CSV
                 </button>
-                <button onclick="exportPDF()" class="btn bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-                    Export PDF
+                <button onclick="exportPDF()" class="btn bg-red-500 hover:bg-red-600 text-white px-2 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm flex items-center gap-1">
+                    <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                    PDF
                 </button>
                 <div class="flex-1"></div>
-                <span id="transactionCount" class="text-xs text-gray-500 self-center">0 failed transactions</span>
+                <span id="transactionCount" class="text-xs self-center" style="color: var(--text-muted);">0 failed</span>
             </div>
         </div>
 
         <!-- Failed Transactions Table -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                    <thead class="bg-red-50 border-b border-red-100">
+        <div class="card-container overflow-hidden">
+            <div class="table-scroll-container">
+                <table class="w-full text-xs sm:text-sm">
+                    <thead style="background: var(--bg-secondary); border-bottom: 1px solid var(--border-color);">
                         <tr>
-                            <th class="px-3 py-3 text-left text-xs font-medium text-red-700 uppercase">Date/Time</th>
-                            <th class="px-3 py-3 text-left text-xs font-medium text-red-700 uppercase">Phone</th>
-                            <th class="px-3 py-3 text-left text-xs font-medium text-red-700 uppercase">Amount</th>
-                            <th class="px-3 py-3 text-left text-xs font-medium text-red-700 uppercase">Payment Reason</th>
-                            <th class="px-3 py-3 text-left text-xs font-medium text-red-700 uppercase">Failure Reason</th>
-                            <th class="px-3 py-3 text-left text-xs font-medium text-red-700 uppercase">Actions</th>
+                            <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-medium uppercase text-red-400">Date</th>
+                            <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-medium uppercase text-red-400">Phone</th>
+                            <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-medium uppercase text-red-400">Amount</th>
+                            <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-medium uppercase text-red-400">Reason</th>
+                            <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-medium uppercase text-red-400">Failure</th>
+                            <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-medium uppercase text-red-400">Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="failedTable" class="divide-y divide-gray-50">
-                        <tr><td colspan="6" class="px-3 py-8 text-center text-gray-400"><div class="loader mx-auto mb-2"></div>Loading failed transactions...</td></tr>
+                    <tbody id="failedTable" class="divide-y" style="border-color: var(--border-color);">
+                        <tr><td colspan="6" class="px-3 py-8 text-center" style="color: var(--text-muted);"><div class="loader mx-auto mb-2"></div>Loading...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -183,28 +491,41 @@
     <div id="toast" class="toast"><span id="toastMessage"></span></div>
 
     <!-- View Details Modal -->
-    <div id="viewModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4">
-        <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl">
+    <div id="viewModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="card-container max-w-md w-full p-6 shadow-2xl">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="font-semibold text-red-700 flex items-center gap-2">
+                <h3 class="font-semibold text-red-400 flex items-center gap-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    Failed Transaction Details
+                    Failed Transaction
                 </h3>
-                <button onclick="closeViewModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+                <button onclick="closeViewModal()" class="text-2xl hover:text-red-400" style="color: var(--text-muted);">&times;</button>
             </div>
             <div id="viewModalContent" class="space-y-3 text-sm"></div>
+            <button onclick="closeViewModal()" class="mt-4 w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white py-2 rounded-lg font-medium">Close</button>
         </div>
     </div>
 
+    <!-- Firebase Client -->
     <script type="module">
-        import { PaymentService, AuthService } from '../firebase/client.js';
+        import { db, auth, COLLECTIONS } from '../firebase/client.js';
+        import { collection, getDocs, query, orderBy, limit, where } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
         let failedPayments = [];
         let filteredPayments = [];
 
-        // Check auth
-        AuthService.onAuthChange((user) => {
-            document.getElementById('authOverlay').classList.add('hidden');
+        const authOverlay = document.getElementById('authOverlay');
+
+        // Auth check with timeout
+        let authTimeout = setTimeout(() => {
+            console.log('Auth timeout - redirecting to login');
+            window.location.href = 'login.html';
+        }, 10000); // 10 second timeout
+
+        onAuthStateChanged(auth, (user) => {
+            clearTimeout(authTimeout);
+            authOverlay.style.display = 'none';
+            
             if (!user) {
                 window.location.href = 'login.html';
             } else {
@@ -214,18 +535,32 @@
 
         // Load failed payments from Firebase
         async function loadFailedPayments() {
+            const failedTable = document.getElementById('failedTable');
             try {
-                const result = await PaymentService.getAll(500);
-                if (result.success) {
-                    // Filter only failed payments
-                    failedPayments = result.data.filter(p => p.status === 'failed');
-                    filteredPayments = [...failedPayments];
-                    updateStats();
-                    renderTable();
-                }
+                failedTable.innerHTML = `<tr><td colspan="6" class="px-3 py-8 text-center" style="color: var(--text-muted);"><div class="loader mx-auto mb-2"></div>Loading...</td></tr>`;
+                
+                const q = query(
+                    collection(db, COLLECTIONS.PAYMENTS),
+                    orderBy("createdAt", "desc"),
+                    limit(500)
+                );
+                const snap = await getDocs(q);
+                
+                failedPayments = [];
+                snap.forEach(d => {
+                    const data = d.data();
+                    if (data.status === 'failed') {
+                        failedPayments.push({ id: d.id, ...data });
+                    }
+                });
+                
+                filteredPayments = [...failedPayments];
+                updateStats();
+                renderTable();
             } catch (error) {
                 console.error('Error loading failed payments:', error);
-                showToast('Failed to load data', true);
+                failedTable.innerHTML = `<tr><td colspan="6" class="px-3 py-8 text-center text-red-500">Error loading data</td></tr>`;
+                showToast('Failed to load data');
             }
         }
 
@@ -247,30 +582,32 @@
             const tbody = document.getElementById('failedTable');
             
             if (filteredPayments.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="px-3 py-8 text-center text-gray-400">No failed transactions found</td></tr>';
-                document.getElementById('transactionCount').textContent = '0 failed transactions';
+                tbody.innerHTML = '<tr><td colspan="6" class="px-3 py-8 text-center" style="color: var(--text-muted);">No failed transactions found</td></tr>';
+                document.getElementById('transactionCount').textContent = '0 failed';
                 return;
             }
 
-            tbody.innerHTML = filteredPayments.map(p => `
-                <tr class="table-row">
-                    <td class="px-3 py-2.5 text-gray-600">
-                        <div class="text-sm">${p.date || ''}</div>
-                        <div class="text-xs text-gray-400">${p.time || ''}</div>
+            tbody.innerHTML = filteredPayments.map(p => {
+                const d = p.createdAt ? new Date(p.createdAt) : null;
+                const ds = d ? d.toLocaleDateString() : p.date || '-';
+                const ts = d ? d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : p.time || '';
+                
+                return `<tr class="table-row">
+                    <td class="px-2 sm:px-3 py-2" style="color: var(--text-secondary);">
+                        <div class="text-xs">${ds}</div>
+                        <div class="text-[9px] sm:text-[10px]" style="color: var(--text-muted);">${ts}</div>
                     </td>
-                    <td class="px-3 py-2.5 font-medium text-gray-800">${p.phone || p.phoneRaw || ''}</td>
-                    <td class="px-3 py-2.5 font-medium text-gray-800">${p.amount || 'KES ' + (p.amountRaw || 0)}</td>
-                    <td class="px-3 py-2.5 text-gray-600 max-w-[120px] truncate" title="${p.reason || ''}">${p.reason || '-'}</td>
-                    <td class="px-3 py-2.5">
-                        <span class="error-badge text-xs px-2 py-1 rounded-full">${p.failureReason || 'Unknown'}</span>
+                    <td class="px-2 sm:px-3 py-2 font-medium" style="color: var(--text-primary);">${p.phone || p.phoneRaw || '-'}</td>
+                    <td class="px-2 sm:px-3 py-2 font-semibold" style="color: var(--text-primary);">${p.amount || 'KES ' + (p.amountRaw || 0)}</td>
+                    <td class="px-2 sm:px-3 py-2 max-w-[80px] sm:max-w-[100px] truncate" style="color: var(--text-secondary);" title="${p.reason || ''}">${p.reason || '-'}</td>
+                    <td class="px-2 sm:px-3 py-2"><span class="error-badge text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full">${p.failureReason || 'Failed'}</span></td>
+                    <td class="px-2 sm:px-3 py-2">
+                        <button onclick="viewDetails('${p.id}')" class="text-red-400 hover:text-red-300 text-xs font-medium">View</button>
                     </td>
-                    <td class="px-3 py-2.5">
-                        <button onclick="viewDetails('${p.id}')" class="text-red-600 hover:text-red-800 text-xs font-medium">View</button>
-                    </td>
-                </tr>
-            `).join('');
+                </tr>`;
+            }).join('');
             
-            document.getElementById('transactionCount').textContent = `${filteredPayments.length} failed transaction${filteredPayments.length !== 1 ? 's' : ''}`;
+            document.getElementById('transactionCount').textContent = `${filteredPayments.length} failed`;
         }
 
         // View details
@@ -279,20 +616,20 @@
             if (!p) return;
             
             document.getElementById('viewModalContent').innerHTML = `
-                <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-                    <div class="flex items-center gap-2 text-red-700 font-medium mb-1">
+                <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-4">
+                    <div class="flex items-center gap-2 text-red-400 font-medium mb-1">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         ${p.failureReason || 'Payment Failed'}
                     </div>
-                    <p class="text-red-600 text-sm">${p.failureMessage || 'Transaction could not be completed'}</p>
+                    <p class="text-red-300 text-sm">${p.failureMessage || 'Transaction could not be completed'}</p>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
-                    <div class="text-gray-500">Date:</div><div class="font-medium">${p.date || '-'}</div>
-                    <div class="text-gray-500">Time:</div><div class="font-medium">${p.time || '-'}</div>
-                    <div class="text-gray-500">Phone:</div><div class="font-medium">${p.phone || p.phoneRaw || '-'}</div>
-                    <div class="text-gray-500">Amount:</div><div class="font-medium">${p.amount || 'KES ' + (p.amountRaw || 0)}</div>
-                    <div class="text-gray-500">Payment Reason:</div><div class="font-medium">${p.reason || '-'}</div>
-                    <div class="text-gray-500">Error Type:</div><div class="font-medium">${p.errorType || '-'}</div>
+                    <div style="color: var(--text-muted);">Date:</div><div class="font-medium" style="color: var(--text-primary);">${p.date || '-'}</div>
+                    <div style="color: var(--text-muted);">Time:</div><div class="font-medium" style="color: var(--text-primary);">${p.time || '-'}</div>
+                    <div style="color: var(--text-muted);">Phone:</div><div class="font-medium" style="color: var(--text-primary);">${p.phone || p.phoneRaw || '-'}</div>
+                    <div style="color: var(--text-muted);">Amount:</div><div class="font-medium" style="color: var(--text-primary);">${p.amount || 'KES ' + (p.amountRaw || 0)}</div>
+                    <div style="color: var(--text-muted);">Payment Reason:</div><div class="font-medium" style="color: var(--text-primary);">${p.reason || '-'}</div>
+                    <div style="color: var(--text-muted);">Error Type:</div><div class="font-medium text-red-400">${p.errorType || '-'}</div>
                 </div>
             `;
             document.getElementById('viewModal').classList.remove('hidden');
@@ -349,7 +686,7 @@
         // Export CSV
         window.exportCSV = function() {
             if (filteredPayments.length === 0) {
-                showToast('No data to export', true);
+                showToast('No data to export');
                 return;
             }
             
@@ -366,13 +703,13 @@
             a.href = url;
             a.download = `failed-transactions-${new Date().toISOString().split('T')[0]}.csv`;
             a.click();
-            showToast('CSV exported successfully');
+            showToast('CSV exported', true);
         };
 
         // Export PDF
         window.exportPDF = function() {
             if (filteredPayments.length === 0) {
-                showToast('No data to export', true);
+                showToast('No data to export');
                 return;
             }
             
@@ -398,9 +735,9 @@
                 }
                 doc.setFillColor(254, 242, 242);
                 doc.rect(14, y - 4, 182, 18, 'F');
-                doc.text(`${p.date} ${p.time}`, 16, y);
-                doc.text(`Phone: ${p.phone || p.phoneRaw}`, 16, y + 5);
-                doc.text(`Amount: KES ${p.amountRaw} | Reason: ${p.reason || '-'}`, 16, y + 10);
+                doc.text(`${p.date || ''} ${p.time || ''}`, 16, y);
+                doc.text(`Phone: ${p.phone || p.phoneRaw || ''}`, 16, y + 5);
+                doc.text(`Amount: KES ${p.amountRaw || ''} | Reason: ${p.reason || '-'}`, 16, y + 10);
                 doc.setTextColor(220, 38, 38);
                 doc.text(`Failed: ${p.failureReason || 'Unknown'}`, 120, y + 5);
                 doc.setTextColor(0);
@@ -408,7 +745,7 @@
             });
             
             doc.save(`failed-transactions-${new Date().toISOString().split('T')[0]}.pdf`);
-            showToast('PDF exported successfully');
+            showToast('PDF exported', true);
         };
 
         // Refresh
@@ -416,18 +753,91 @@
 
         // Logout
         window.logout = async function() {
-            await AuthService.logout();
+            try {
+                await signOut(auth);
+            } catch (e) {}
             window.location.href = 'login.html';
         };
 
         // Toast
-        function showToast(message, isError = false) {
+        function showToast(message, isSuccess = false) {
             const toast = document.getElementById('toast');
             document.getElementById('toastMessage').textContent = message;
-            toast.classList.toggle('error', isError);
+            toast.classList.toggle('success', isSuccess);
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
+    </script>
+
+    <!-- Theme Toggle Script -->
+    <script>
+        const themeToggle = document.getElementById('themeToggle');
+        const toggleIcon = document.getElementById('toggleIcon');
+        const mobileThemeIcon = document.getElementById('mobileThemeIcon');
+        const mobileThemeText = document.getElementById('mobileThemeText');
+        let isDarkMode = true;
+
+        // Check for saved theme preference
+        const savedTheme = localStorage.getItem('adminTheme');
+        if (savedTheme === 'light') {
+            isDarkMode = false;
+            document.body.classList.add('light-mode');
+            themeToggle.classList.add('light');
+            toggleIcon.textContent = '☀️';
+            if (mobileThemeIcon) mobileThemeIcon.textContent = '☀️';
+            if (mobileThemeText) mobileThemeText.textContent = 'Light Mode';
+        }
+
+        function updateThemeUI() {
+            if (isDarkMode) {
+                document.body.classList.remove('light-mode');
+                themeToggle.classList.remove('light');
+                toggleIcon.textContent = '🌙';
+                if (mobileThemeIcon) mobileThemeIcon.textContent = '🌙';
+                if (mobileThemeText) mobileThemeText.textContent = 'Dark Mode';
+                localStorage.setItem('adminTheme', 'dark');
+            } else {
+                document.body.classList.add('light-mode');
+                themeToggle.classList.add('light');
+                toggleIcon.textContent = '☀️';
+                if (mobileThemeIcon) mobileThemeIcon.textContent = '☀️';
+                if (mobileThemeText) mobileThemeText.textContent = 'Light Mode';
+                localStorage.setItem('adminTheme', 'light');
+            }
+        }
+
+        themeToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            isDarkMode = !isDarkMode;
+            updateThemeUI();
+        });
+
+        // Mobile theme toggle function
+        window.toggleMobileTheme = function() {
+            isDarkMode = !isDarkMode;
+            updateThemeUI();
+        };
+
+        // Hamburger Menu
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+
+        window.toggleMobileMenu = function() {
+            hamburgerBtn.classList.toggle('active');
+            mobileMenu.classList.toggle('open');
+        };
+
+        window.closeMobileMenu = function() {
+            hamburgerBtn.classList.remove('active');
+            mobileMenu.classList.remove('open');
+        };
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!hamburgerBtn.contains(e.target) && !mobileMenu.contains(e.target)) {
+                closeMobileMenu();
+            }
+        });
     </script>
 </body>
 </html>

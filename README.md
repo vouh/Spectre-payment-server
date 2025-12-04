@@ -9,11 +9,12 @@ SPECTRE SECURE PAYMENT/
 │
 ├── 📁 admin/                    # Admin Dashboard
 │   ├── index.html              # Main dashboard (stats, transactions, exports)
+│   ├── failed.html             # Failed transactions analysis page
 │   └── login.html              # Admin authentication
 │
-├── 📁 firebase/                 # Firebase Integration (Single Source)
+├── 📁 firebase/                 # Firebase Integration
 │   ├── config.js               # Firebase configuration & constants
-│   └── client.js               # All Firebase services
+│   └── client.js               # Firebase services
 │                               # - PaymentService (CRUD operations)
 │                               # - StatsService (Dashboard stats)
 │                               # - AuthService (Admin authentication)
@@ -23,17 +24,17 @@ SPECTRE SECURE PAYMENT/
 │                               # - 3D Card UI with themes
 │                               # - M-Pesa STK Push integration
 │                               # - PDF receipt generation
-│                               # - Styled error modals
+│                               # - Custom error modals
+│                               # - Amount limit (max 9999)
 │
 ├── 📄 coming-soon.html         # Company website placeholder
 │
-├── 📄 server.js                # Backend API (Vercel)
+├── 📄 server.js                # Backend API (Vercel Serverless)
 │                               # - /api/stkpush - Initiate payment
 │                               # - /api/query - Check payment status
 │                               # - /api/callback - M-Pesa callback handler
 │                               # - /api/result/:id - Get transaction result
 │                               # - Rate limiting & caching
-│                               # - Production error handling
 │
 ├── 📄 vercel.json              # Vercel deployment configuration
 ├── 📄 package.json             # Node.js dependencies
@@ -60,6 +61,28 @@ SPECTRE SECURE PAYMENT/
 - **Payment**: Safaricom M-Pesa Daraja API (Production)
 - **PDF**: jsPDF
 
+## 👨‍💼 Admin Dashboard Features
+
+### Main Dashboard (`admin/index.html`)
+- **Statistics Cards**: Total, Completed, Failed, Revenue
+- **Transaction Table**: Search, filter by status/date, sort
+- **Export Options**: CSV and PDF reports
+- **Actions**: View details, delete transactions
+- **Theme Toggle**: Dark/Light mode with persistence
+- **Mobile Optimized**: Hamburger menu, responsive grid
+- **Custom Modals**: Styled confirmation dialogs (no browser prompts)
+
+### Failed Transactions (`admin/failed.html`)
+- **Error Breakdown**: Wrong PIN, Insufficient Funds, Cancelled, Timeout, Other
+- **Detailed Stats**: Count per error type
+- **Filter & Search**: By error type, date range
+- **Export**: CSV and PDF reports
+
+### Authentication (`admin/login.html`)
+- Firebase Auth protected
+- Email/password login
+- Session persistence
+
 ## 📱 M-Pesa Integration
 
 ### Production API URLs
@@ -70,7 +93,7 @@ STK Query: https://api.safaricom.co.ke/mpesa/stkpushquery/v1/query
 ```
 
 ### Transaction Flow
-1. User enters phone, amount, and reason
+1. User enters phone, amount (max 9999), and reason
 2. STK Push sent to customer's phone
 3. Customer enters M-Pesa PIN
 4. Callback received with `MpesaReceiptNumber`
@@ -78,10 +101,12 @@ STK Query: https://api.safaricom.co.ke/mpesa/stkpushquery/v1/query
 6. Transaction saved to Firebase
 
 ### Error Handling
-- **Wrong PIN** (Code 2001): User entered incorrect PIN
-- **Insufficient Balance** (Code 1): Not enough funds
-- **Cancelled** (Code 1032): User cancelled transaction
-- **Timeout** (Code 1037): Request expired
+| Code | Error | Description |
+|------|-------|-------------|
+| 2001 | Wrong PIN | User entered incorrect M-Pesa PIN |
+| 1 | Insufficient Balance | Not enough funds in account |
+| 1032 | Cancelled | User cancelled the transaction |
+| 1037 | Timeout | Request expired (no response) |
 
 ### API Endpoints
 
@@ -116,20 +141,13 @@ DOMAIN=https://spectre-payment-server.vercel.app
 - Input validation & sanitization
 - CORS restriction to allowed origins
 - Request timeouts (30s)
+- Firebase Auth for admin access
 
-## 👨‍💼 Admin Dashboard Features
-
-- **Statistics**: Total, Completed, Failed, Revenue
-- **Transaction Table**: Search, filter, sort
-- **Export**: CSV and PDF reports
-- **Actions**: View, delete transactions
-- **Authentication**: Firebase Auth protected
-
-## 📞 Contact
+## 📞 Support
 
 - **Email**: spectretechlimited@gmail.com
 - **Phone**: 0741739262
 
 ---
 
-© 2024 Spectre Tech Limited. All rights reserved.
+© 2025 Spectre Tech Limited. All rights reserved.
