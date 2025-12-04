@@ -700,6 +700,180 @@
             border: 1px solid rgba(60, 179, 113, 0.2);
         }
 
+        /* Error Modal Styles */
+        .error-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(6px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2500;
+            padding: 1rem;
+        }
+
+        .error-modal.show {
+            display: flex;
+        }
+
+        .error-modal-content {
+            background: linear-gradient(135deg, #1e1e2e 0%, #2d2d3d 100%);
+            border-radius: 1.25rem;
+            padding: 2rem;
+            max-width: 340px;
+            width: 100%;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(239, 68, 68, 0.15);
+            animation: errorModalIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            text-align: center;
+        }
+
+        @keyframes errorModalIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.8) translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .error-icon-container {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.25rem;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.1));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            animation: errorPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes errorPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            50% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+        }
+
+        .error-icon {
+            width: 40px;
+            height: 40px;
+            color: #ef4444;
+        }
+
+        .error-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 0.75rem;
+        }
+
+        .error-message {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 1.5rem;
+        }
+
+        .error-details {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .error-details-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .error-code {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            font-family: monospace;
+        }
+
+        .error-type-badge {
+            font-size: 0.85rem;
+            color: #fca5a5;
+            font-weight: 500;
+        }
+
+        .error-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            font-weight: 600;
+            padding: 0.875rem 1.5rem;
+            border-radius: 0.75rem;
+            font-size: 0.95rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .error-btn:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+        }
+
+        /* Different error type colors */
+        .error-modal-content.insufficient-funds .error-icon-container {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.1));
+        }
+        .error-modal-content.insufficient-funds .error-icon {
+            color: #f59e0b;
+        }
+        .error-modal-content.insufficient-funds {
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+
+        .error-modal-content.cancelled .error-icon-container {
+            background: linear-gradient(135deg, rgba(107, 114, 128, 0.2), rgba(107, 114, 128, 0.1));
+        }
+        .error-modal-content.cancelled .error-icon {
+            color: #6b7280;
+        }
+        .error-modal-content.cancelled {
+            border-color: rgba(107, 114, 128, 0.3);
+        }
+
+        .error-modal-content.timeout .error-icon-container {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.1));
+        }
+        .error-modal-content.timeout .error-icon {
+            color: #3b82f6;
+        }
+        .error-modal-content.timeout {
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        /* Light mode error modal */
+        .light-mode .error-modal-content {
+            background: linear-gradient(135deg, #ffffff 0%, #fef2f2 100%);
+        }
+        .light-mode .error-title {
+            color: #1e293b;
+        }
+        .light-mode .error-message {
+            color: #64748b;
+        }
+
         /* Tablet and Desktop */
         @media (min-width: 641px) {
             .card-3d {
@@ -709,6 +883,11 @@
             .success-modal-content {
                 max-width: 380px;
                 padding: 2rem;
+            }
+
+            .error-modal-content {
+                max-width: 400px;
+                padding: 2.5rem;
             }
         }
     </style>
@@ -825,11 +1004,15 @@
                         <input 
                             type="text" 
                             id="reasonInput" 
-                            placeholder="e.g. Service payment, Product purchase"
-                            maxlength="50"
+                            placeholder="e.g. New laptop, Service fee"
+                            maxlength="30"
+                            pattern="[a-zA-Z0-9 ]*"
                             class="input-compact input-3d w-full bg-gray-800 text-white rounded-lg border border-gray-600 focus:border-[#3cb371] focus:outline-none focus:ring-1 focus:ring-[#3cb371]/50 transition-all"
                         >
-                        <p id="reasonError" class="text-red-400 text-xs mt-0.5 hidden">Payment reason is required</p>
+                        <div class="flex justify-between items-center mt-0.5">
+                            <p id="reasonError" class="text-red-400 text-xs hidden">Payment reason is required</p>
+                            <span id="reasonCharCount" class="text-gray-500 text-xs ml-auto">0/30</span>
+                        </div>
                     </div>
 
                     <div class="pay-btn-container">
@@ -949,6 +1132,42 @@
                     New Payment
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div id="errorModal" class="error-modal">
+        <div id="errorModalContent" class="error-modal-content">
+            <!-- Error Icon Container -->
+            <div class="error-icon-container">
+                <svg id="errorIcon" class="error-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+            </div>
+
+            <!-- Error Title -->
+            <h3 id="errorTitle" class="error-title">Payment Failed</h3>
+
+            <!-- Error Message -->
+            <p id="errorMessage" class="error-message">
+                Something went wrong with your payment. Please try again.
+            </p>
+
+            <!-- Error Details Box -->
+            <div class="error-details">
+                <div class="error-details-row">
+                    <span id="errorCode" class="error-code">ERR_000</span>
+                    <span id="errorTypeBadge" class="error-type-badge">Unknown Error</span>
+                </div>
+            </div>
+
+            <!-- Try Again Button -->
+            <button id="errorCloseBtn" class="error-btn">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+                Try Again
+            </button>
         </div>
     </div>
 
@@ -1186,14 +1405,120 @@
             }
         });
 
-        // Handle payment failure
+        // Error Modal Elements
+        const errorModal = document.getElementById('errorModal');
+        const errorModalContent = document.getElementById('errorModalContent');
+        const errorTitle = document.getElementById('errorTitle');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorCode = document.getElementById('errorCode');
+        const errorTypeBadge = document.getElementById('errorTypeBadge');
+        const errorIcon = document.getElementById('errorIcon');
+        const errorCloseBtn = document.getElementById('errorCloseBtn');
+
+        // Error type configurations
+        const errorConfigs = {
+            'wrong_pin': {
+                title: 'Wrong PIN Entered',
+                message: 'The M-Pesa PIN you entered is incorrect. Please check your PIN and try again.',
+                code: 'ERR_2001',
+                badge: 'Authentication Error',
+                icon: 'lock',
+                class: ''
+            },
+            'insufficient': {
+                title: 'Insufficient Balance',
+                message: 'Your M-Pesa account does not have enough funds to complete this transaction.',
+                code: 'ERR_001',
+                badge: 'Balance Error',
+                icon: 'wallet',
+                class: 'insufficient-funds'
+            },
+            'cancelled': {
+                title: 'Payment Cancelled',
+                message: 'You cancelled the payment request. No money was deducted from your account.',
+                code: 'ERR_1032',
+                badge: 'User Cancelled',
+                icon: 'cancel',
+                class: 'cancelled'
+            },
+            'timeout': {
+                title: 'Request Timed Out',
+                message: 'The payment request expired before you could complete it. Please try again.',
+                code: 'ERR_1037',
+                badge: 'Timeout',
+                icon: 'clock',
+                class: 'timeout'
+            },
+            'default': {
+                title: 'Payment Failed',
+                message: 'Something went wrong with your payment. Please try again.',
+                code: 'ERR_000',
+                badge: 'Unknown Error',
+                icon: 'warning',
+                class: ''
+            }
+        };
+
+        // Icon SVG paths
+        const iconPaths = {
+            'lock': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>',
+            'wallet': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>',
+            'cancel': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>',
+            'clock': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>',
+            'warning': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>'
+        };
+
+        // Detect error type from message
+        function detectErrorType(message) {
+            const lowerMsg = message.toLowerCase();
+            if (lowerMsg.includes('wrong pin') || lowerMsg.includes('incorrect pin')) {
+                return 'wrong_pin';
+            } else if (lowerMsg.includes('insufficient') || lowerMsg.includes('not enough')) {
+                return 'insufficient';
+            } else if (lowerMsg.includes('cancelled') || lowerMsg.includes('canceled')) {
+                return 'cancelled';
+            } else if (lowerMsg.includes('timed out') || lowerMsg.includes('timeout') || lowerMsg.includes('expired')) {
+                return 'timeout';
+            }
+            return 'default';
+        }
+
+        // Handle payment failure with styled modal
         function handlePaymentFailure(message) {
             step2.classList.add('hidden');
             step1.classList.remove('hidden');
             
-            // Show error alert
-            alert('❌ Payment Failed\n\n' + message);
+            // Detect error type
+            const errorType = detectErrorType(message);
+            const config = errorConfigs[errorType];
+            
+            // Remove all error type classes
+            errorModalContent.classList.remove('insufficient-funds', 'cancelled', 'timeout');
+            if (config.class) {
+                errorModalContent.classList.add(config.class);
+            }
+            
+            // Update modal content
+            errorTitle.textContent = config.title;
+            errorMessage.textContent = config.message;
+            errorCode.textContent = config.code;
+            errorTypeBadge.textContent = config.badge;
+            errorIcon.innerHTML = iconPaths[config.icon];
+            
+            // Show the modal
+            errorModal.classList.add('show');
         }
+
+        // Close error modal handlers
+        errorCloseBtn.addEventListener('click', () => {
+            errorModal.classList.remove('show');
+        });
+
+        errorModal.addEventListener('click', (e) => {
+            if (e.target === errorModal) {
+                errorModal.classList.remove('show');
+            }
+        });
 
         // Handle payment success - now accepts mpesaReceiptNumber from callback
         async function handlePaymentSuccess(phone, amount, reason, mpesaReceiptNumber = null) {
@@ -1420,9 +1745,42 @@
             }
         });
 
-        // Hide reason error on input
-        reasonInput.addEventListener('input', () => {
-            reasonError.classList.add('hidden');
+        // Character count element
+        const reasonCharCount = document.getElementById('reasonCharCount');
+
+        // Reason input validation with character count and filtering
+        reasonInput.addEventListener('input', (e) => {
+            // Filter out special characters (only allow alphanumeric and spaces)
+            let value = e.target.value.replace(/[^a-zA-Z0-9 ]/g, '');
+            
+            // Prevent multiple consecutive spaces
+            value = value.replace(/\s+/g, ' ');
+            
+            // Update input value if it was filtered
+            if (e.target.value !== value) {
+                e.target.value = value;
+            }
+            
+            // Update character count
+            const count = value.length;
+            reasonCharCount.textContent = `${count}/30`;
+            
+            // Change color based on count
+            if (count >= 28) {
+                reasonCharCount.classList.remove('text-gray-500', 'text-yellow-500');
+                reasonCharCount.classList.add('text-red-400');
+            } else if (count >= 20) {
+                reasonCharCount.classList.remove('text-gray-500', 'text-red-400');
+                reasonCharCount.classList.add('text-yellow-500');
+            } else {
+                reasonCharCount.classList.remove('text-yellow-500', 'text-red-400');
+                reasonCharCount.classList.add('text-gray-500');
+            }
+            
+            // Hide error on valid input
+            if (count > 0) {
+                reasonError.classList.add('hidden');
+            }
         });
 
         // Close modal on backdrop click
