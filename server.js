@@ -188,6 +188,11 @@ app.post('/api/stkpush', checkRateLimit, async (req, res) => {
         }
         const formattedPhone = `254${number}`;
 
+        // Validate transaction description length (client should enforce 30 chars)
+        if (transactionDesc && String(transactionDesc).trim().length > 30) {
+            return errorResponse(res, 400, 'Transaction description must be 30 characters or less');
+        }
+
         // Get access token
         const access_token = await getAccessToken();
 
@@ -205,7 +210,7 @@ app.post('/api/stkpush', checkRateLimit, async (req, res) => {
 
         // Sanitize inputs - M-Pesa only accepts alphanumeric
         const cleanAccountRef = (accountReference || 'SpectreTech').replace(/[^a-zA-Z0-9]/g, '').substring(0, 12);
-        const cleanTransDesc = (transactionDesc || 'Payment').replace(/[^a-zA-Z0-9 ]/g, '').substring(0, 20);
+        const cleanTransDesc = (transactionDesc || 'Payment').replace(/[^a-zA-Z0-9 ]/g, '').substring(0, 30);
 
         const body = {
             BusinessShortCode: BusinessShortCode,

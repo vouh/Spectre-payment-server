@@ -1289,6 +1289,16 @@
 
             // Validate reason
             if (!reason) {
+                reasonError.textContent = 'Payment reason is required';
+                reasonError.classList.remove('hidden');
+                reasonInput.classList.add('shake');
+                setTimeout(() => reasonInput.classList.remove('shake'), 500);
+                return;
+            }
+
+            // Enforce max length (client-side) to guard against pasted/forged input
+            if (reason.length > 30) {
+                reasonError.textContent = 'Payment reason must be 30 characters or less';
                 reasonError.classList.remove('hidden');
                 reasonInput.classList.add('shake');
                 setTimeout(() => reasonInput.classList.remove('shake'), 500);
@@ -1324,8 +1334,8 @@
                 // Send STK Push request
                 console.log('📱 Sending STK Push request to:', `${apiBaseUrl}/api/stkpush`);
                 
-                // Sanitize reason - only alphanumeric and spaces, max 20 chars
-                const cleanReason = reason.replace(/[^a-zA-Z0-9 ]/g, '').substring(0, 20) || 'Payment';
+                // Sanitize reason - only alphanumeric and spaces, max 30 chars
+                const cleanReason = reason.replace(/[^a-zA-Z0-9 ]/g, '').substring(0, 30) || 'Payment';
                 
                 const stkResponse = await fetch(`${apiBaseUrl}/api/stkpush`, {
                     method: 'POST',
@@ -1835,8 +1845,13 @@
             
             // Prevent multiple consecutive spaces
             value = value.replace(/\s+/g, ' ');
+
+            // Enforce max length on the live input to prevent pasted text > 30 chars
+            if (value.length > 30) {
+                value = value.substring(0, 30);
+            }
             
-            // Update input value if it was filtered
+            // Update input value if it was filtered/truncated
             if (e.target.value !== value) {
                 e.target.value = value;
             }
