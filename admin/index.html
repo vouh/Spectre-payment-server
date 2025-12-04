@@ -570,7 +570,7 @@
         <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-2">
                 <img src="../logo.jpg" alt="Spectre" class="w-7 h-7 rounded" onerror="this.style.display='none'">
-                <span class="font-bold text-lg">Spectre Admin</span>
+                <span class="font-bold text-lg">Admin</span>
             </div>
             
             <!-- Desktop Navigation -->
@@ -767,13 +767,18 @@
 
     <!-- View Payment Modal -->
     <div id="viewModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-        <div class="card-container max-w-md w-full p-6 shadow-2xl">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="font-semibold" style="color: var(--text-primary);">Transaction Details</h3>
-                <button onclick="closeViewModal()" class="text-2xl hover:text-red-400" style="color: var(--text-muted);">&times;</button>
+        <div class="card-container max-w-lg w-full p-6 shadow-2xl mx-4">
+            <div class="flex justify-between items-center mb-5 pb-4 border-b" style="border-color: var(--border-color);">
+                <h3 class="font-semibold text-lg flex items-center gap-2" style="color: var(--text-primary);">
+                    <div class="bg-[#3cb371]/20 p-2 rounded-full">
+                        <svg class="w-5 h-5 text-[#3cb371]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                    </div>
+                    Transaction Details
+                </h3>
+                <button onclick="closeViewModal()" class="text-2xl hover:text-red-400 p-1" style="color: var(--text-muted);">&times;</button>
             </div>
-            <div id="viewModalContent" class="space-y-3 text-sm"></div>
-            <button onclick="closeViewModal()" class="mt-4 w-full bg-gradient-to-r from-[#3cb371] to-[#2d9a5e] hover:from-[#2d9a5e] hover:to-[#3cb371] text-white py-2 rounded-lg font-medium">Close</button>
+            <div id="viewModalContent" class="text-sm"></div>
+            <button onclick="closeViewModal()" class="mt-5 w-full bg-gradient-to-r from-[#3cb371] to-[#2d9a5e] hover:from-[#2d9a5e] hover:to-[#3cb371] text-white py-2.5 rounded-lg font-medium">Close</button>
         </div>
     </div>
 
@@ -948,15 +953,35 @@
         window.viewPayment = id => {
             const p = allPayments.find(x => x.id === id);
             if (!p) return;
-            document.getElementById('viewModalContent').innerHTML = `<div class="grid grid-cols-2 gap-2">
-                <div style="color: var(--text-muted);">Phone:</div><div class="font-medium" style="color: var(--text-primary);">${p.phone || p.phoneRaw || '-'}</div>
-                <div style="color: var(--text-muted);">Amount:</div><div class="font-medium" style="color: var(--text-primary);">${p.amount || `KES ${p.amountRaw}`}</div>
-                <div style="color: var(--text-muted);">Reason:</div><div class="font-medium" style="color: var(--text-primary);">${p.reason || '-'}</div>
-                <div style="color: var(--text-muted);">Status:</div><div class="font-medium capitalize" style="color: var(--text-primary);">${p.status || 'pending'}</div>
-                <div style="color: var(--text-muted);">M-Pesa Code:</div><div class="font-medium text-[#3cb371]">${p.mpesaReceiptNumber || p.code || '-'}</div>
-                <div style="color: var(--text-muted);">Date:</div><div class="font-medium" style="color: var(--text-primary);">${p.date || new Date(p.createdAt).toLocaleDateString()}</div>
-                <div style="color: var(--text-muted);">Time:</div><div class="font-medium" style="color: var(--text-primary);">${p.time || new Date(p.createdAt).toLocaleTimeString()}</div>
-            </div>`;
+            const statusColor = (p.status === 'completed' || p.status === 'success') ? '#3cb371' : p.status === 'failed' ? '#ef4444' : '#eab308';
+            const statusBg = (p.status === 'completed' || p.status === 'success') ? 'rgba(60,179,113,0.15)' : p.status === 'failed' ? 'rgba(239,68,68,0.15)' : 'rgba(234,179,8,0.15)';
+            document.getElementById('viewModalContent').innerHTML = `
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center py-2 border-b" style="border-color: var(--border-color);">
+                        <span style="color: var(--text-muted);">Phone</span>
+                        <span class="font-medium" style="color: var(--text-primary);">${p.phone || p.phoneRaw || '-'}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b" style="border-color: var(--border-color);">
+                        <span style="color: var(--text-muted);">Amount</span>
+                        <span class="font-semibold text-lg" style="color: var(--text-primary);">${p.amount || 'KES ' + p.amountRaw}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b" style="border-color: var(--border-color);">
+                        <span style="color: var(--text-muted);">Reason</span>
+                        <span class="font-medium" style="color: var(--text-primary);">${p.reason || '-'}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b" style="border-color: var(--border-color);">
+                        <span style="color: var(--text-muted);">Status</span>
+                        <span class="px-3 py-1 rounded-full text-xs font-medium capitalize" style="background: ${statusBg}; color: ${statusColor};">${p.status || 'pending'}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b" style="border-color: var(--border-color);">
+                        <span style="color: var(--text-muted);">M-Pesa Code</span>
+                        <span class="font-mono font-medium text-[#3cb371]">${p.mpesaReceiptNumber || p.code || '-'}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2">
+                        <span style="color: var(--text-muted);">Date & Time</span>
+                        <span class="font-medium" style="color: var(--text-primary);">${p.date || new Date(p.createdAt).toLocaleDateString()} ${p.time || new Date(p.createdAt).toLocaleTimeString()}</span>
+                    </div>
+                </div>`;
             document.getElementById('viewModal').classList.remove('hidden');
             document.getElementById('viewModal').classList.add('flex');
         };

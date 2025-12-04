@@ -587,7 +587,7 @@
                 </a>
                 <span class="text-white/50 hidden sm:inline">|</span>
                 <div class="flex items-center gap-2">
-                    <svg class="w-5 h-5 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <img src="../logo.jpg" alt="" class="w-5 h-5 rounded hidden sm:block" onerror="this.style.display='none'">
                     <span class="font-bold text-sm sm:text-base">Failed</span>
                 </div>
             </div>
@@ -718,14 +718,14 @@
                             <div class="custom-option" data-value="wrong_pin" onclick="selectReason('wrong_pin', 'Wrong PIN')">
                                 <span style="color: #f97316;">●</span> Wrong PIN
                             </div>
-                            <div class="custom-option" data-value="insufficient" onclick="selectReason('insufficient', 'Insufficient')">
-                                <span style="color: #eab308;">●</span> Insufficient
-                            </div>
                             <div class="custom-option" data-value="cancelled" onclick="selectReason('cancelled', 'Cancelled')">
                                 <span style="color: #6b7280;">●</span> Cancelled
                             </div>
                             <div class="custom-option" data-value="timeout" onclick="selectReason('timeout', 'Timed Out')">
                                 <span style="color: #ef4444;">●</span> Timed Out
+                            </div>
+                            <div class="custom-option" data-value="other" onclick="selectReason('other', 'Other')">
+                                <span style="color: #8b5cf6;">●</span> Other
                             </div>
                         </div>
                     </div>
@@ -780,16 +780,18 @@
 
     <!-- View Details Modal -->
     <div id="viewModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-        <div class="card-container max-w-md w-full p-6 shadow-2xl">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="font-semibold text-red-400 flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        <div class="card-container max-w-lg w-full p-6 shadow-2xl mx-4">
+            <div class="flex justify-between items-center mb-5 pb-4 border-b" style="border-color: var(--border-color);">
+                <h3 class="font-semibold text-lg text-red-400 flex items-center gap-2">
+                    <div class="bg-red-500/20 p-2 rounded-full">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
                     Failed Transaction
                 </h3>
-                <button onclick="closeViewModal()" class="text-2xl hover:text-red-400" style="color: var(--text-muted);">&times;</button>
+                <button onclick="closeViewModal()" class="text-2xl hover:text-red-400 p-1" style="color: var(--text-muted);">&times;</button>
             </div>
-            <div id="viewModalContent" class="space-y-3 text-sm"></div>
-            <button onclick="closeViewModal()" class="mt-4 w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white py-2 rounded-lg font-medium">Close</button>
+            <div id="viewModalContent" class="text-sm"></div>
+            <button onclick="closeViewModal()" class="mt-5 w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white py-2.5 rounded-lg font-medium">Close</button>
         </div>
     </div>
 
@@ -955,20 +957,34 @@
             if (!p) return;
             
             document.getElementById('viewModalContent').innerHTML = `
-                <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-4">
-                    <div class="flex items-center gap-2 text-red-400 font-medium mb-1">
+                <div class="bg-red-500/10 border border-red-500/30 rounded-xl p-4 mb-5">
+                    <div class="flex items-center gap-2 text-red-400 font-semibold mb-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         ${p.failureReason || 'Payment Failed'}
                     </div>
-                    <p class="text-red-300 text-sm">${p.failureMessage || 'Transaction could not be completed'}</p>
+                    <p class="text-red-300/80 text-sm">${p.failureMessage || 'Transaction could not be completed'}</p>
                 </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div style="color: var(--text-muted);">Date:</div><div class="font-medium" style="color: var(--text-primary);">${p.date || '-'}</div>
-                    <div style="color: var(--text-muted);">Time:</div><div class="font-medium" style="color: var(--text-primary);">${p.time || '-'}</div>
-                    <div style="color: var(--text-muted);">Phone:</div><div class="font-medium" style="color: var(--text-primary);">${p.phone || p.phoneRaw || '-'}</div>
-                    <div style="color: var(--text-muted);">Amount:</div><div class="font-medium" style="color: var(--text-primary);">${p.amount || 'KES ' + (p.amountRaw || 0)}</div>
-                    <div style="color: var(--text-muted);">Payment Reason:</div><div class="font-medium" style="color: var(--text-primary);">${p.reason || '-'}</div>
-                    <div style="color: var(--text-muted);">Error Type:</div><div class="font-medium text-red-400">${p.errorType || '-'}</div>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center py-2 border-b" style="border-color: var(--border-color);">
+                        <span style="color: var(--text-muted);">Date & Time</span>
+                        <span class="font-medium" style="color: var(--text-primary);">${p.date || '-'} ${p.time || ''}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b" style="border-color: var(--border-color);">
+                        <span style="color: var(--text-muted);">Phone</span>
+                        <span class="font-medium" style="color: var(--text-primary);">${p.phone || p.phoneRaw || '-'}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b" style="border-color: var(--border-color);">
+                        <span style="color: var(--text-muted);">Amount</span>
+                        <span class="font-semibold text-lg" style="color: var(--text-primary);">${p.amount || 'KES ' + (p.amountRaw || 0)}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b" style="border-color: var(--border-color);">
+                        <span style="color: var(--text-muted);">Payment Reason</span>
+                        <span class="font-medium" style="color: var(--text-primary);">${p.reason || '-'}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2">
+                        <span style="color: var(--text-muted);">Error Type</span>
+                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-red-500/20 text-red-400">${p.errorType || 'unknown'}</span>
+                    </div>
                 </div>
             `;
             document.getElementById('viewModal').classList.remove('hidden');
@@ -1063,10 +1079,20 @@
             const fromDate = document.getElementById('fromDate').value;
             const toDate = document.getElementById('toDate').value;
 
+            // Define main error types
+            const mainErrorTypes = ['wrong_pin', 'cancelled', 'timeout'];
+
             filteredPayments = failedPayments.filter(p => {
                 const phone = (p.phone || p.phoneRaw || '').replace(/\D/g, '');
                 const matchSearch = !search || phone.includes(search);
-                const matchReason = !reason || p.errorType === reason;
+                
+                // Handle "other" filter - anything not in main types
+                let matchReason = true;
+                if (reason === 'other') {
+                    matchReason = !mainErrorTypes.includes(p.errorType);
+                } else if (reason) {
+                    matchReason = p.errorType === reason;
+                }
                 
                 let matchDate = true;
                 if (fromDate || toDate) {
