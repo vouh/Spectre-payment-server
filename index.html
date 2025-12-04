@@ -977,12 +977,12 @@
                         <input 
                             type="number" 
                             id="amountInput" 
-                            placeholder="Enter amount (max 9999)"
+                            placeholder="Enter amount (max 250,000)"
                             min="1"
-                            max="9999"
+                            max="250000"
                             class="input-compact input-3d w-full bg-gray-800 text-white rounded-lg border border-gray-600 focus:border-[#3cb371] focus:outline-none focus:ring-1 focus:ring-[#3cb371]/50 transition-all"
                         >
-                        <p id="amountError" class="text-red-400 text-xs mt-0.5 hidden">Amount must be between 1 and 9999</p>
+                        <p id="amountError" class="text-red-400 text-xs mt-0.5 hidden">Amount must be between 1 and 250,000</p>
                     </div>
 
                     <div class="relative">
@@ -1247,13 +1247,13 @@
             phoneError.classList.add('hidden');
         });
 
-        // Amount input validation - limit to 4 figures
+        // Amount input validation - limit to 6 figures (max 250,000)
         amountInput.addEventListener('input', (e) => {
             let value = parseInt(e.target.value);
             const amountError = document.getElementById('amountError');
             
-            if (value > 9999) {
-                e.target.value = 9999;
+            if (value > 250000) {
+                e.target.value = 250000;
                 amountError.classList.remove('hidden');
             } else if (value < 0) {
                 e.target.value = '';
@@ -1278,8 +1278,8 @@
                 return;
             }
 
-            // Validate amount - must be 1-9999
-            if (!amount || amount <= 0 || amount > 9999) {
+            // Validate amount - must be 1-250000
+            if (!amount || amount <= 0 || amount > 250000) {
                 amountError.classList.remove('hidden');
                 amountInput.classList.add('shake');
                 setTimeout(() => amountInput.classList.remove('shake'), 500);

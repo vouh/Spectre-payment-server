@@ -385,10 +385,18 @@
             .stat-card p {
                 font-size: 0.6rem !important;
             }
-            .filter-container {
-                flex-direction: column;
+            /* Mobile filter layout - search full width, rest in 2 cols */
+            .filter-row-1 {
+                width: 100%;
             }
-            .filter-container > * {
+            .filter-row-2 {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 0.5rem;
+                width: 100%;
+            }
+            .filter-row-2 select,
+            .filter-row-2 input {
                 width: 100%;
             }
         }
@@ -516,22 +524,24 @@
 
         <!-- Filters & Actions -->
         <div class="card-container p-3 sm:p-4 mb-4">
-            <div class="flex flex-wrap gap-2 sm:gap-3 items-center filter-container">
-                <div class="flex-1 min-w-[150px] sm:min-w-[200px]">
-                    <div class="relative">
-                        <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--text-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                        <input type="text" id="searchInput" placeholder="Search..." class="input-dark w-full pl-9 pr-3 py-2 text-sm rounded-lg">
-                    </div>
+            <!-- Search - Full Width on Mobile -->
+            <div class="mb-2 sm:mb-0 filter-row-1">
+                <div class="relative">
+                    <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--text-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <input type="text" id="searchInput" placeholder="Search..." class="input-dark w-full pl-9 pr-3 py-2 text-sm rounded-lg">
                 </div>
-                <select id="statusFilter" class="input-dark px-3 py-2 text-sm rounded-lg">
+            </div>
+            <!-- Other Filters - 2 columns on mobile -->
+            <div class="filter-row-2 flex flex-wrap gap-2 sm:gap-3 items-center mt-2">
+                <select id="statusFilter" class="input-dark px-3 py-2 text-sm rounded-lg flex-1 min-w-[100px]">
                     <option value="">All Status</option>
                     <option value="completed">Completed</option>
                     <option value="pending">Pending</option>
                     <option value="failed">Failed</option>
                 </select>
-                <input type="date" id="fromDate" class="input-dark px-2 sm:px-3 py-2 text-xs sm:text-sm rounded-lg">
-                <input type="date" id="toDate" class="input-dark px-2 sm:px-3 py-2 text-xs sm:text-sm rounded-lg">
-                <button onclick="clearFilters()" class="text-sm hover:text-[#3cb371]" style="color: var(--text-muted);">Clear</button>
+                <input type="date" id="fromDate" class="input-dark px-2 sm:px-3 py-2 text-xs sm:text-sm rounded-lg flex-1 min-w-[100px]">
+                <input type="date" id="toDate" class="input-dark px-2 sm:px-3 py-2 text-xs sm:text-sm rounded-lg flex-1 min-w-[100px]">
+                <button onclick="clearFilters()" class="text-sm hover:text-[#3cb371] px-2" style="color: var(--text-muted);">Clear</button>
             </div>
             <div class="flex flex-wrap gap-2 mt-3 pt-3 border-t" style="border-color: var(--border-color);">
                 <button onclick="exportCSV()" class="btn bg-blue-500 hover:bg-blue-600 text-white px-2 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm flex items-center gap-1">

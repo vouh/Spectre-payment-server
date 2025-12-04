@@ -301,12 +301,116 @@
             .stat-card p {
                 font-size: 0.6rem !important;
             }
-            .filter-container {
-                flex-direction: column;
-            }
-            .filter-container > * {
+            /* Mobile filter layout - search full width, rest in 2 cols */
+            .filter-row-1 {
                 width: 100%;
             }
+            .filter-row-2 {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 0.5rem;
+                width: 100%;
+            }
+            .filter-row-2 select,
+            .filter-row-2 input {
+                width: 100%;
+            }
+        }
+
+        /* Confirm Modal */
+        .confirm-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .confirm-modal-overlay.show {
+            display: flex;
+        }
+
+        .confirm-modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 360px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            animation: modalSlideIn 0.25s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from { opacity: 0; transform: scale(0.95) translateY(-10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .confirm-modal-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(239, 68, 68, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
+
+        .confirm-modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .confirm-modal-message {
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .confirm-modal-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .confirm-modal-btn {
+            flex: 1;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .confirm-modal-btn.cancel {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .confirm-modal-btn.cancel:hover {
+            background: var(--bg-primary);
+        }
+
+        .confirm-modal-btn.confirm {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .confirm-modal-btn.confirm:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
         }
     </style>
 </head>
@@ -433,32 +537,38 @@
 
         <!-- Filters -->
         <div class="card-container p-3 sm:p-4 mb-4">
-            <div class="flex flex-wrap gap-2 sm:gap-3 items-center filter-container">
-                <div class="flex-1 min-w-[150px] sm:min-w-[200px]">
-                    <div class="relative">
-                        <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--text-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                        <input type="text" id="searchInput" placeholder="Search phone..." class="input-dark w-full pl-9 pr-3 py-2 text-sm rounded-lg">
-                    </div>
+            <!-- Search - Full Width on Mobile -->
+            <div class="mb-2 sm:mb-0 filter-row-1">
+                <div class="relative">
+                    <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--text-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <input type="text" id="searchInput" placeholder="Search phone..." class="input-dark w-full pl-9 pr-3 py-2 text-sm rounded-lg">
                 </div>
-                <select id="reasonFilter" class="input-dark px-3 py-2 text-sm rounded-lg">
+            </div>
+            <!-- Other Filters - 2 columns on mobile -->
+            <div class="filter-row-2 flex flex-wrap gap-2 sm:gap-3 items-center mt-2">
+                <select id="reasonFilter" class="input-dark px-3 py-2 text-sm rounded-lg flex-1 min-w-[100px]">
                     <option value="">All Reasons</option>
                     <option value="wrong_pin">Wrong PIN</option>
                     <option value="insufficient">Insufficient</option>
                     <option value="cancelled">Cancelled</option>
                     <option value="timeout">Timed Out</option>
                 </select>
-                <input type="date" id="fromDate" class="input-dark px-2 sm:px-3 py-2 text-xs sm:text-sm rounded-lg">
-                <input type="date" id="toDate" class="input-dark px-2 sm:px-3 py-2 text-xs sm:text-sm rounded-lg">
-                <button onclick="clearFilters()" class="text-sm hover:text-red-400" style="color: var(--text-muted);">Clear</button>
+                <input type="date" id="fromDate" class="input-dark px-2 sm:px-3 py-2 text-xs sm:text-sm rounded-lg flex-1 min-w-[100px]">
+                <input type="date" id="toDate" class="input-dark px-2 sm:px-3 py-2 text-xs sm:text-sm rounded-lg flex-1 min-w-[100px]">
+                <button onclick="clearFilters()" class="text-sm hover:text-red-400 px-2" style="color: var(--text-muted);">Clear</button>
             </div>
             <div class="flex flex-wrap gap-2 mt-3 pt-3 border-t" style="border-color: var(--border-color);">
                 <button onclick="exportCSV()" class="btn bg-blue-500 hover:bg-blue-600 text-white px-2 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm flex items-center gap-1">
                     <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                     CSV
                 </button>
-                <button onclick="exportPDF()" class="btn bg-red-500 hover:bg-red-600 text-white px-2 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm flex items-center gap-1">
+                <button onclick="exportPDF()" class="btn bg-orange-500 hover:bg-orange-600 text-white px-2 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm flex items-center gap-1">
                     <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
                     PDF
+                </button>
+                <button onclick="deleteSelected()" id="deleteBtn" class="btn bg-gray-600 text-gray-400 px-2 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm flex items-center gap-1" disabled>
+                    <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    (<span id="deleteCount">0</span>)
                 </button>
                 <div class="flex-1"></div>
                 <span id="transactionCount" class="text-xs self-center" style="color: var(--text-muted);">0 failed</span>
@@ -471,16 +581,16 @@
                 <table class="w-full text-xs sm:text-sm">
                     <thead style="background: var(--bg-secondary); border-bottom: 1px solid var(--border-color);">
                         <tr>
+                            <th class="px-2 sm:px-3 py-2 sm:py-3"><input type="checkbox" id="selectAll" class="rounded"></th>
                             <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-medium uppercase text-red-400">Date</th>
                             <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-medium uppercase text-red-400">Phone</th>
                             <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-medium uppercase text-red-400">Amount</th>
-                            <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-medium uppercase text-red-400">Reason</th>
                             <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-medium uppercase text-red-400">Failure</th>
                             <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-medium uppercase text-red-400">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="failedTable" class="divide-y" style="border-color: var(--border-color);">
-                        <tr><td colspan="6" class="px-3 py-8 text-center" style="color: var(--text-muted);"><div class="loader mx-auto mb-2"></div>Loading...</td></tr>
+                        <tr><td colspan="7" class="px-3 py-8 text-center" style="color: var(--text-muted);"><div class="loader mx-auto mb-2"></div>Loading...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -505,16 +615,37 @@
         </div>
     </div>
 
+    <!-- Confirm Delete Modal -->
+    <div id="confirmModal" class="confirm-modal-overlay">
+        <div class="confirm-modal">
+            <div class="confirm-modal-icon">
+                <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+            </div>
+            <h3 id="confirmTitle" class="confirm-modal-title">Confirm Delete</h3>
+            <p id="confirmMessage" class="confirm-modal-message">Are you sure you want to delete this failed transaction? This action cannot be undone.</p>
+            <div class="confirm-modal-buttons">
+                <button id="confirmCancelBtn" class="confirm-modal-btn cancel">Cancel</button>
+                <button id="confirmDeleteBtn" class="confirm-modal-btn confirm">Delete</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase Client -->
     <script type="module">
         import { db, auth, COLLECTIONS } from '../firebase/client.js';
-        import { collection, getDocs, query, orderBy, limit, where } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+        import { collection, getDocs, doc, deleteDoc, query, orderBy, limit, where } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
         let failedPayments = [];
         let filteredPayments = [];
+        let selectedIds = new Set();
 
         const authOverlay = document.getElementById('authOverlay');
+        const deleteBtn = document.getElementById('deleteBtn');
+        const deleteCount = document.getElementById('deleteCount');
+        const selectAll = document.getElementById('selectAll');
 
         // Auth check with timeout
         let authTimeout = setTimeout(() => {
@@ -533,11 +664,32 @@
             }
         });
 
+        // Select all checkbox
+        selectAll.addEventListener('change', e => {
+            document.querySelectorAll('.row-cb').forEach(cb => { 
+                cb.checked = e.target.checked; 
+                e.target.checked ? selectedIds.add(cb.dataset.id) : selectedIds.delete(cb.dataset.id); 
+            });
+            updateDeleteBtn();
+        });
+
+        function updateDeleteBtn() {
+            const c = selectedIds.size;
+            deleteCount.textContent = c;
+            deleteBtn.disabled = c === 0;
+            deleteBtn.classList.toggle('bg-red-500', c > 0);
+            deleteBtn.classList.toggle('text-white', c > 0);
+            deleteBtn.classList.toggle('bg-gray-600', c === 0);
+            deleteBtn.classList.toggle('text-gray-400', c === 0);
+        }
+
         // Load failed payments from Firebase
         async function loadFailedPayments() {
             const failedTable = document.getElementById('failedTable');
+            selectedIds.clear();
+            updateDeleteBtn();
             try {
-                failedTable.innerHTML = `<tr><td colspan="6" class="px-3 py-8 text-center" style="color: var(--text-muted);"><div class="loader mx-auto mb-2"></div>Loading...</td></tr>`;
+                failedTable.innerHTML = `<tr><td colspan="7" class="px-3 py-8 text-center" style="color: var(--text-muted);"><div class="loader mx-auto mb-2"></div>Loading...</td></tr>`;
                 
                 const q = query(
                     collection(db, COLLECTIONS.PAYMENTS),
@@ -582,7 +734,7 @@
             const tbody = document.getElementById('failedTable');
             
             if (filteredPayments.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="px-3 py-8 text-center" style="color: var(--text-muted);">No failed transactions found</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="px-3 py-8 text-center" style="color: var(--text-muted);">No failed transactions found</td></tr>';
                 document.getElementById('transactionCount').textContent = '0 failed';
                 return;
             }
@@ -593,21 +745,30 @@
                 const ts = d ? d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : p.time || '';
                 
                 return `<tr class="table-row">
+                    <td class="px-2 sm:px-3 py-2"><input type="checkbox" class="row-cb rounded" data-id="${p.id}" ${selectedIds.has(p.id) ? 'checked' : ''}></td>
                     <td class="px-2 sm:px-3 py-2" style="color: var(--text-secondary);">
                         <div class="text-xs">${ds}</div>
                         <div class="text-[9px] sm:text-[10px]" style="color: var(--text-muted);">${ts}</div>
                     </td>
                     <td class="px-2 sm:px-3 py-2 font-medium" style="color: var(--text-primary);">${p.phone || p.phoneRaw || '-'}</td>
                     <td class="px-2 sm:px-3 py-2 font-semibold" style="color: var(--text-primary);">${p.amount || 'KES ' + (p.amountRaw || 0)}</td>
-                    <td class="px-2 sm:px-3 py-2 max-w-[80px] sm:max-w-[100px] truncate" style="color: var(--text-secondary);" title="${p.reason || ''}">${p.reason || '-'}</td>
                     <td class="px-2 sm:px-3 py-2"><span class="error-badge text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full">${p.failureReason || 'Failed'}</span></td>
-                    <td class="px-2 sm:px-3 py-2">
-                        <button onclick="viewDetails('${p.id}')" class="text-red-400 hover:text-red-300 text-xs font-medium">View</button>
-                    </td>
+                    <td class="px-2 sm:px-3 py-2"><div class="flex gap-1">
+                        <button onclick="viewDetails('${p.id}')" class="p-1 text-blue-400 hover:bg-blue-500/20 rounded"><svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg></button>
+                        <button onclick="deletePayment('${p.id}')" class="p-1 text-red-400 hover:bg-red-500/20 rounded"><svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                    </div></td>
                 </tr>`;
             }).join('');
             
             document.getElementById('transactionCount').textContent = `${filteredPayments.length} failed`;
+            
+            // Add checkbox event listeners
+            document.querySelectorAll('.row-cb').forEach(cb => {
+                cb.addEventListener('change', e => { 
+                    e.target.checked ? selectedIds.add(e.target.dataset.id) : selectedIds.delete(e.target.dataset.id); 
+                    updateDeleteBtn(); 
+                });
+            });
         }
 
         // View details
@@ -640,6 +801,77 @@
             document.getElementById('viewModal').classList.add('hidden');
             document.getElementById('viewModal').classList.remove('flex');
         };
+
+        // Custom Confirm Modal
+        let confirmCallback = null;
+        const confirmModal = document.getElementById('confirmModal');
+        const confirmTitle = document.getElementById('confirmTitle');
+        const confirmMessage = document.getElementById('confirmMessage');
+        const confirmCancelBtn = document.getElementById('confirmCancelBtn');
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+
+        function showConfirmModal(title, message, onConfirm) {
+            confirmTitle.textContent = title;
+            confirmMessage.textContent = message;
+            confirmCallback = onConfirm;
+            confirmModal.classList.add('show');
+        }
+
+        function hideConfirmModal() {
+            confirmModal.classList.remove('show');
+            confirmCallback = null;
+        }
+
+        confirmCancelBtn.addEventListener('click', hideConfirmModal);
+        confirmDeleteBtn.addEventListener('click', () => {
+            if (confirmCallback) confirmCallback();
+            hideConfirmModal();
+        });
+
+        confirmModal.addEventListener('click', (e) => {
+            if (e.target === confirmModal) hideConfirmModal();
+        });
+
+        // Delete single payment
+        window.deletePayment = async function(id) {
+            showConfirmModal(
+                'Delete Failed Transaction',
+                'Are you sure you want to delete this failed transaction? This action cannot be undone.',
+                async () => {
+                    try { 
+                        await deleteDoc(doc(db, COLLECTIONS.PAYMENTS, id)); 
+                        showToast('Deleted', true);
+                        loadFailedPayments(); 
+                    } catch (e) { 
+                        showToast('Failed to delete'); 
+                    }
+                }
+            );
+        };
+
+        // Delete selected payments
+        window.deleteSelected = async function() {
+            if (selectedIds.size === 0) return;
+            showConfirmModal(
+                'Delete Multiple Transactions',
+                `Are you sure you want to delete ${selectedIds.size} failed transaction(s)? This action cannot be undone.`,
+                async () => {
+                    try { 
+                        for (const id of selectedIds) { 
+                            await deleteDoc(doc(db, COLLECTIONS.PAYMENTS, id)); 
+                        } 
+                        selectedIds.clear(); 
+                        updateDeleteBtn(); 
+                        showToast('Deleted', true);
+                        loadFailedPayments(); 
+                    } catch (e) { 
+                        showToast('Failed to delete'); 
+                    }
+                }
+            );
+        };
+
+        window.refreshData = loadFailedPayments;
 
         // Filter functionality
         document.getElementById('searchInput').addEventListener('input', applyFilters);

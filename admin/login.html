@@ -6,14 +6,33 @@
     <title>Admin Login - Spectre Tech</title>
     <link rel="icon" href="../logo-no-bg.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2634 0%, #2d4a5e 50%, #1e3a4f 100%);
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(60, 179, 113, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(45, 74, 94, 0.2) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
         }
         
         .login-card {
             animation: slideUp 0.5s ease-out;
+            background: linear-gradient(135deg, rgba(36, 52, 66, 0.95), rgba(30, 58, 79, 0.9));
+            border: 1px solid rgba(60, 179, 113, 0.3);
+            backdrop-filter: blur(10px);
         }
         
         @keyframes slideUp {
@@ -28,11 +47,11 @@
         }
         
         .loader {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #22c55e;
+            border: 2px solid rgba(60, 179, 113, 0.3);
+            border-top: 2px solid #3cb371;
             border-radius: 50%;
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             animation: spin 1s linear infinite;
         }
         
@@ -40,48 +59,63 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        .input-field {
+            background: rgba(26, 38, 52, 0.8);
+            border: 1px solid rgba(60, 179, 113, 0.3);
+            color: white;
+        }
+
+        .input-field:focus {
+            border-color: #3cb371;
+            box-shadow: 0 0 0 2px rgba(60, 179, 113, 0.2);
+        }
+
+        .input-field::placeholder {
+            color: #64748b;
+        }
     </style>
 </head>
-<body class="bg-gradient-to-br from-green-500 to-green-700 min-h-screen flex items-center justify-center p-4">
-    <div class="login-card bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
+<body class="flex items-center justify-center p-4">
+    <div class="login-card rounded-xl shadow-2xl p-6 sm:p-8 w-full max-w-sm relative z-10">
         <!-- Logo & Header -->
-        <div class="text-center mb-8">
-            <img src="../logo-no-bg.png" alt="Spectre Tech" class="w-20 h-20 mx-auto mb-4" onerror="this.style.display='none'">
-            <h1 class="text-2xl font-bold text-gray-800">Admin Dashboard</h1>
-            <p class="text-gray-500 mt-2">Sign in to manage payments</p>
+        <div class="text-center mb-6">
+            <img src="../logo-no-bg.png" alt="Spectre Tech" class="w-14 h-14 mx-auto mb-3" onerror="this.style.display='none'">
+            <h1 class="text-xl font-bold text-white">Admin Dashboard</h1>
+            <p class="text-gray-400 text-sm mt-1">Sign in to manage payments</p>
         </div>
 
         <!-- Login Form -->
-        <form id="loginForm" class="space-y-6">
+        <form id="loginForm" class="space-y-4">
             <!-- Email -->
             <div>
-                <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                <label for="email" class="block text-sm font-medium text-[#3cb371] mb-1.5">Email Address</label>
                 <div class="relative">
-                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path>
                         </svg>
                     </span>
                     <input type="email" id="email" name="email" required
-                        class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        class="input-field w-full pl-9 pr-4 py-2.5 text-sm rounded-lg focus:outline-none transition-all"
                         placeholder="admin@spectretech.com">
                 </div>
             </div>
 
             <!-- Password -->
             <div>
-                <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                <label for="password" class="block text-sm font-medium text-[#3cb371] mb-1.5">Password</label>
                 <div class="relative">
-                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
                         </svg>
                     </span>
                     <input type="password" id="password" name="password" required
-                        class="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        class="input-field w-full pl-9 pr-10 py-2.5 text-sm rounded-lg focus:outline-none transition-all"
                         placeholder="••••••••">
-                    <button type="button" id="togglePassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <button type="button" id="togglePassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                         </svg>
@@ -90,27 +124,27 @@
             </div>
 
             <!-- Remember Me -->
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between text-sm">
                 <label class="flex items-center">
-                    <input type="checkbox" id="remember" class="rounded border-gray-300 text-green-500 focus:ring-green-500">
-                    <span class="ml-2 text-sm text-gray-600">Remember me</span>
+                    <input type="checkbox" id="remember" class="rounded border-gray-600 bg-gray-800 text-[#3cb371] focus:ring-[#3cb371] focus:ring-offset-0">
+                    <span class="ml-2 text-gray-400">Remember me</span>
                 </label>
-                <a href="#" class="text-sm text-green-600 hover:text-green-700">Forgot password?</a>
+                <a href="#" class="text-[#3cb371] hover:text-[#4fd98b]">Forgot password?</a>
             </div>
 
             <!-- Error Message -->
-            <div id="errorMessage" class="hidden bg-red-50 text-red-600 p-3 rounded-lg text-sm"></div>
+            <div id="errorMessage" class="hidden bg-red-500/20 border border-red-500/30 text-red-400 p-2.5 rounded-lg text-sm"></div>
 
             <!-- Submit Button -->
             <button type="submit" id="loginBtn"
-                class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
+                class="w-full bg-gradient-to-r from-[#3cb371] to-[#2d9a5e] hover:from-[#4fd98b] hover:to-[#3cb371] text-white py-2.5 rounded-lg font-medium transition-all flex items-center justify-center gap-2 text-sm">
                 <span>Sign In</span>
                 <div id="loginLoader" class="loader hidden"></div>
             </button>
         </form>
 
         <!-- Footer -->
-        <div class="mt-8 text-center text-sm text-gray-500">
+        <div class="mt-6 text-center text-xs text-gray-500">
             <p>© 2025 Spectre Tech Limited. All rights reserved.</p>
         </div>
     </div>
