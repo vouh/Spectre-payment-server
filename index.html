@@ -1098,6 +1098,10 @@
 
                 // Send STK Push request
                 console.log('📱 Sending STK Push request to:', `${apiBaseUrl}/api/stkpush`);
+                
+                // Sanitize reason - only alphanumeric and spaces, max 20 chars
+                const cleanReason = reason.replace(/[^a-zA-Z0-9 ]/g, '').substring(0, 20) || 'Payment';
+                
                 const stkResponse = await fetch(`${apiBaseUrl}/api/stkpush`, {
                     method: 'POST',
                     headers: {
@@ -1106,8 +1110,8 @@
                     body: JSON.stringify({
                         phoneNumber: formattedPhone,
                         amount: parseInt(amount),
-                        accountReference: 'Spectre Tech',
-                        transactionDesc: reason.substring(0, 30) // Max 30 chars
+                        accountReference: 'SpectreTech',
+                        transactionDesc: cleanReason
                     })
                 });
 

@@ -89,6 +89,10 @@ app.post('/api/stkpush', async (req, res) => {
         // Callback URL
         const domain = process.env.DOMAIN || 'https://spectre-payment-server.vercel.app';
 
+        // Sanitize inputs - M-Pesa only accepts alphanumeric
+        const cleanAccountRef = (accountReference || 'SpectreTech').replace(/[^a-zA-Z0-9]/g, '').substring(0, 12);
+        const cleanTransDesc = (transactionDesc || 'Payment').replace(/[^a-zA-Z0-9 ]/g, '').substring(0, 20);
+
         const body = {
             BusinessShortCode: BusinessShortCode,
             Password: password,
@@ -99,8 +103,8 @@ app.post('/api/stkpush', async (req, res) => {
             PartyB: TILL_NUMBER,
             PhoneNumber: formattedPhone,
             CallBackURL: `${domain}/api/callback`,
-            AccountReference: accountReference || 'Spectre Tech',
-            TransactionDesc: transactionDesc || 'Payment to Spectre Tech'
+            AccountReference: cleanAccountRef,
+            TransactionDesc: cleanTransDesc
         };
 
         console.log('STK Push Request:', { ...body, Password: '[HIDDEN]' });
