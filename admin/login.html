@@ -115,29 +115,13 @@
         </div>
     </div>
 
-    <!-- Firebase SDK -->
+    <!-- Firebase Client -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { auth, AuthService } from '../firebase/client.js';
         import {
-            getAuth,
             signInWithEmailAndPassword,
             onAuthStateChanged
         } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyB2CXyFin6LNLTXe4C_Dj8HrAkwIhbuQPs",
-            authDomain: "spectre-payment.firebaseapp.com",
-            projectId: "spectre-payment",
-            storageBucket: "spectre-payment.firebasestorage.app",
-            messagingSenderId: "384792827904",
-            appId: "1:384792827904:web:4a08eed1fe885f9cab60e5",
-            measurementId: "G-J0BZ9STKZ1"
-        };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
 
         // DOM Elements
         const loginForm = document.getElementById('loginForm');
