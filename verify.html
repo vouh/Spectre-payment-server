@@ -117,7 +117,6 @@
                 </a>
                 <div class="flex items-center gap-2">
                     <img src="logo.jpg" alt="Spectre" class="w-8 h-8 rounded">
-                    <span class="text-[#3cb371] font-semibold">Spectre</span>
                 </div>
             </div>
         </header>
@@ -408,8 +407,24 @@
             }
         });
 
-        // Focus input on load
-        searchInput.focus();
+        // Check for URL parameter and auto-verify
+        const urlParams = new URLSearchParams(window.location.search);
+        const codeParam = urlParams.get('code');
+        
+        if (codeParam) {
+            // Auto-fill the search input with the code from URL
+            searchInput.value = codeParam;
+            clearBtn.classList.remove('hidden');
+            
+            // Auto-verify after a short delay
+            setTimeout(() => {
+                console.log('🔍 Auto-verifying code from URL:', codeParam);
+                searchPayments();
+            }, 500);
+        } else {
+            // Focus input on load if no code in URL
+            searchInput.focus();
+        }
     </script>
 </body>
 </html>

@@ -7,6 +7,7 @@
     <link rel="icon" href="logo.jpg" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="qrcode/qrcode.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
         
@@ -1796,7 +1797,7 @@
                 const doc = new jsPDF({
                     orientation: 'portrait',
                     unit: 'mm',
-                    format: [80, 150]
+                    format: [80, 180] // Increased height for QR code
                 });
 
                 // Colors
@@ -1895,8 +1896,27 @@
                 doc.setFont('courier', 'bold');
                 doc.text(currentPaymentData.code || 'N/A', 40, y + 13, { align: 'center' });
 
+                // QR Code Section
+                y += 22;
+                const receiptCode = currentPaymentData.code || currentPaymentData.mpesaReceiptNumber || '';
+                if (receiptCode && window.generateQRDataURL) {
+                    try {
+                        // Generate verification URL
+                        const verifyURL = `https://spectre-tech.netlify.app/verify.html?code=${encodeURIComponent(receiptCode)}`;
+                        const qrDataURL = await window.generateQRDataURL(verifyURL, 200);
+                        
+                        // Add QR code to PDF (centered, medium size ~25mm)
+                        doc.addImage(qrDataURL, 'PNG', 27.5, y, 25, 25);
+                        y += 28;
+                    } catch (qrError) {
+                        console.log('QR generation skipped:', qrError);
+                        y += 3;
+                    }
+                } else {
+                    y += 3;
+                }
+
                 // Footer
-                y += 25;
                 doc.setTextColor(...gray);
                 doc.setFontSize(6);
                 doc.setFont('helvetica', 'normal');
