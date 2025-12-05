@@ -25,7 +25,7 @@ SPECTRE SECURE PAYMENT/
 │                               # - M-Pesa STK Push integration
 │                               # - PDF receipt generation
 │                               # - Custom error modals
-│                               # - Amount limit (max 250,000)
+│                               # - Amount limit (max 150,000 - M-Pesa limit)
 │                               # - Name field (required)
 │
 ├── 📄 verify.html              # Receipt Verification Page
@@ -111,7 +111,7 @@ STK Query: https://api.safaricom.co.ke/mpesa/stkpushquery/v1/query
 ```
 
 ### Transaction Flow
-1. User enters phone, name (required), amount (max 250,000), and reason (max 30 chars)
+1. User enters phone, name (required), amount (max 150,000 KES - M-Pesa STK limit), and reason (max 30 chars)
 2. Amount validation: no decimals, no leading zeros
 3. STK Push sent to customer's phone
 4. Customer enters M-Pesa PIN

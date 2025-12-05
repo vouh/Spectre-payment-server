@@ -206,7 +206,7 @@
     <!-- Firebase -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js';
-        import { getFirestore, collection, query, where, getDocs, orderBy, limit } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js';
+        import { getFirestore, collection, query, where, getDocs, limit } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js';
 
         // Firebase config
         const firebaseConfig = {
@@ -264,65 +264,63 @@
                 const paymentsRef = collection(db, 'payments');
 
                 // Determine if searching by phone or receipt code
-                const isPhone = /^\d+$/.test(searchTerm.replace(/[\s+\-]/g, ''));
+                const isPhone = /^[\d\s+\-]+$/.test(searchTerm) && searchTerm.replace(/[\s+\-]/g, '').length >= 9;
+                
+                // Get all payments (without composite index requirement)
+                const allPaymentsQuery = query(
+                    paymentsRef,
+                    limit(500)
+                );
+                
+                const snapshot = await getDocs(allPaymentsQuery);
                 
                 if (isPhone) {
                     // Search by phone - normalize the phone number
-                    const cleanPhone = searchTerm.replace(/[\s+\-]/g, '');
-                    // Try different phone formats
-                    const phoneVariants = [
-                        cleanPhone,
-                        cleanPhone.replace(/^0/, ''),
-                        cleanPhone.replace(/^254/, ''),
-                        cleanPhone.replace(/^0/, '254'),
-                        `+254${cleanPhone.replace(/^0/, '')}`,
-                        `+254 ${cleanPhone.replace(/^0/, '').replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3')}`
-                    ];
+                    let cleanPhone = searchTerm.replace(/[\s+\-]/g, '');
+                    // Normalize: remove leading 0 or 254
+                    if (cleanPhone.startsWith('254')) cleanPhone = cleanPhone.substring(3);
+                    if (cleanPhone.startsWith('0')) cleanPhone = cleanPhone.substring(1);
 
-                    // Get all completed payments and filter
-                    const allPaymentsQuery = query(
-                        paymentsRef,
-                        where('status', '==', 'completed'),
-                        orderBy('createdAt', 'desc'),
-                        limit(100)
-                    );
-                    
-                    const snapshot = await getDocs(allPaymentsQuery);
                     snapshot.forEach(doc => {
                         const data = doc.data();
-                        const paymentPhone = (data.phone || data.phoneRaw || '').replace(/[\s+\-]/g, '');
-                        // Check if any variant matches
-                        if (phoneVariants.some(v => paymentPhone.includes(v.replace(/[\s+]/g, '')) || v.includes(paymentPhone))) {
+                        // Only include completed payments
+                        if (data.status !== 'completed') return;
+                        
+                        // Normalize stored phone
+                        let storedPhone = (data.phone || data.phoneRaw || '').replace(/[\s+\-]/g, '');
+                        if (storedPhone.startsWith('254')) storedPhone = storedPhone.substring(3);
+                        if (storedPhone.startsWith('0')) storedPhone = storedPhone.substring(1);
+                        
+                        // Check if phone matches
+                        if (storedPhone.includes(cleanPhone) || cleanPhone.includes(storedPhone)) {
                             payments.push({ id: doc.id, ...data });
                         }
                     });
                 } else {
-                    // Search by receipt code - exact match (case insensitive)
+                    // Search by receipt code
                     const upperCode = searchTerm.toUpperCase();
                     
-                    // Try mpesaReceiptNumber field
-                    const codeQuery = query(
-                        paymentsRef,
-                        where('mpesaReceiptNumber', '==', upperCode),
-                        limit(1)
-                    );
-                    
-                    let snapshot = await getDocs(codeQuery);
-                    
-                    if (snapshot.empty) {
-                        // Try 'code' field
-                        const codeQuery2 = query(
-                            paymentsRef,
-                            where('code', '==', upperCode),
-                            limit(1)
-                        );
-                        snapshot = await getDocs(codeQuery2);
-                    }
-
                     snapshot.forEach(doc => {
-                        payments.push({ id: doc.id, ...doc.data() });
+                        const data = doc.data();
+                        // Only include completed payments
+                        if (data.status !== 'completed') return;
+                        
+                        const mpesaReceipt = (data.mpesaReceiptNumber || '').toUpperCase();
+                        const code = (data.code || '').toUpperCase();
+                        
+                        // Check if receipt matches
+                        if (mpesaReceipt === upperCode || code === upperCode) {
+                            payments.push({ id: doc.id, ...data });
+                        }
                     });
                 }
+
+                // Sort by date descending
+                payments.sort((a, b) => {
+                    const dateA = a.createdAt?.seconds || 0;
+                    const dateB = b.createdAt?.seconds || 0;
+                    return dateB - dateA;
+                });
 
                 // Hide loading
                 loadingState.classList.add('hidden');
