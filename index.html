@@ -1391,6 +1391,9 @@
                 return;
             }
 
+            // Flag to prevent duplicate saves
+            let paymentProcessed = false;
+
             // Show step 2
             step1.classList.add('hidden');
             step2.classList.remove('hidden');
@@ -1469,20 +1472,28 @@
                         console.log('Query Response:', queryData);
 
                         if (queryData.status === 'success') {
+                            if (paymentProcessed) return; // Prevent duplicate processing
+                            paymentProcessed = true;
                             clearInterval(timer);
                             clearInterval(pollInterval);
                             // Pass the M-Pesa receipt number from callback
                             await handlePaymentSuccess(phone, name, amount, reason, queryData.mpesaReceiptNumber);
                         } else if (queryData.status === 'cancelled') {
+                            if (paymentProcessed) return;
+                            paymentProcessed = true;
                             clearInterval(timer);
                             clearInterval(pollInterval);
                             handlePaymentFailure('Payment was cancelled by user.', phone, name, amount, reason);
                         } else if (queryData.status === 'failed') {
+                            if (paymentProcessed) return;
+                            paymentProcessed = true;
                             clearInterval(timer);
                             clearInterval(pollInterval);
                             // Pass the result code for better error detection
                             handlePaymentFailure(queryData.message || 'Payment failed.', phone, name, amount, reason, queryData.resultCode);
                         } else if (queryData.status === 'timeout') {
+                            if (paymentProcessed) return;
+                            paymentProcessed = true;
                             clearInterval(timer);
                             clearInterval(pollInterval);
                             handlePaymentFailure('Payment request timed out. Please try again.', phone, name, amount, reason);
@@ -1495,6 +1506,8 @@
 
                     // Stop polling after max attempts
                     if (pollCount >= maxPolls) {
+                        if (paymentProcessed) return;
+                        paymentProcessed = true;
                         clearInterval(timer);
                         clearInterval(pollInterval);
                         handlePaymentFailure('Payment verification timed out. If you completed the payment, please contact support.', phone, name, amount, reason);
@@ -1502,9 +1515,12 @@
                 }, 5000); // Poll every 5 seconds
 
             } catch (error) {
-                clearInterval(timer);
-                console.error('Payment error:', error);
-                handlePaymentFailure(error.message || 'Failed to process payment. Please try again.', phone, name, amount, reason);
+                if (!paymentProcessed) {
+                    paymentProcessed = true;
+                    clearInterval(timer);
+                    console.error('Payment error:', error);
+                    handlePaymentFailure(error.message || 'Failed to process payment. Please try again.', phone, name, amount, reason);
+                }
             }
         });
 

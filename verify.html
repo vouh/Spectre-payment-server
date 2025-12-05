@@ -19,29 +19,47 @@
         }
 
         .input-dark {
-            background: #1a2634;
-            border: 1px solid #2d3748;
+            background: rgba(26, 38, 52, 0.8);
+            border: 1px solid rgba(60, 179, 113, 0.2);
             transition: all 0.3s ease;
+            font-size: 14px;
         }
 
         .input-dark:focus {
             border-color: #3cb371;
-            box-shadow: 0 0 0 3px rgba(60, 179, 113, 0.1);
+            box-shadow: 0 0 0 2px rgba(60, 179, 113, 0.15), 0 0 20px rgba(60, 179, 113, 0.1);
             outline: none;
         }
 
         .glow-green {
-            box-shadow: 0 0 20px rgba(60, 179, 113, 0.15), 0 0 40px rgba(60, 179, 113, 0.05);
+            box-shadow: 0 0 30px rgba(60, 179, 113, 0.12), 0 0 60px rgba(60, 179, 113, 0.06);
+        }
+
+        .glow-line {
+            position: relative;
+        }
+
+        .glow-line::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(60, 179, 113, 0.5), transparent);
         }
 
         .btn-primary {
             background: linear-gradient(135deg, #3cb371 0%, #2d9a5e 100%);
             transition: all 0.3s ease;
+            font-size: 13px;
+            padding: 10px 20px;
         }
 
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(60, 179, 113, 0.4);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(60, 179, 113, 0.35);
         }
 
         .btn-primary:disabled {
@@ -52,26 +70,38 @@
 
         .verified-badge {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        }
-
-        .not-found-badge {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            font-size: 10px;
+            padding: 3px 10px;
         }
 
         .result-card {
-            background: linear-gradient(135deg, #1a2634 0%, #243442 50%, #1a2634 100%);
-            border: 1px solid rgba(60, 179, 113, 0.3);
+            background: linear-gradient(145deg, rgba(26, 38, 52, 0.9), rgba(36, 52, 66, 0.9));
+            border: 1px solid rgba(60, 179, 113, 0.2);
+            backdrop-filter: blur(10px);
         }
 
         .payment-item {
-            background: rgba(26, 38, 52, 0.8);
-            border: 1px solid #2d3748;
-            transition: all 0.2s ease;
+            background: rgba(26, 38, 52, 0.6);
+            border: 1px solid rgba(60, 179, 113, 0.15);
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .payment-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(60, 179, 113, 0.4), transparent);
         }
 
         .payment-item:hover {
-            border-color: #3cb371;
+            border-color: rgba(60, 179, 113, 0.4);
             background: rgba(60, 179, 113, 0.05);
+            box-shadow: 0 0 20px rgba(60, 179, 113, 0.1);
         }
 
         .fade-in {
@@ -79,16 +109,16 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         .loading-spinner {
-            border: 3px solid rgba(60, 179, 113, 0.2);
+            border: 2px solid rgba(60, 179, 113, 0.2);
             border-top-color: #3cb371;
             border-radius: 50%;
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             animation: spin 0.8s linear infinite;
         }
 
@@ -96,10 +126,30 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Mobile optimizations */
+        /* Compact typography */
+        .text-compact {
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .text-compact-sm {
+            font-size: 11px;
+            line-height: 1.3;
+        }
+
+        /* Mobile optimizations - more compact */
         @media (max-width: 640px) {
             .container-main {
-                padding: 1rem;
+                padding: 0.75rem;
+            }
+            .mobile-compact {
+                padding: 0.75rem !important;
+            }
+            .mobile-text-sm {
+                font-size: 12px !important;
+            }
+            .mobile-gap-sm {
+                gap: 0.5rem !important;
             }
         }
     </style>
@@ -107,75 +157,73 @@
 <body class="text-white">
     <div class="min-h-screen flex flex-col">
         <!-- Header -->
-        <header class="p-4">
-            <div class="max-w-lg mx-auto flex items-center justify-between">
-                <a href="index.html" class="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <header class="p-3 sm:p-4">
+            <div class="max-w-md mx-auto flex items-center justify-between">
+                <a href="index.html" class="flex items-center gap-1.5 text-gray-400 hover:text-white transition-colors text-compact">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                     </svg>
-                    <span class="text-sm">Back to Payment</span>
+                    <span>Back</span>
                 </a>
-                <div class="flex items-center gap-2">
-                    <img src="logo.jpg" alt="Spectre" class="w-8 h-8 rounded">
-                </div>
+                <img src="logo.jpg" alt="Spectre" class="w-7 h-7 rounded">
             </div>
         </header>
 
         <!-- Main Content -->
-        <main class="flex-1 flex items-start justify-center p-4 pt-8">
-            <div class="w-full max-w-lg">
-                <!-- Title -->
-                <div class="text-center mb-6">
-                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#3cb371]/20 mb-4">
-                        <svg class="w-8 h-8 text-[#3cb371]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <main class="flex-1 flex items-start justify-center p-3 sm:p-4 pt-4 sm:pt-6">
+            <div class="w-full max-w-md">
+                <!-- Title - Compact -->
+                <div class="text-center mb-4 sm:mb-5">
+                    <div class="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#3cb371]/15 mb-3 glow-line">
+                        <svg class="w-6 h-6 sm:w-7 sm:h-7 text-[#3cb371]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                     </div>
-                    <h1 class="text-2xl font-bold text-white mb-2">Verify Payment</h1>
-                    <p class="text-gray-400 text-sm">Enter M-Pesa receipt code or phone number to verify a payment</p>
+                    <h1 class="text-lg sm:text-xl font-bold text-white mb-1">Verify Payment</h1>
+                    <p class="text-gray-400 text-compact-sm sm:text-compact">Enter receipt code or phone number</p>
                 </div>
 
-                <!-- Search Form -->
-                <div class="result-card rounded-2xl p-5 glow-green mb-6">
-                    <div class="space-y-4">
+                <!-- Search Form - Compact -->
+                <div class="result-card rounded-xl p-4 sm:p-5 glow-green mb-4 sm:mb-5">
+                    <div class="space-y-3">
                         <div class="relative">
-                            <label class="block text-[#3cb371] text-sm font-medium mb-1">Receipt Code or Phone Number</label>
+                            <label class="block text-[#3cb371] text-compact font-medium mb-1">Receipt / Phone</label>
                             <div class="relative">
                                 <input 
                                     type="text" 
                                     id="searchInput" 
                                     placeholder="e.g. TL49Q0112L or 0712345678"
-                                    class="input-dark w-full px-4 py-3 rounded-lg text-white placeholder-gray-500"
+                                    class="input-dark w-full px-3 py-2.5 rounded-lg text-white placeholder-gray-500 text-compact"
                                     autocomplete="off"
                                 >
                                 <button 
                                     id="clearBtn"
-                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white hidden"
+                                    class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white hidden"
+                                    type="button"
                                 >
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                     </svg>
                                 </button>
                             </div>
-                            <p class="text-gray-500 text-xs mt-1">Search by M-Pesa receipt number (e.g. TL49Q0112L) or phone number</p>
                         </div>
 
                         <button 
                             id="verifyBtn"
-                            class="btn-primary w-full py-3 rounded-lg text-white font-semibold flex items-center justify-center gap-2"
+                            class="btn-primary w-full py-2.5 rounded-lg text-white font-medium flex items-center justify-center gap-1.5"
                         >
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                             </svg>
-                            Verify Payment
+                            Verify
                         </button>
                     </div>
                 </div>
 
-                <!-- Loading State -->
-                <div id="loadingState" class="hidden text-center py-8">
-                    <div class="loading-spinner mx-auto mb-4"></div>
-                    <p class="text-gray-400">Searching payments...</p>
+                <!-- Loading State - Compact -->
+                <div id="loadingState" class="hidden text-center py-6">
+                    <div class="loading-spinner mx-auto mb-3"></div>
+                    <p class="text-gray-400 text-compact">Searching...</p>
                 </div>
 
                 <!-- Results Container -->
@@ -183,22 +231,22 @@
                     <!-- Results will be injected here -->
                 </div>
 
-                <!-- Empty State -->
-                <div id="emptyState" class="hidden text-center py-8">
-                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-500/20 mb-4">
-                        <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <!-- Empty State - Compact -->
+                <div id="emptyState" class="hidden text-center py-6">
+                    <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-500/15 mb-3">
+                        <svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
                     </div>
-                    <h3 class="text-lg font-semibold text-white mb-2">No Payment Found</h3>
-                    <p class="text-gray-400 text-sm">We couldn't find any payment matching your search.<br>Please check the receipt code or phone number and try again.</p>
+                    <h3 class="text-base font-semibold text-white mb-1">No Payment Found</h3>
+                    <p class="text-gray-400 text-compact-sm">Check the receipt code or phone number and try again.</p>
                 </div>
             </div>
         </main>
 
         <!-- Footer -->
-        <footer class="p-4 text-center">
-            <p class="text-gray-500 text-xs">© 2025 Spectre Tech Limited. All rights reserved.</p>
+        <footer class="p-3 text-center">
+            <p class="text-gray-500 text-[10px]">© 2025 Spectre Tech Limited</p>
         </footer>
     </div>
 
@@ -345,48 +393,48 @@
         function displayResults(payments) {
             resultsContainer.innerHTML = '';
             
-            // Header
+            // Header - Compact
             const header = document.createElement('div');
-            header.className = 'flex items-center justify-between mb-4';
+            header.className = 'flex items-center justify-between mb-3';
             header.innerHTML = `
                 <div class="flex items-center gap-2">
-                    <span class="verified-badge text-white text-xs px-3 py-1 rounded-full font-medium">
+                    <span class="verified-badge text-white rounded-full font-medium">
                         ✓ Verified
                     </span>
-                    <span class="text-gray-400 text-sm">${payments.length} payment${payments.length > 1 ? 's' : ''} found</span>
+                    <span class="text-gray-400 text-compact-sm">${payments.length} found</span>
                 </div>
             `;
             resultsContainer.appendChild(header);
 
-            // Payment cards
+            // Payment cards - Compact with glow
             payments.forEach((payment, index) => {
                 const card = document.createElement('div');
-                card.className = 'payment-item rounded-xl p-4 mb-3 fade-in';
-                card.style.animationDelay = `${index * 0.1}s`;
+                card.className = 'payment-item rounded-lg p-3 sm:p-4 mb-2.5 fade-in';
+                card.style.animationDelay = `${index * 0.08}s`;
                 
                 const date = payment.createdAt ? new Date(payment.createdAt.seconds ? payment.createdAt.seconds * 1000 : payment.createdAt) : null;
                 const dateStr = date ? date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : payment.date || '-';
                 const timeStr = date ? date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : payment.time || '-';
 
                 card.innerHTML = `
-                    <div class="flex items-start justify-between mb-3">
+                    <div class="flex items-start justify-between mb-2">
                         <div>
-                            <p class="text-[#3cb371] font-mono font-bold">${payment.mpesaReceiptNumber || payment.code || '-'}</p>
-                            <p class="text-gray-500 text-xs">${dateStr} • ${timeStr}</p>
+                            <p class="text-[#3cb371] font-mono font-bold text-sm">${payment.mpesaReceiptNumber || payment.code || '-'}</p>
+                            <p class="text-gray-500 text-[10px]">${dateStr} • ${timeStr}</p>
                         </div>
-                        <span class="text-white font-bold">${payment.amount || `KES ${(payment.amountRaw || 0).toLocaleString()}`}</span>
+                        <span class="text-white font-bold text-sm">${payment.amount || `KES ${(payment.amountRaw || 0).toLocaleString()}`}</span>
                     </div>
-                    <div class="grid grid-cols-2 gap-2 text-sm">
+                    <div class="grid grid-cols-2 gap-x-3 gap-y-1.5 text-compact-sm">
                         <div>
-                            <p class="text-gray-500 text-xs">Name</p>
+                            <p class="text-gray-500 text-[10px]">Name</p>
                             <p class="text-white">${payment.name || '-'}</p>
                         </div>
                         <div>
-                            <p class="text-gray-500 text-xs">Phone</p>
+                            <p class="text-gray-500 text-[10px]">Phone</p>
                             <p class="text-white">${payment.phone || payment.phoneRaw || '-'}</p>
                         </div>
                         <div class="col-span-2">
-                            <p class="text-gray-500 text-xs">Reason</p>
+                            <p class="text-gray-500 text-[10px]">Reason</p>
                             <p class="text-white">${payment.reason || '-'}</p>
                         </div>
                     </div>
