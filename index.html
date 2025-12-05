@@ -1011,10 +1011,13 @@
                             type="text" 
                             id="nameInput" 
                             placeholder="Official name"
-                            maxlength="15"
+                            maxlength="20"
                             class="input-compact input-3d w-full bg-gray-800 text-white rounded-lg border border-gray-600 focus:border-[#3cb371] focus:outline-none focus:ring-1 focus:ring-[#3cb371]/50 transition-all"
                         >
-                        <p id="nameError" class="text-red-400 text-xs mt-0.5 hidden">Letters only, single space allowed, max 15</p>
+                        <div class="flex justify-between items-center mt-0.5">
+                            <p id="nameError" class="text-red-400 text-xs hidden">Letters only, single space allowed, max 20</p>
+                            <span id="nameCharCount" class="text-gray-500 text-xs ml-auto">0/20</span>
+                        </div>
                     </div>
 
                     <div class="relative">
@@ -1228,6 +1231,7 @@
         const payBtn = document.getElementById('payBtn');
         const phoneError = document.getElementById('phoneError');
         const nameError = document.getElementById('nameError');
+        const nameCharCount = document.getElementById('nameCharCount');
         const reasonError = document.getElementById('reasonError');
         const displayPhone = document.getElementById('displayPhone');
         const countdown = document.getElementById('countdown');
@@ -1325,7 +1329,7 @@
             }
         });
 
-        // Name input validation (letters only, single space between words, max 15 chars)
+        // Name input validation (letters only, single space between words, max 20 chars)
         nameInput.addEventListener('input', (e) => {
             nameError.classList.add('hidden');
             let value = e.target.value;
@@ -1335,9 +1339,25 @@
             value = value.replace(/\s+/g, ' ');
             // Prevent starting with a space
             if (value.startsWith(' ')) value = value.substring(1);
-            // Enforce max 15 characters
-            if (value.length > 15) value = value.substring(0, 15);
+            // Enforce max 20 characters
+            if (value.length > 20) value = value.substring(0, 20);
             e.target.value = value;
+            
+            // Update character count
+            const count = value.length;
+            nameCharCount.textContent = `${count}/20`;
+            
+            // Change color based on count
+            if (count >= 18) {
+                nameCharCount.classList.remove('text-gray-500', 'text-yellow-500');
+                nameCharCount.classList.add('text-red-400');
+            } else if (count >= 15) {
+                nameCharCount.classList.remove('text-gray-500', 'text-red-400');
+                nameCharCount.classList.add('text-yellow-500');
+            } else {
+                nameCharCount.classList.remove('text-yellow-500', 'text-red-400');
+                nameCharCount.classList.add('text-gray-500');
+            }
         });
 
         // Pay button click
