@@ -206,21 +206,23 @@
     <!-- Firebase -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js';
-        import { getFirestore, collection, query, where, getDocs, limit } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js';
+        import { getFirestore, collection, query, getDocs, limit } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js';
 
-        // Firebase config
+        // Firebase config - MUST match firebase/config.js
         const firebaseConfig = {
-            apiKey: "AIzaSyCGdNLoP_3zJi-gNyUMSq3SB92eAzKfj5A",
-            authDomain: "payment-hub-c4740.firebaseapp.com",
-            projectId: "payment-hub-c4740",
-            storageBucket: "payment-hub-c4740.firebasestorage.app",
-            messagingSenderId: "893aborede792800",
-            appId: "1:893792800:web:5a2b72d84b7c5f29f7b3c2"
+            apiKey: "AIzaSyB2CXyFin6LNLTXe4C_Dj8HrAkwIhbuQPs",
+            authDomain: "spectre-payment.firebaseapp.com",
+            projectId: "spectre-payment",
+            storageBucket: "spectre-payment.firebasestorage.app",
+            messagingSenderId: "384792827904",
+            appId: "1:384792827904:web:4a08eed1fe885f9cab60e5",
+            measurementId: "G-J0BZ9STKZ1"
         };
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        console.log("🔥 Verify: Firebase initialized with project:", firebaseConfig.projectId);
 
         // DOM Elements
         const searchInput = document.getElementById('searchInput');
