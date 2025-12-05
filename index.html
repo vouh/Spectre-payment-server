@@ -1010,11 +1010,11 @@
                         <input 
                             type="text" 
                             id="nameInput" 
-                            placeholder="Official name"
+                            placeholder="e.g. Kelkin Peter"
                             maxlength="15"
                             class="input-compact input-3d w-full bg-gray-800 text-white rounded-lg border border-gray-600 focus:border-[#3cb371] focus:outline-none focus:ring-1 focus:ring-[#3cb371]/50 transition-all"
                         >
-                        <p id="nameError" class="text-red-400 text-xs mt-0.5 hidden">Name is required (letters only)</p>
+                        <p id="nameError" class="text-red-400 text-xs mt-0.5 hidden">Letters only, single space allowed, max 15</p>
                     </div>
 
                     <div class="relative">
@@ -1325,17 +1325,18 @@
             }
         });
 
-        // Name input validation (letters only + single space between names)
+        // Name input validation (letters only, single space between words, max 15 chars)
         nameInput.addEventListener('input', (e) => {
             nameError.classList.add('hidden');
-            // Allow only letters and single space between words
             let value = e.target.value;
-            // Remove any characters that are not letters or spaces
+            // Remove anything that's not a letter or space
             value = value.replace(/[^a-zA-Z\s]/g, '');
             // Replace multiple spaces with single space
             value = value.replace(/\s+/g, ' ');
             // Prevent starting with a space
             if (value.startsWith(' ')) value = value.substring(1);
+            // Enforce max 15 characters
+            if (value.length > 15) value = value.substring(0, 15);
             e.target.value = value;
         });
 
