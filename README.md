@@ -25,7 +25,14 @@ SPECTRE SECURE PAYMENT/
 │                               # - M-Pesa STK Push integration
 │                               # - PDF receipt generation
 │                               # - Custom error modals
-│                               # - Amount limit (max 9999)
+│                               # - Amount limit (max 250,000)
+│                               # - Name field (required)
+│
+├── 📄 verify.html              # Receipt Verification Page
+│                               # - Search by M-Pesa receipt number
+│                               # - Search by phone number
+│                               # - View all matching transactions
+│                               # - Anti-forgery verification
 │
 ├── 📄 coming-soon.html         # Company website placeholder
 │
@@ -40,7 +47,7 @@ SPECTRE SECURE PAYMENT/
 ├── 📄 package.json             # Node.js dependencies
 ├── 📄 .gitignore               # Git ignore rules
 │
-├── 🖼️ logo.jpg                 # Company logo
+├── 🖼️ logo.jpg                 # Company logo (also used as favicon)
 └── 🖼️ logo-no-bg.png           # Logo (transparent)
 ```
 
@@ -49,6 +56,7 @@ SPECTRE SECURE PAYMENT/
 | Service | URL |
 |---------|-----|
 | Payment Page | https://spectre-tech.netlify.app |
+| Verify Receipt | https://spectre-tech.netlify.app/verify.html |
 | Admin Dashboard | https://spectre-tech.netlify.app/admin |
 | API Server | https://spectre-payment-server.vercel.app |
 
@@ -83,6 +91,16 @@ SPECTRE SECURE PAYMENT/
 - Email/password login
 - Session persistence
 
+## 🔍 Receipt Verification
+
+### Verification Page (`verify.html`)
+- **Anti-Forgery System**: Verify authenticity of payment receipts
+- **Search Options**: 
+  - M-Pesa Receipt Number (e.g., TDK7XY9Z2P)
+  - Phone Number (shows all matching payments)
+- **Results Display**: Card-based layout showing all matching transactions
+- **Access**: Link from payment page (Verify button)
+
 ## 📱 M-Pesa Integration
 
 ### Production API URLs
@@ -93,12 +111,13 @@ STK Query: https://api.safaricom.co.ke/mpesa/stkpushquery/v1/query
 ```
 
 ### Transaction Flow
-1. User enters phone, amount (max 9999), and reason
-2. STK Push sent to customer's phone
-3. Customer enters M-Pesa PIN
-4. Callback received with `MpesaReceiptNumber`
-5. Receipt displayed and PDF generated
-6. Transaction saved to Firebase
+1. User enters phone, name (required), amount (max 250,000), and reason (max 30 chars)
+2. Amount validation: no decimals, no leading zeros
+3. STK Push sent to customer's phone
+4. Customer enters M-Pesa PIN
+5. Callback received with `MpesaReceiptNumber`
+6. Receipt displayed and PDF generated (compact receipt-style formatting)
+7. Transaction saved to Firebase (includes name field)
 
 ### Error Handling
 | Code | Error | Description |

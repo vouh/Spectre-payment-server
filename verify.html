@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Payment - Spectre Tech</title>
+    <link rel="icon" href="logo.jpg" type="image/jpeg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f1a24 0%, #1a2634 50%, #0f1a24 100%);
+            min-height: 100vh;
+        }
+
+        .input-dark {
+            background: #1a2634;
+            border: 1px solid #2d3748;
+            transition: all 0.3s ease;
+        }
+
+        .input-dark:focus {
+            border-color: #3cb371;
+            box-shadow: 0 0 0 3px rgba(60, 179, 113, 0.1);
+            outline: none;
+        }
+
+        .glow-green {
+            box-shadow: 0 0 20px rgba(60, 179, 113, 0.15), 0 0 40px rgba(60, 179, 113, 0.05);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3cb371 0%, #2d9a5e 100%);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(60, 179, 113, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .verified-badge {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .not-found-badge {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #1a2634 0%, #243442 50%, #1a2634 100%);
+            border: 1px solid rgba(60, 179, 113, 0.3);
+        }
+
+        .payment-item {
+            background: rgba(26, 38, 52, 0.8);
+            border: 1px solid #2d3748;
+            transition: all 0.2s ease;
+        }
+
+        .payment-item:hover {
+            border-color: #3cb371;
+            background: rgba(60, 179, 113, 0.05);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .loading-spinner {
+            border: 3px solid rgba(60, 179, 113, 0.2);
+            border-top-color: #3cb371;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 640px) {
+            .container-main {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body class="text-white">
+    <div class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="p-4">
+            <div class="max-w-lg mx-auto flex items-center justify-between">
+                <a href="index.html" class="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    <span class="text-sm">Back to Payment</span>
+                </a>
+                <div class="flex items-center gap-2">
+                    <img src="logo.jpg" alt="Spectre" class="w-8 h-8 rounded">
+                    <span class="text-[#3cb371] font-semibold">Spectre</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex items-start justify-center p-4 pt-8">
+            <div class="w-full max-w-lg">
+                <!-- Title -->
+                <div class="text-center mb-6">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#3cb371]/20 mb-4">
+                        <svg class="w-8 h-8 text-[#3cb371]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <h1 class="text-2xl font-bold text-white mb-2">Verify Payment</h1>
+                    <p class="text-gray-400 text-sm">Enter M-Pesa receipt code or phone number to verify a payment</p>
+                </div>
+
+                <!-- Search Form -->
+                <div class="result-card rounded-2xl p-5 glow-green mb-6">
+                    <div class="space-y-4">
+                        <div class="relative">
+                            <label class="block text-[#3cb371] text-sm font-medium mb-1">Receipt Code or Phone Number</label>
+                            <div class="relative">
+                                <input 
+                                    type="text" 
+                                    id="searchInput" 
+                                    placeholder="e.g. TL49Q0112L or 0712345678"
+                                    class="input-dark w-full px-4 py-3 rounded-lg text-white placeholder-gray-500"
+                                    autocomplete="off"
+                                >
+                                <button 
+                                    id="clearBtn"
+                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white hidden"
+                                >
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <p class="text-gray-500 text-xs mt-1">Search by M-Pesa receipt number (e.g. TL49Q0112L) or phone number</p>
+                        </div>
+
+                        <button 
+                            id="verifyBtn"
+                            class="btn-primary w-full py-3 rounded-lg text-white font-semibold flex items-center justify-center gap-2"
+                        >
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            Verify Payment
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loadingState" class="hidden text-center py-8">
+                    <div class="loading-spinner mx-auto mb-4"></div>
+                    <p class="text-gray-400">Searching payments...</p>
+                </div>
+
+                <!-- Results Container -->
+                <div id="resultsContainer" class="hidden">
+                    <!-- Results will be injected here -->
+                </div>
+
+                <!-- Empty State -->
+                <div id="emptyState" class="hidden text-center py-8">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-500/20 mb-4">
+                        <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-2">No Payment Found</h3>
+                    <p class="text-gray-400 text-sm">We couldn't find any payment matching your search.<br>Please check the receipt code or phone number and try again.</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="p-4 text-center">
+            <p class="text-gray-500 text-xs">© 2025 Spectre Tech Limited. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js';
+        import { getFirestore, collection, query, where, getDocs, orderBy, limit } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js';
+
+        // Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyCGdNLoP_3zJi-gNyUMSq3SB92eAzKfj5A",
+            authDomain: "payment-hub-c4740.firebaseapp.com",
+            projectId: "payment-hub-c4740",
+            storageBucket: "payment-hub-c4740.firebasestorage.app",
+            messagingSenderId: "893aborede792800",
+            appId: "1:893792800:web:5a2b72d84b7c5f29f7b3c2"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // DOM Elements
+        const searchInput = document.getElementById('searchInput');
+        const clearBtn = document.getElementById('clearBtn');
+        const verifyBtn = document.getElementById('verifyBtn');
+        const loadingState = document.getElementById('loadingState');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const emptyState = document.getElementById('emptyState');
+
+        // Show/hide clear button
+        searchInput.addEventListener('input', () => {
+            clearBtn.classList.toggle('hidden', !searchInput.value);
+        });
+
+        // Clear input
+        clearBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            clearBtn.classList.add('hidden');
+            resultsContainer.classList.add('hidden');
+            emptyState.classList.add('hidden');
+            searchInput.focus();
+        });
+
+        // Search function
+        async function searchPayments() {
+            const searchTerm = searchInput.value.trim();
+            
+            if (!searchTerm) {
+                searchInput.focus();
+                return;
+            }
+
+            // Show loading
+            loadingState.classList.remove('hidden');
+            resultsContainer.classList.add('hidden');
+            emptyState.classList.add('hidden');
+            verifyBtn.disabled = true;
+
+            try {
+                const payments = [];
+                const paymentsRef = collection(db, 'payments');
+
+                // Determine if searching by phone or receipt code
+                const isPhone = /^\d+$/.test(searchTerm.replace(/[\s+\-]/g, ''));
+                
+                if (isPhone) {
+                    // Search by phone - normalize the phone number
+                    const cleanPhone = searchTerm.replace(/[\s+\-]/g, '');
+                    // Try different phone formats
+                    const phoneVariants = [
+                        cleanPhone,
+                        cleanPhone.replace(/^0/, ''),
+                        cleanPhone.replace(/^254/, ''),
+                        cleanPhone.replace(/^0/, '254'),
+                        `+254${cleanPhone.replace(/^0/, '')}`,
+                        `+254 ${cleanPhone.replace(/^0/, '').replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3')}`
+                    ];
+
+                    // Get all completed payments and filter
+                    const allPaymentsQuery = query(
+                        paymentsRef,
+                        where('status', '==', 'completed'),
+                        orderBy('createdAt', 'desc'),
+                        limit(100)
+                    );
+                    
+                    const snapshot = await getDocs(allPaymentsQuery);
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        const paymentPhone = (data.phone || data.phoneRaw || '').replace(/[\s+\-]/g, '');
+                        // Check if any variant matches
+                        if (phoneVariants.some(v => paymentPhone.includes(v.replace(/[\s+]/g, '')) || v.includes(paymentPhone))) {
+                            payments.push({ id: doc.id, ...data });
+                        }
+                    });
+                } else {
+                    // Search by receipt code - exact match (case insensitive)
+                    const upperCode = searchTerm.toUpperCase();
+                    
+                    // Try mpesaReceiptNumber field
+                    const codeQuery = query(
+                        paymentsRef,
+                        where('mpesaReceiptNumber', '==', upperCode),
+                        limit(1)
+                    );
+                    
+                    let snapshot = await getDocs(codeQuery);
+                    
+                    if (snapshot.empty) {
+                        // Try 'code' field
+                        const codeQuery2 = query(
+                            paymentsRef,
+                            where('code', '==', upperCode),
+                            limit(1)
+                        );
+                        snapshot = await getDocs(codeQuery2);
+                    }
+
+                    snapshot.forEach(doc => {
+                        payments.push({ id: doc.id, ...doc.data() });
+                    });
+                }
+
+                // Hide loading
+                loadingState.classList.add('hidden');
+                verifyBtn.disabled = false;
+
+                if (payments.length === 0) {
+                    emptyState.classList.remove('hidden');
+                } else {
+                    displayResults(payments);
+                }
+
+            } catch (error) {
+                console.error('Search error:', error);
+                loadingState.classList.add('hidden');
+                verifyBtn.disabled = false;
+                emptyState.classList.remove('hidden');
+            }
+        }
+
+        // Display results
+        function displayResults(payments) {
+            resultsContainer.innerHTML = '';
+            
+            // Header
+            const header = document.createElement('div');
+            header.className = 'flex items-center justify-between mb-4';
+            header.innerHTML = `
+                <div class="flex items-center gap-2">
+                    <span class="verified-badge text-white text-xs px-3 py-1 rounded-full font-medium">
+                        ✓ Verified
+                    </span>
+                    <span class="text-gray-400 text-sm">${payments.length} payment${payments.length > 1 ? 's' : ''} found</span>
+                </div>
+            `;
+            resultsContainer.appendChild(header);
+
+            // Payment cards
+            payments.forEach((payment, index) => {
+                const card = document.createElement('div');
+                card.className = 'payment-item rounded-xl p-4 mb-3 fade-in';
+                card.style.animationDelay = `${index * 0.1}s`;
+                
+                const date = payment.createdAt ? new Date(payment.createdAt.seconds ? payment.createdAt.seconds * 1000 : payment.createdAt) : null;
+                const dateStr = date ? date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : payment.date || '-';
+                const timeStr = date ? date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : payment.time || '-';
+
+                card.innerHTML = `
+                    <div class="flex items-start justify-between mb-3">
+                        <div>
+                            <p class="text-[#3cb371] font-mono font-bold">${payment.mpesaReceiptNumber || payment.code || '-'}</p>
+                            <p class="text-gray-500 text-xs">${dateStr} • ${timeStr}</p>
+                        </div>
+                        <span class="text-white font-bold">${payment.amount || `KES ${(payment.amountRaw || 0).toLocaleString()}`}</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 text-sm">
+                        <div>
+                            <p class="text-gray-500 text-xs">Name</p>
+                            <p class="text-white">${payment.name || '-'}</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 text-xs">Phone</p>
+                            <p class="text-white">${payment.phone || payment.phoneRaw || '-'}</p>
+                        </div>
+                        <div class="col-span-2">
+                            <p class="text-gray-500 text-xs">Reason</p>
+                            <p class="text-white">${payment.reason || '-'}</p>
+                        </div>
+                    </div>
+                `;
+                
+                resultsContainer.appendChild(card);
+            });
+
+            resultsContainer.classList.remove('hidden');
+        }
+
+        // Event listeners
+        verifyBtn.addEventListener('click', searchPayments);
+        
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                searchPayments();
+            }
+        });
+
+        // Focus input on load
+        searchInput.focus();
+    </script>
+</body>
+</html>

@@ -761,6 +761,7 @@
                         <tr>
                             <th class="px-2 sm:px-3 py-2 sm:py-3"><input type="checkbox" id="selectAll" class="rounded"></th>
                             <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-medium uppercase text-red-400">Date</th>
+                            <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-medium uppercase text-red-400">Name</th>
                             <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-medium uppercase text-red-400">Phone</th>
                             <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-medium uppercase text-red-400">Amount</th>
                             <th class="px-2 sm:px-3 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-medium uppercase text-red-400">Failure</th>
@@ -930,6 +931,7 @@
                         <div class="text-xs">${ds}</div>
                         <div class="text-[9px] sm:text-[10px]" style="color: var(--text-muted);">${ts}</div>
                     </td>
+                    <td class="px-2 sm:px-3 py-2 max-w-[70px] sm:max-w-[90px] truncate" style="color: var(--text-primary);" title="${p.name || ''}">${p.name || '-'}</td>
                     <td class="px-2 sm:px-3 py-2 font-medium" style="color: var(--text-primary);">${p.phone || p.phoneRaw || '-'}</td>
                     <td class="px-2 sm:px-3 py-2 font-semibold" style="color: var(--text-primary);">${p.amount || 'KES ' + (p.amountRaw || 0)}</td>
                     <td class="px-2 sm:px-3 py-2"><span class="error-badge text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full">${p.failureReason || 'Failed'}</span></td>
@@ -972,6 +974,10 @@
                     <div class="flex justify-between items-center py-2 border-b" style="border-color: var(--border-color);">
                         <span style="color: var(--text-muted);">Phone</span>
                         <span class="font-medium" style="color: var(--text-primary);">${p.phone || p.phoneRaw || '-'}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b" style="border-color: var(--border-color);">
+                        <span style="color: var(--text-muted);">Name</span>
+                        <span class="font-medium" style="color: var(--text-primary);">${p.name || '-'}</span>
                     </div>
                     <div class="flex justify-between items-center py-2 border-b" style="border-color: var(--border-color);">
                         <span style="color: var(--text-muted);">Amount</span>
@@ -1120,9 +1126,9 @@
                 return;
             }
             
-            const headers = ['Date', 'Time', 'Phone', 'Amount', 'Payment Reason', 'Failure Reason', 'Error Type'];
+            const headers = ['Date', 'Time', 'Phone', 'Name', 'Amount', 'Payment Reason', 'Failure Reason', 'Error Type'];
             const rows = filteredPayments.map(p => [
-                p.date || '', p.time || '', p.phone || p.phoneRaw || '', 
+                p.date || '', p.time || '', p.phone || p.phoneRaw || '', p.name || '',
                 p.amountRaw || '', p.reason || '', p.failureReason || '', p.errorType || ''
             ]);
             
@@ -1164,14 +1170,14 @@
                     y = 20;
                 }
                 doc.setFillColor(254, 242, 242);
-                doc.rect(14, y - 4, 182, 18, 'F');
+                doc.rect(14, y - 4, 182, 22, 'F');
                 doc.text(`${p.date || ''} ${p.time || ''}`, 16, y);
-                doc.text(`Phone: ${p.phone || p.phoneRaw || ''}`, 16, y + 5);
+                doc.text(`Phone: ${p.phone || p.phoneRaw || ''} | Name: ${p.name || '-'}`, 16, y + 5);
                 doc.text(`Amount: KES ${p.amountRaw || ''} | Reason: ${p.reason || '-'}`, 16, y + 10);
                 doc.setTextColor(220, 38, 38);
-                doc.text(`Failed: ${p.failureReason || 'Unknown'}`, 120, y + 5);
+                doc.text(`Failed: ${p.failureReason || 'Unknown'}`, 16, y + 15);
                 doc.setTextColor(0);
-                y += 22;
+                y += 26;
             });
             
             doc.save(`failed-transactions-${new Date().toISOString().split('T')[0]}.pdf`);

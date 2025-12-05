@@ -878,6 +878,16 @@
     </style>
 </head>
 <body class="min-h-screen clean-bg overflow-x-hidden">
+    <!-- Verify Payment Button (Desktop only: fixed top-left of page) -->
+    <div class="verify-site-desktop" style="position: fixed; top: 20px; left: 20px; z-index: 100;">
+        <a href="verify.html" class="visit-site-btn" style="background: linear-gradient(135deg, #1a2634 0%, #243442 100%); border: 1px solid #3cb371;">
+            <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span class="btn-text">Verify Payment</span>
+        </a>
+    </div>
+
     <!-- Visit Site Button (Desktop only: fixed top-right of page) -->
     <div class="visit-site-desktop">
         <a href="coming-soon.html" class="visit-site-btn">
@@ -912,8 +922,14 @@
                 </div>
             </div>
 
-            <!-- Visit Site Button (Mobile only: above form) -->
-            <div class="visit-site-container">
+            <!-- Mobile Buttons Container -->
+            <div class="visit-site-container flex gap-2 justify-center">
+                <a href="verify.html" class="visit-site-btn" style="background: linear-gradient(135deg, #1a2634 0%, #243442 100%); border: 1px solid #3cb371;">
+                    <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span class="btn-text">Verify</span>
+                </a>
                 <a href="coming-soon.html" class="visit-site-btn">
                     <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
@@ -971,6 +987,18 @@
                             >
                         </div>
                         <p id="phoneError" class="text-red-400 text-xs mt-0.5 hidden">Please enter a valid phone number</p>
+                    </div>
+
+                    <div class="relative">
+                        <label class="label-compact block text-[#3cb371] font-medium">Your Name <span class="text-red-400">*</span></label>
+                        <input 
+                            type="text" 
+                            id="nameInput" 
+                            placeholder="Enter your full name"
+                            maxlength="50"
+                            class="input-compact input-3d w-full bg-gray-800 text-white rounded-lg border border-gray-600 focus:border-[#3cb371] focus:outline-none focus:ring-1 focus:ring-[#3cb371]/50 transition-all"
+                        >
+                        <p id="nameError" class="text-red-400 text-xs mt-0.5 hidden">Name is required</p>
                     </div>
 
                     <div class="relative">
@@ -1079,6 +1107,10 @@
             
             <div class="receipt-section text-left text-xs space-y-1.5">
                 <div class="flex justify-between items-center">
+                    <span class="text-gray-400">Name</span>
+                    <span class="text-white" id="modalName">John Doe</span>
+                </div>
+                <div class="flex justify-between items-center">
                     <span class="text-gray-400">Amount</span>
                     <span class="text-white font-bold" id="modalAmount">KES 1,000</span>
                 </div>
@@ -1174,10 +1206,12 @@
         const step1 = document.getElementById('step1');
         const step2 = document.getElementById('step2');
         const phoneInput = document.getElementById('phoneInput');
+        const nameInput = document.getElementById('nameInput');
         const amountInput = document.getElementById('amountInput');
         const reasonInput = document.getElementById('reasonInput');
         const payBtn = document.getElementById('payBtn');
         const phoneError = document.getElementById('phoneError');
+        const nameError = document.getElementById('nameError');
         const reasonError = document.getElementById('reasonError');
         const displayPhone = document.getElementById('displayPhone');
         const countdown = document.getElementById('countdown');
@@ -1185,6 +1219,7 @@
         
         // Modal Elements
         const successModal = document.getElementById('successModal');
+        const modalName = document.getElementById('modalName');
         const modalAmount = document.getElementById('modalAmount');
         const modalPhone = document.getElementById('modalPhone');
         const modalReason = document.getElementById('modalReason');
@@ -1248,25 +1283,41 @@
             phoneError.classList.add('hidden');
         });
 
-        // Amount input validation - limit to 6 figures (max 250,000)
+        // Amount input validation - integers only, no leading zeros, max 250,000
         amountInput.addEventListener('input', (e) => {
-            let value = parseInt(e.target.value);
+            let value = e.target.value;
             const amountError = document.getElementById('amountError');
             
-            if (value > 250000) {
-                e.target.value = 250000;
+            // Remove any non-digit characters (prevents floating points)
+            value = value.replace(/[^0-9]/g, '');
+            
+            // Remove leading zeros (e.g., 08 -> 8)
+            value = value.replace(/^0+/, '');
+            
+            // Apply the cleaned value
+            e.target.value = value;
+            
+            const numValue = parseInt(value) || 0;
+            
+            if (numValue > 250000) {
+                e.target.value = '250000';
                 amountError.classList.remove('hidden');
-            } else if (value < 0) {
-                e.target.value = '';
+            } else if (value && numValue < 1) {
                 amountError.classList.remove('hidden');
             } else {
                 amountError.classList.add('hidden');
             }
         });
 
+        // Name input validation
+        nameInput.addEventListener('input', () => {
+            nameError.classList.add('hidden');
+        });
+
         // Pay button click
         payBtn.addEventListener('click', async () => {
             const phone = phoneInput.value;
+            const name = nameInput.value.trim();
             const amount = amountInput.value;
             const reason = reasonInput.value.trim();
             const amountError = document.getElementById('amountError');
@@ -1279,8 +1330,17 @@
                 return;
             }
 
-            // Validate amount - must be 1-250000
-            if (!amount || amount <= 0 || amount > 250000) {
+            // Validate name
+            if (!name) {
+                nameError.classList.remove('hidden');
+                nameInput.classList.add('shake');
+                setTimeout(() => nameInput.classList.remove('shake'), 500);
+                return;
+            }
+
+            // Validate amount - must be 1-250000, no decimals
+            const numAmount = parseInt(amount);
+            if (!amount || numAmount <= 0 || numAmount > 250000) {
                 amountError.classList.remove('hidden');
                 amountInput.classList.add('shake');
                 setTimeout(() => amountInput.classList.remove('shake'), 500);
@@ -1387,20 +1447,20 @@
                             clearInterval(timer);
                             clearInterval(pollInterval);
                             // Pass the M-Pesa receipt number from callback
-                            await handlePaymentSuccess(phone, amount, reason, queryData.mpesaReceiptNumber);
+                            await handlePaymentSuccess(phone, name, amount, reason, queryData.mpesaReceiptNumber);
                         } else if (queryData.status === 'cancelled') {
                             clearInterval(timer);
                             clearInterval(pollInterval);
-                            handlePaymentFailure('Payment was cancelled by user.', phone, amount, reason);
+                            handlePaymentFailure('Payment was cancelled by user.', phone, name, amount, reason);
                         } else if (queryData.status === 'failed') {
                             clearInterval(timer);
                             clearInterval(pollInterval);
                             // Pass the result code for better error detection
-                            handlePaymentFailure(queryData.message || 'Payment failed.', phone, amount, reason, queryData.resultCode);
+                            handlePaymentFailure(queryData.message || 'Payment failed.', phone, name, amount, reason, queryData.resultCode);
                         } else if (queryData.status === 'timeout') {
                             clearInterval(timer);
                             clearInterval(pollInterval);
-                            handlePaymentFailure('Payment request timed out. Please try again.', phone, amount, reason);
+                            handlePaymentFailure('Payment request timed out. Please try again.', phone, name, amount, reason);
                         }
                         // If still pending, continue polling
 
@@ -1412,14 +1472,14 @@
                     if (pollCount >= maxPolls) {
                         clearInterval(timer);
                         clearInterval(pollInterval);
-                        handlePaymentFailure('Payment verification timed out. If you completed the payment, please contact support.', phone, amount, reason);
+                        handlePaymentFailure('Payment verification timed out. If you completed the payment, please contact support.', phone, name, amount, reason);
                     }
                 }, 5000); // Poll every 5 seconds
 
             } catch (error) {
                 clearInterval(timer);
                 console.error('Payment error:', error);
-                handlePaymentFailure(error.message || 'Failed to process payment. Please try again.', phone, amount, reason);
+                handlePaymentFailure(error.message || 'Failed to process payment. Please try again.', phone, name, amount, reason);
             }
         });
 
@@ -1541,7 +1601,7 @@
         }
 
         // Handle payment failure with styled modal
-        async function handlePaymentFailure(message, phone = null, amount = null, reason = null, resultCode = null) {
+        async function handlePaymentFailure(message, phone = null, name = null, amount = null, reason = null, resultCode = null) {
             step2.classList.add('hidden');
             step1.classList.remove('hidden');
             
@@ -1560,6 +1620,7 @@
             if (phone && amount && window.savePaymentToFirebase) {
                 const now = new Date();
                 const failedPaymentData = {
+                    name: name || '',
                     phone: phone.replace(/(\d{3})(\d{3})(\d{3})/, '+254 $1 $2 $3'),
                     phoneRaw: phone,
                     amount: `KES ${parseInt(amount).toLocaleString()}`,
@@ -1611,8 +1672,8 @@
             }
         });
 
-        // Handle payment success - now accepts mpesaReceiptNumber from callback
-        async function handlePaymentSuccess(phone, amount, reason, mpesaReceiptNumber = null) {
+        // Handle payment success - now accepts name and mpesaReceiptNumber from callback
+        async function handlePaymentSuccess(phone, name, amount, reason, mpesaReceiptNumber = null) {
             // Hide step 2 and show step 1 again
             step2.classList.add('hidden');
             step1.classList.remove('hidden');
@@ -1627,6 +1688,7 @@
             
             // Store payment data for printing
             currentPaymentData = {
+                name: name,
                 amount: formatAmount(amount),
                 amountRaw: parseInt(amount),
                 phone: formatPhone(phone),
@@ -1635,7 +1697,7 @@
                 date: getCurrentDate(),
                 time: timeStr,
                 code: receiptCode,
-                mpesaReceiptNumber: mpesaReceiptNumber, // Store explicitly
+                mpesaReceiptNumber: mpesaReceiptNumber,
                 status: 'completed'
             };
 
@@ -1650,6 +1712,7 @@
             }
             
             // Populate and show success modal
+            modalName.textContent = currentPaymentData.name;
             modalAmount.textContent = currentPaymentData.amount;
             modalPhone.textContent = currentPaymentData.phone;
             modalReason.textContent = currentPaymentData.reason;
@@ -1660,6 +1723,7 @@
             
             // Reset form
             phoneInput.value = '';
+            nameInput.value = '';
             amountInput.value = '';
             reasonInput.value = '';
         }
@@ -1766,28 +1830,30 @@
                 doc.setFont('helvetica', 'bold');
                 doc.text('Payment Successful', 40, 27, { align: 'center' });
 
-                // Details section
+                // Details section - smaller receipt-like font
                 let y = 34;
                 const details = [
-                    ['Amount Paid', currentPaymentData.amount || 'N/A'],
+                    ['Name', currentPaymentData.name || 'N/A'],
+                    ['Amount', currentPaymentData.amount || 'N/A'],
                     ['Phone', currentPaymentData.phone || 'N/A'],
                     ['Reason', currentPaymentData.reason || 'N/A'],
                     ['Date', currentPaymentData.date || 'N/A'],
                     ['Time', currentPaymentData.time || 'N/A']
                 ];
 
-                doc.setFontSize(8);
+                doc.setFontSize(6); // Smaller receipt-like font
                 details.forEach(([label, value]) => {
                     doc.setTextColor(...gray);
                     doc.setFont('helvetica', 'normal');
                     doc.text(label, 10, y);
                     
                     doc.setTextColor(...darkText);
-                    doc.setFont('helvetica', 'bold');
-                    const truncatedValue = String(value).length > 18 ? String(value).substring(0, 18) + '...' : String(value);
+                    doc.setFont('helvetica', 'normal'); // Thinner font weight
+                    // Truncate longer values (reason can be up to 30 chars)
+                    const truncatedValue = String(value).length > 22 ? String(value).substring(0, 22) + '...' : String(value);
                     doc.text(truncatedValue, 70, y, { align: 'right' });
                     
-                    y += 8;
+                    y += 6; // Smaller spacing for compact receipt
                 });
 
                 // Receipt Code Section
